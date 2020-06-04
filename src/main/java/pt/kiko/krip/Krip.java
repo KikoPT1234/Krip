@@ -1,10 +1,8 @@
 package pt.kiko.krip;
 
-import jdk.internal.dynalink.beans.StaticClass;
 import org.bukkit.event.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import pt.kiko.krip.commands.KripCommand;
 import pt.kiko.krip.lang.*;
 import pt.kiko.krip.lang.results.LexResult;
@@ -12,7 +10,6 @@ import pt.kiko.krip.lang.results.ParseResult;
 import pt.kiko.krip.lang.results.RunResult;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.Value;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,7 +54,7 @@ public class Krip extends JavaPlugin {
 		if (runtimeResult.error != null) {
 			System.out.println(runtimeResult.error.toString());
 			return result.failure(runtimeResult.error);
-		};
+		}
 		return result.success(runtimeResult.value);
 	}
 
@@ -126,11 +123,14 @@ public class Krip extends JavaPlugin {
 
 		Krip.plugin = this;
 
+		boolean created = true;
 		pluginFolder = getDataFolder();
-		if (!pluginFolder.exists())	pluginFolder.mkdir();
+		if (!pluginFolder.exists())	created = pluginFolder.mkdir();
+		if (!created) getServer().getLogger().warning("Failed to create plugin directory");
 
 		scriptFolder = new File(pluginFolder, "scripts");
-		if (!scriptFolder.exists()) scriptFolder.mkdir();
+		if (!scriptFolder.exists()) created = scriptFolder.mkdir();
+		if (!created) getServer().getLogger().warning("Failed to create script directory");
 
 		try {
 			loadClasses("pt.kiko.krip.variables");
