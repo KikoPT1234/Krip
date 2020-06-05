@@ -16,7 +16,7 @@ public class PlayerJoinEvt extends EventInfo {
 	}
 
 	public PlayerJoinEvt() {
-		super("playerJoin", PlayerJoinEvent.class);
+		super("PlayerJoinEvent", PlayerJoinEvent.class);
 	}
 
 	@Override

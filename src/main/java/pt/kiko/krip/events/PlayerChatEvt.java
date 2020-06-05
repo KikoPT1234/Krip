@@ -17,7 +17,7 @@ public class PlayerChatEvt extends EventInfo {
 	}
 
 	public PlayerChatEvt() {
-		super("playerChat", AsyncPlayerChatEvent.class);
+		super("PlayerChatEvent", AsyncPlayerChatEvent.class);
 	}
 
 	@Override
