@@ -1,6 +1,6 @@
 package pt.kiko.krip;
 
-import org.bukkit.event.*;
+import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.commands.KripCommand;
@@ -9,12 +9,11 @@ import pt.kiko.krip.lang.results.LexResult;
 import pt.kiko.krip.lang.results.ParseResult;
 import pt.kiko.krip.lang.results.RunResult;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
+import pt.kiko.krip.lang.values.Value;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -90,28 +89,13 @@ public class Krip extends JavaPlugin {
 		}
 	}
 
-	public static void registerVariable(@NotNull Class<? extends Variable> Var) {
-		try {
-			Variable var = Var.getConstructor().newInstance();
-			registeredNames.add(var.name);
-		} catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void registerFunction(@NotNull Class<? extends BuiltInFunctionValue> Function) {
-		try {
-			BuiltInFunctionValue func = Function.getConstructor().newInstance();
-			context.symbolTable.set(func.name, func, true);
-			registeredNames.add(func.name);
-		} catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
+	public static void registerValue(String name, Value value) {
+		context.symbolTable.set(name, value, true);
+		registeredNames.add(name);
 	}
 
 	public static void registerEvent(EventInfo eventInfo) {
 		events.put(eventInfo.name, eventInfo);
-		plugin.getServer().getPluginManager().registerEvents(eventInfo, plugin);
 		plugin.getServer().getPluginManager().registerEvent(eventInfo.event, eventInfo, EventPriority.NORMAL, (listener, event) -> eventInfo.execute(event), plugin);
 	}
 
@@ -146,6 +130,7 @@ public class Krip extends JavaPlugin {
 			new Thread(() -> Krip.run(code, file.getName())).start();
 		}
 
+		getServer().getLogger().info("Krip enabled!");
 	}
 
 	public String loadFile(File file) {

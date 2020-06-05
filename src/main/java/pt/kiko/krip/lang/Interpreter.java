@@ -1,11 +1,11 @@
 package pt.kiko.krip.lang;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.cases.Case;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.nodes.*;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.values.*;
 
 import java.util.ArrayList;
@@ -207,7 +207,10 @@ abstract public class Interpreter {
 			return result.success(value);
 		} else {
 			Value keyValue = result.register(visit(node.keyNode, context));
-			if (!(keyValue instanceof NumberValue) || keyValue.getValue().contains(".") || Integer.parseInt(keyValue.getValue()) < 0 || Integer.parseInt(keyValue.getValue()) > ((ListValue) object).value.size() - 1) return result.success(new NullValue(context));
+			if (result.shouldReturn()) return result;
+
+			if (!(keyValue instanceof NumberValue) || keyValue.getValue().contains(".") || Integer.parseInt(keyValue.getValue()) < 0 || Integer.parseInt(keyValue.getValue()) > ((ListValue) object).value.size() - 1)
+				return result.success(new NullValue(context));
 
 			return result.success(((ListValue) object).value.get(Integer.parseInt(keyValue.getValue())));
 		}
@@ -232,9 +235,13 @@ abstract public class Interpreter {
 			((ObjectValue) object).set(key, value);
 		} else {
 			Value keyValue = result.register(visit(node.keyNode, context));
-			if (!(keyValue instanceof NumberValue) || keyValue.getValue().contains(".") || Integer.parseInt(keyValue.getValue()) < 0 || Integer.parseInt(keyValue.getValue()) > ((ListValue) object).value.size()) return result.success(new NullValue(context));
+			if (result.shouldReturn()) return result;
 
-			if (Integer.parseInt(keyValue.getValue()) == ((ListValue) object).value.size()) ((ListValue) object).value.add(value);
+			if (!(keyValue instanceof NumberValue) || keyValue.getValue().contains(".") || Integer.parseInt(keyValue.getValue()) < 0 || Integer.parseInt(keyValue.getValue()) > ((ListValue) object).value.size())
+				return result.success(new NullValue(context));
+
+			if (Integer.parseInt(keyValue.getValue()) == ((ListValue) object).value.size())
+				((ListValue) object).value.add(value);
 			else ((ListValue) object).value.set(Integer.parseInt(keyValue.getValue()), value);
 
 		}
@@ -369,11 +376,15 @@ abstract public class Interpreter {
 		List<Value> args = node.argNodes.stream().map((arg) -> result.register(visit(arg, callContext))).collect(Collectors.toList());
 		if (result.shouldReturn()) return result;
 
-		BaseFunctionValue valueToCall = (BaseFunctionValue) result.register(visit(node.nodeToCall, context));
+		Value valueToCall = result.register(visit(node.nodeToCall, context));
 		if (result.shouldReturn()) return result;
+
+		if (!(valueToCall instanceof BaseFunctionValue))
+			return result.failure(new RuntimeError(valueToCall.startPosition, valueToCall.endPosition, "Not a function", context));
+
 		valueToCall.setPosition(node.startPosition, node.endPosition);
 
-		Value returnValue = result.register(valueToCall.execute(args));
+		Value returnValue = result.register(((BaseFunctionValue) valueToCall).execute(args, context));
 		if (result.shouldReturn()) return result;
 		returnValue.setContext(context).setPosition(node.startPosition, node.endPosition);
 

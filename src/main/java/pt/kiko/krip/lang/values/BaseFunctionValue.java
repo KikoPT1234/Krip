@@ -1,9 +1,9 @@
 package pt.kiko.krip.lang.values;
 
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.SymbolTable;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -46,15 +46,17 @@ abstract public class BaseFunctionValue extends Value {
 
 	@Override
 	public RuntimeResult equal(Value other) {
-		if (other instanceof BaseFunctionValue) return new RuntimeResult().success(new BooleanValue(name.equals(other.getValue()), context));
+		if (other instanceof BaseFunctionValue)
+			return new RuntimeResult().success(new BooleanValue(name.equals(other.getValue()), context));
 		else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
 	public RuntimeResult notEquals(Value other) {
-		if (other instanceof BaseFunctionValue) return new RuntimeResult().success(new BooleanValue(!name.equals(other.getValue()), context));
+		if (other instanceof BaseFunctionValue)
+			return new RuntimeResult().success(new BooleanValue(!name.equals(other.getValue()), context));
 		else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 
-	abstract public RuntimeResult execute(List<Value> args);
+	abstract public RuntimeResult execute(List<Value> args, Context ctx);
 }

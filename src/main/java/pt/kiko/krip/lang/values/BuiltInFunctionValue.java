@@ -14,9 +14,10 @@ public class BuiltInFunctionValue extends BaseFunctionValue {
 	}
 
 	@Override
-	public RuntimeResult execute(List<Value> args) {
+	public RuntimeResult execute(List<Value> args, Context ctx) {
 		RuntimeResult result = new RuntimeResult();
 		Context context = generateNewContext();
+		context.parent = ctx;
 
 		result.register(populateArgs(argNames, args, context));
 		if (result.shouldReturn()) return result;

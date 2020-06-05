@@ -1,12 +1,12 @@
 package pt.kiko.krip.lang.errors;
 
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.Position;
-import org.jetbrains.annotations.NotNull;
 
 public class RuntimeError extends Error {
 
-	Context context;
+	public Context context;
 
 	public RuntimeError(Position startPosition, Position endPosition, String details, Context context) {
 		super("Runtime Error", startPosition, endPosition, details);

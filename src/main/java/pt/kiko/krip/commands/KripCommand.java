@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.Krip;
+import pt.kiko.krip.lang.values.BaseFunctionValue;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,9 +30,13 @@ public class KripCommand implements CommandExecutor {
 				commandSender.sendMessage(ChatColor.RED + "File not found");
 				return true;
 			}
-			Krip.events.forEach((name, event) -> event.functions.forEach(function -> {
-				if (function.startPosition.fileName.equals(args[1])) event.functions.remove(function);
-			}));
+			Krip.events.forEach((name, event) -> {
+				List<BaseFunctionValue> functionsToRemove = new ArrayList<>();
+				event.functions.forEach(function -> {
+					if (function.startPosition.fileName.equals(args[1])) functionsToRemove.add(function);
+				});
+				functionsToRemove.forEach(function -> event.functions.remove(function));
+			});
 			List<String> namesToRemove = new ArrayList<>();
 			Krip.context.symbolTable.symbols.forEach((key, value) -> {
 				if (!Krip.registeredNames.contains(key)) namesToRemove.add(key);

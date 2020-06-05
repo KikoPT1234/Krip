@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class onEventFunc extends BuiltInFunctionValue {
 
 	static {
-		Krip.registerFunction(onEventFunc.class);
+		Krip.registerValue("onEvent", new onEventFunc());
 	}
 
 	public onEventFunc() {
@@ -24,9 +24,13 @@ public class onEventFunc extends BuiltInFunctionValue {
 		Value name = context.symbolTable.get("eventName");
 		Value func = context.symbolTable.get("function");
 
-		if (!(name instanceof StringValue)) return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Invalid type", context));
-		if (!(func instanceof BaseFunctionValue)) return result.failure(new RuntimeError(func.startPosition, func.endPosition, "Invalid type", context));
+		if (!(name instanceof StringValue))
+			return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Invalid type", context));
+		if (!(func instanceof BaseFunctionValue))
+			return result.failure(new RuntimeError(func.startPosition, func.endPosition, "Invalid type", context));
 
+		if (!Krip.events.containsKey(name.getValue()))
+			return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Invalid event", context));
 		Krip.events.get(name.getValue()).addFunction((BaseFunctionValue) func);
 
 		return result.success(new NullValue(context.parent));

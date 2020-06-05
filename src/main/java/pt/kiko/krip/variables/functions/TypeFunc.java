@@ -10,7 +10,7 @@ import java.util.Collections;
 public class TypeFunc extends BuiltInFunctionValue {
 
 	static {
-		Krip.registerFunction(TypeFunc.class);
+		Krip.registerValue("type", new TypeFunc());
 	}
 
 	public TypeFunc() {

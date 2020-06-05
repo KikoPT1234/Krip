@@ -1,17 +1,16 @@
 package pt.kiko.krip.variables.constants;
 
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.lang.Variable;
 import pt.kiko.krip.lang.values.NullValue;
 
-public class Null extends Variable {
+public class Null extends NullValue {
 
 	static {
-		Krip.registerVariable(Null.class);
+		Krip.registerValue("null", new Null());
 	}
 
 	public Null() {
-		super("null", new NullValue(Krip.context));
+		super(Krip.context);
 	}
 
 }
