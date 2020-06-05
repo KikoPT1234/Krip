@@ -1,14 +1,13 @@
 package pt.kiko.krip.lang;
 
-import pt.kiko.krip.lang.errors.LexError;
-import pt.kiko.krip.lang.results.LexResult;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import pt.kiko.krip.lang.errors.LexError;
+import pt.kiko.krip.lang.results.LexResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Lexer {
 
@@ -16,7 +15,7 @@ public class Lexer {
 	Position position;
 	char currentChar;
 
-	public Lexer(String code, String fileName) {
+	public Lexer(@NotNull String code, String fileName) {
 		this.code = code.replaceAll("\\r", "");
 		position = new Position(-1, 0, -1, fileName, code);
 		advance();
@@ -34,15 +33,8 @@ public class Lexer {
 		ArrayList<Token> tokens = new ArrayList<>();
 
 		while (position.index < code.length()) {
-
-			Pattern newlinePattern = Pattern.compile("[;\n]");
-			Matcher newlineMatcher = newlinePattern.matcher(String.valueOf(currentChar));
-
-			Pattern whitespacePattern = Pattern.compile("\\s");
-			Matcher whitespaceMatcher = whitespacePattern.matcher(String.valueOf(currentChar));
-
-			if (newlineMatcher.matches()) {
-				if (String.valueOf(currentChar).equals(";")) {
+			if (String.valueOf(currentChar).matches("[;\\n]")) {
+				if (currentChar == ';') {
 					Position startPosition = position.copy();
 					advance();
 					if (String.valueOf(currentChar).equals("\n")) {
@@ -53,70 +45,71 @@ public class Lexer {
 				}
 				tokens.add(new Token(TokenTypes.NEWLINE, position));
 				advance();
-			} else if (whitespaceMatcher.matches()) advance();
+			} else if (String.valueOf(currentChar).matches("\\s")) advance();
 			else if (Characters.letters.contains(String.valueOf(currentChar))) {
 				tokens.add(makeIdentifier());
 			} else if (Characters.digits.contains(String.valueOf(currentChar))) {
 				tokens.add(makeNumber());
 			} else if (String.valueOf(currentChar).equals("\"")) {
 				tokens.add(makeString());
-			} else if (String.valueOf(currentChar).equals("+")) {
+			} else if (currentChar == '+') {
 				tokens.add(new Token(TokenTypes.PLUS, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("-")) {
+			} else if (currentChar == '-') {
 				tokens.add(new Token(TokenTypes.MINUS, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("*")) {
+			} else if (currentChar == '*') {
 				tokens.add(new Token(TokenTypes.MUL, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("^")) {
+			} else if (currentChar == '^') {
 				tokens.add(new Token(TokenTypes.POW, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("%")) {
+			} else if (currentChar == '%') {
 				tokens.add(new Token(TokenTypes.MOD, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("/")) {
-				tokens.add(new Token(TokenTypes.DIV, position));
-				advance();
-			} else if (String.valueOf(currentChar).equals("(")) {
+			} else if (currentChar == '/') {
+				Token token = makeDivOrComment();
+				if (token == null) continue;
+				tokens.add(token);
+			} else if (currentChar == '(') {
 				tokens.add(new Token(TokenTypes.LPAREN, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals(")")) {
+			} else if (currentChar == ')') {
 				tokens.add(new Token(TokenTypes.RPAREN, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("[")) {
+			} else if (currentChar == '[') {
 				tokens.add(new Token(TokenTypes.LSQUARE, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("]")) {
+			} else if (currentChar == ']') {
 				tokens.add(new Token(TokenTypes.RSQUARE, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("{")) {
+			} else if (currentChar == '{') {
 				tokens.add(new Token(TokenTypes.LBRACKET, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("}")) {
+			} else if (currentChar == '}') {
 				tokens.add(new Token(TokenTypes.RBRACKET, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("=")) {
+			} else if (currentChar == '=') {
 				tokens.add(makeEqualsOrArrow());
-			} else if (String.valueOf(currentChar).equals("<")) {
+			} else if (currentChar == '<') {
 				tokens.add(makeLessThan());
-			} else if (String.valueOf(currentChar).equals(">")) {
+			} else if (currentChar == '>') {
 				tokens.add(makeGreaterThan());
-			} else if (String.valueOf(currentChar).equals("&")) {
+			} else if (currentChar == '&') {
 				tokens.add(new Token(TokenTypes.AND, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("|")) {
+			} else if (currentChar == '|') {
 				tokens.add(new Token(TokenTypes.OR, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals("!")) {
+			} else if (currentChar == '!') {
 				tokens.add(makeNot());
-			} else if (String.valueOf(currentChar).equals(":")) {
+			} else if (currentChar == ':') {
 				tokens.add(new Token(TokenTypes.COLON, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals(",")) {
+			} else if (currentChar == ',') {
 				tokens.add(new Token(TokenTypes.COMMA, position));
 				advance();
-			} else if (String.valueOf(currentChar).equals(".")) {
+			} else if (currentChar == '.') {
 				tokens.add(new Token(TokenTypes.PERIOD, position));
 				advance();
 			} else {
@@ -128,6 +121,18 @@ public class Lexer {
 
 		return new LexResult().success(tokens);
 
+	}
+
+	private @Nullable Token makeDivOrComment() {
+		Position startPosition = position.copy();
+		advance();
+
+		if (currentChar == '/') {
+			while (!String.valueOf(currentChar).matches("[;\n]") || currentChar == Character.MIN_VALUE) {
+				advance();
+			}
+			return null;
+		} else return new Token(TokenTypes.DIV, startPosition);
 	}
 
 	@Contract(" -> new")
@@ -160,7 +165,7 @@ public class Lexer {
 		Position startPosition = position.copy();
 
 		while ((Characters.digits + ".").contains(String.valueOf(currentChar))) {
-			if (String.valueOf(currentChar).equals(".")) {
+			if (currentChar == '.') {
 				if (dotCount > 0) break;
 				dotCount++;
 				numberString.append(".");
@@ -191,9 +196,9 @@ public class Lexer {
 			if (identifierString.equals("else")) {
 				Position position = this.position.copy();
 				advance();
-				if (String.valueOf(currentChar).equals("i")) {
+				if (currentChar == 'i') {
 					advance();
-					if (String.valueOf(currentChar).equals("f")) {
+					if (currentChar == 'f') {
 						identifierString = "else if";
 						advance();
 					} else {
@@ -216,10 +221,10 @@ public class Lexer {
 		Position startPosition = position.copy();
 		advance();
 
-		if (String.valueOf(currentChar).equals("=")) {
+		if (currentChar == '=') {
 			advance();
 			return new Token(TokenTypes.EE, startPosition, position);
-		} else if (String.valueOf(currentChar).equals(">")) {
+		} else if (currentChar == '>') {
 			advance();
 			return new Token(TokenTypes.ARROW, startPosition, position);
 		} else return new Token(TokenTypes.EQ, startPosition);
@@ -230,7 +235,7 @@ public class Lexer {
 		Position startPosition = position.copy();
 		advance();
 
-		if (String.valueOf(currentChar).equals("=")) {
+		if (currentChar == '=') {
 			advance();
 			return new Token(TokenTypes.NE, startPosition, position);
 		} else return new Token(TokenTypes.NOT, startPosition);
@@ -241,7 +246,7 @@ public class Lexer {
 		Position startPosition = position.copy();
 		advance();
 
-		if (String.valueOf(currentChar).equals("=")) {
+		if (currentChar == '=') {
 			advance();
 			return new Token(TokenTypes.LTE, startPosition, position);
 		} else return new Token(TokenTypes.LT, startPosition);
@@ -252,7 +257,7 @@ public class Lexer {
 		Position startPosition = position.copy();
 		advance();
 
-		if (String.valueOf(currentChar).equals("=")) {
+		if (currentChar == '=') {
 			advance();
 			return new Token(TokenTypes.GTE, startPosition, position);
 		} else return new Token(TokenTypes.GT, startPosition);
