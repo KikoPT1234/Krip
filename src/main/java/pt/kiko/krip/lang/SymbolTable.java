@@ -18,11 +18,6 @@ public class SymbolTable {
 		this.parent = parent;
 	}
 
-	public SymbolTable(SymbolTable parent, HashMap<String, Value> symbols) {
-		this.parent = parent;
-		this.symbols= symbols;
-	}
-
 	public SymbolTable(SymbolTable parent, HashMap<String, Value> symbols, ArrayList<String> constants) {
 		this.parent = parent;
 		this.symbols= symbols;
