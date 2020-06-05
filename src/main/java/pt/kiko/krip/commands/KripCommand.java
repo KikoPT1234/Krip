@@ -25,9 +25,13 @@ public class KripCommand implements CommandExecutor {
 			return true;
 		}
 		if (args[0].equals("reload")) {
+			if (args.length < 2) {
+				commandSender.sendMessage(ChatColor.RED + "Usage: /krip reload (file)");
+				return true;
+			}
 			File file = new File(Krip.plugin.scriptFolder, args[1]);
 			if (!file.exists()) {
-				commandSender.sendMessage(ChatColor.RED + "File not found");
+				commandSender.sendMessage(ChatColor.RED + "File not found: " + args[1]);
 				return true;
 			}
 			Krip.events.forEach((name, event) -> {
