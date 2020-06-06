@@ -1,14 +1,14 @@
 package pt.kiko.krip.lang.errors;
 
-import pt.kiko.krip.lang.Position;
 import org.jetbrains.annotations.NotNull;
+import pt.kiko.krip.lang.Position;
 
 abstract public class Error {
 
 	String name;
 	Position startPosition;
 	Position endPosition;
-	String details;
+	public String details;
 
 	public Error(String name, @NotNull Position startPosition, @NotNull Position endPosition, String details) {
 		this.name = name;

@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.Krip;
+import pt.kiko.krip.lang.results.RunResult;
 import pt.kiko.krip.lang.values.BaseFunctionValue;
 
 import java.io.File;
@@ -46,7 +47,13 @@ public class KripCommand implements CommandExecutor {
 				if (!Krip.registeredNames.contains(key)) namesToRemove.add(key);
 			});
 			namesToRemove.forEach(name -> Krip.context.symbolTable.remove(name));
-			new Thread(() -> Krip.run(Krip.plugin.loadFile(file), file.getName())).start();
+			new Thread(() -> {
+				RunResult result = Krip.run(Krip.plugin.loadFile(file), file.getName());
+				if (result.error != null) {
+					commandSender.sendMessage(ChatColor.RED + "Error while loading " + file.getName() + ": " + ChatColor.DARK_RED + result.error.details);
+					commandSender.sendMessage(ChatColor.RED + "Check the logs for more info");
+				} else commandSender.sendMessage(ChatColor.GREEN + file.getName() + " loaded successfully!");
+			}).start();
 		}
 		return false;
 	}

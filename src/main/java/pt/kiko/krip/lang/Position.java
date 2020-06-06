@@ -21,7 +21,7 @@ public class Position {
         this.fileText = fileText;
     }
 
-    public Position advance(@NotNull char currentChar) {
+    public void advance(@NotNull char currentChar) {
 
         index++;
         col++;
@@ -33,7 +33,6 @@ public class Position {
             line++;
         }
 
-        return this;
     }
 
     public Position copy() {

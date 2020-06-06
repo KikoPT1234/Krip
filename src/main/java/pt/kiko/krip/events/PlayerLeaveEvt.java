@@ -16,7 +16,7 @@ public class PlayerLeaveEvt extends EventInfo {
 	}
 
 	public PlayerLeaveEvt() {
-		super("playerLeave", PlayerQuitEvent.class);
+		super("PlayerLeaveEvent", PlayerQuitEvent.class);
 	}
 
 	@Override
