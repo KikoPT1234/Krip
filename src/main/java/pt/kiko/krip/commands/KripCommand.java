@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.Krip;
+import pt.kiko.krip.lang.results.RunResult;
 import pt.kiko.krip.lang.values.BaseFunctionValue;
 
 import java.io.File;
@@ -25,6 +26,10 @@ public class KripCommand implements CommandExecutor {
 			return true;
 		}
 		if (args[0].equals("reload")) {
+			if (args.length != 2) {
+				commandSender.sendMessage(ChatColor.RED + "Please specify a file name!");
+				return true;
+			}
 			File file = new File(Krip.plugin.scriptFolder, args[1]);
 			if (!file.exists()) {
 				commandSender.sendMessage(ChatColor.RED + "File not found");
@@ -42,7 +47,13 @@ public class KripCommand implements CommandExecutor {
 				if (!Krip.registeredNames.contains(key)) namesToRemove.add(key);
 			});
 			namesToRemove.forEach(name -> Krip.context.symbolTable.remove(name));
-			new Thread(() -> Krip.run(Krip.plugin.loadFile(file), file.getName())).start();
+			new Thread(() -> {
+				RunResult result = Krip.run(Krip.plugin.loadFile(file), file.getName());
+				if (result.error != null) {
+					commandSender.sendMessage(ChatColor.RED + "Error while loading " + file.getName() + ": " + ChatColor.DARK_RED + result.error.details);
+					commandSender.sendMessage(ChatColor.RED + "Check the logs for more info");
+				} else commandSender.sendMessage(ChatColor.GREEN + file.getName() + " loaded successfully!");
+			}).start();
 		}
 		return false;
 	}
