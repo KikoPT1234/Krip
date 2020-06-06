@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class PlayerMoveEvt extends EventInfo {
 
     public PlayerMoveEvt() {
-        super("playerMove", PlayerMoveEvent.class);
+        super("PlayerMoveEvent", PlayerMoveEvent.class);
     }
 
     @Override
