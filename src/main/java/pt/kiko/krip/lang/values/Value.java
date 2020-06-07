@@ -1,10 +1,10 @@
 package pt.kiko.krip.lang.values;
 
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.Position;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import org.jetbrains.annotations.NotNull;
 
 abstract public class Value {
 	public Context context;

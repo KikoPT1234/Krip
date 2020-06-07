@@ -37,5 +37,17 @@ public class PlayerObj extends ObjectValue {
 				return new RuntimeResult().success(new NullValue(context));
 			}
 		});
+		value.put("hasPermission", new BuiltInFunctionValue("hasPermission", Collections.singletonList("permission"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				Value permission = context.symbolTable.get("permission");
+
+				if (!(permission instanceof StringValue))
+					return result.failure(new RuntimeError(permission.startPosition, permission.endPosition, "Invalid type", context));
+
+				return result.success(new BooleanValue(player.hasPermission(permission.getValue()), context.parent));
+			}
+		});
 	}
 }

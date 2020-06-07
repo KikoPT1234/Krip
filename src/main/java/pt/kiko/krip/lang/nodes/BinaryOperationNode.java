@@ -1,7 +1,7 @@
 package pt.kiko.krip.lang.nodes;
 
-import pt.kiko.krip.lang.Token;
 import org.jetbrains.annotations.NotNull;
+import pt.kiko.krip.lang.Token;
 
 public class BinaryOperationNode extends Node {
 

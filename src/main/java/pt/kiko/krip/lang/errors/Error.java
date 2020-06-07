@@ -10,10 +10,10 @@ abstract public class Error {
 	Position endPosition;
 	public String details;
 
-	public Error(String name, @NotNull Position startPosition, @NotNull Position endPosition, String details) {
+	public Error(String name, Position startPosition, Position endPosition, String details) {
 		this.name = name;
-		this.startPosition = startPosition.copy();
-		this.endPosition = endPosition.copy();
+		if (startPosition != null) this.startPosition = startPosition.copy();
+		if (startPosition != null) this.endPosition = endPosition.copy();
 		this.details = details;
 	}
 

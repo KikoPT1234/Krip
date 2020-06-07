@@ -25,7 +25,7 @@ abstract public class BaseFunctionValue extends Value {
 	}
 
 	public Context generateNewContext() {
-		Context newContext = new Context("<function " + name + ">", context, startPosition);
+		Context newContext = new Context("<function " + (name == null ? "anonymous" : name) + ">", context, startPosition);
 		newContext.symbolTable = new SymbolTable(newContext.symbolTable.parent != null ? newContext.symbolTable.parent : newContext.parent.symbolTable);
 		return newContext;
 	}
@@ -41,7 +41,7 @@ abstract public class BaseFunctionValue extends Value {
 
 	@Override
 	public String getValue() {
-		return "<function " + name + ">";
+		return "<function " + (name == null ? "anonymous" : name) + ">";
 	}
 
 	@Override

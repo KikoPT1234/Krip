@@ -37,7 +37,10 @@ abstract public class Interpreter {
 		else if (node instanceof ReturnNode) return visitReturnNode((ReturnNode) node, context);
 		else if (node instanceof ContinueNode) return visitContinueNode();
 		else if (node instanceof BreakNode) return visitBreakNode();
-		else return new RuntimeResult().failure(new RuntimeError(node.startPosition, node.endPosition, "Unexpected node", context));
+		else if (node instanceof EmptyNode)
+			return new RuntimeResult().success(new NullValue(context).setPosition(node.startPosition, node.endPosition));
+		else
+			return new RuntimeResult().failure(new RuntimeError(node.startPosition, node.endPosition, "Unexpected node", context));
 	}
 
 	static RuntimeResult visitNumberNode(@NotNull NumberNode node, Context context) {
@@ -353,7 +356,7 @@ abstract public class Interpreter {
 	@Contract(pure = true)
 	static RuntimeResult visitFunctionNode(@NotNull FunctionNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		String functionName = (node.varNameToken != null && node.varNameToken.value != null) ? node.varNameToken.value : "anonymous";
+		String functionName = (node.varNameToken != null && node.varNameToken.value != null) ? node.varNameToken.value : null;
 
 		Node body = node.bodyNode;
 

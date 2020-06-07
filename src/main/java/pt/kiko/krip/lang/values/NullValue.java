@@ -11,7 +11,7 @@ public class NullValue extends Value {
 
 	@Override
 	public String getValue() {
-		return null;
+		return "null";
 	}
 
 	@Override

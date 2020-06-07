@@ -38,7 +38,7 @@ public class Lexer {
 					Position startPosition = position.copy();
 					advance();
 					if (String.valueOf(currentChar).equals("\n")) {
-						tokens.add(new Token(TokenTypes.NEWLINE, startPosition, position));
+						tokens.add(new Token(TokenTypes.NEWLINE, startPosition));
 						advance();
 					} else tokens.add(new Token(TokenTypes.NEWLINE, startPosition));
 					continue;

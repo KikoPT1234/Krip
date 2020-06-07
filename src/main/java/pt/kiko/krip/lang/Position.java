@@ -2,9 +2,6 @@ package pt.kiko.krip.lang;
 
 import com.sun.istack.internal.NotNull;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class Position {
 
     public int col;
@@ -26,13 +23,10 @@ public class Position {
         index++;
         col++;
 
-        Pattern pattern = Pattern.compile("[;\\n]");
-        Matcher matcher = pattern.matcher(String.valueOf(currentChar));
-        if (matcher.matches()) {
+        if (currentChar == '\n') {
             col = 0;
             line++;
         }
-
     }
 
     public Position copy() {

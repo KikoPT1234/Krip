@@ -25,8 +25,9 @@ public class RuntimeError extends Error {
 		StringBuilder string = new StringBuilder();
 
 		while (context != null) {
-			if (position == null) break;
-			string.append("\n\tat ").append(context.displayName).append(" (").append(position.fileName).append(":").append(position.line + 1).append(":").append(position.col + 1).append(")");
+			if (position != null) {
+				string.append("\n\tat ").append(context.displayName).append(" (").append(position.fileName).append(":").append(position.line + 1).append(":").append(position.col + 1).append(")");
+			}
 			position = context.parentEntryPosition;
 			context = context.parent;
 		}

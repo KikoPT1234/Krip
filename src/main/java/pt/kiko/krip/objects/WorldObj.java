@@ -1,10 +1,8 @@
 package pt.kiko.krip.objects;
 
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.Context;
-import pt.kiko.krip.lang.values.NumberValue;
 import pt.kiko.krip.lang.values.ObjectValue;
 import pt.kiko.krip.lang.values.StringValue;
 

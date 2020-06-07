@@ -1,6 +1,6 @@
 package pt.kiko.krip.lang.results;
 
-import pt.kiko.krip.lang.cases.Cases;
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.errors.Error;
 import pt.kiko.krip.lang.nodes.Node;
 
@@ -15,21 +15,15 @@ public class ParseResult {
         advanceCount++;
     }
 
-    public Node register(ParseResult result) {
+    public Node register(@NotNull ParseResult result) {
         advanceCount += result.advanceCount;
         if (result.error != null) error = result.error;
         return result.node;
     }
 
-    public Cases register(CaseResult result) {
-        advanceCount += result.advanceCount;
-        if (result.error != null) error = result.error;
-        return result.cases;
-    }
-
-    public Node tryRegister(ParseResult result) {
+    public Node tryRegister(@NotNull ParseResult result) {
         if (result.error != null) {
-            toReverseCount = result.toReverseCount;
+            toReverseCount = result.advanceCount;
             return null;
         }
         return register(result);

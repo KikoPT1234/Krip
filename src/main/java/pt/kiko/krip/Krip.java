@@ -1,6 +1,10 @@
 package pt.kiko.krip;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.event.EventPriority;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.commands.KripCommand;
@@ -14,6 +18,7 @@ import pt.kiko.krip.lang.values.Value;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -27,6 +32,9 @@ public class Krip extends JavaPlugin {
 	public static Krip plugin;
 	public static Map<String, EventInfo> events = new HashMap<>();
 	public static List<String> registeredNames = new ArrayList<>();
+	public static Map<String, String> commandNames = new HashMap<>();
+	public static SimpleCommandMap commandMap;
+	public static Map<String, Command> knownCommands;
 
 	public static RunResult run(String code, String fileName) {
 		RunResult result = new RunResult();
@@ -102,14 +110,27 @@ public class Krip extends JavaPlugin {
 	public File pluginFolder;
 	public File scriptFolder;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
 
 		Krip.plugin = this;
 
+		try {
+			SimplePluginManager pluginManager = (SimplePluginManager) Bukkit.getPluginManager();
+			final Field commandMapField = pluginManager.getClass().getDeclaredField("commandMap");
+			commandMapField.setAccessible(true);
+			final Field knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
+			knownCommandsField.setAccessible(true);
+			commandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getPluginManager());
+			knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		boolean created = true;
 		pluginFolder = getDataFolder();
-		if (!pluginFolder.exists())	created = pluginFolder.mkdir();
+		if (!pluginFolder.exists()) created = pluginFolder.mkdir();
 		if (!created) getServer().getLogger().warning("Failed to create plugin directory");
 
 		scriptFolder = new File(pluginFolder, "scripts");
@@ -127,7 +148,7 @@ public class Krip extends JavaPlugin {
 
 		for (File file : scriptFolder.listFiles()) {
 			String code = loadFile(file);
-			new Thread(() -> Krip.run(code, file.getName())).start();
+			run(code, file.getName());
 		}
 
 		getServer().getLogger().info("Krip enabled!");
@@ -148,5 +169,4 @@ public class Krip extends JavaPlugin {
 		}
 		return code.toString();
 	}
-
 }

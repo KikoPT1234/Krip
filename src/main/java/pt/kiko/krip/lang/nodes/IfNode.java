@@ -1,8 +1,8 @@
 package pt.kiko.krip.lang.nodes;
 
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.cases.Case;
 import pt.kiko.krip.lang.cases.ElseCase;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 

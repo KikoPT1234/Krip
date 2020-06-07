@@ -1,13 +1,13 @@
 package pt.kiko.krip.lang;
 
-import pt.kiko.krip.lang.errors.SyntaxError;
-import pt.kiko.krip.lang.results.CaseResult;
-import pt.kiko.krip.lang.results.ParseResult;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.cases.Case;
 import pt.kiko.krip.lang.cases.Cases;
 import pt.kiko.krip.lang.cases.ElseCase;
+import pt.kiko.krip.lang.errors.SyntaxError;
 import pt.kiko.krip.lang.nodes.*;
+import pt.kiko.krip.lang.results.CaseResult;
+import pt.kiko.krip.lang.results.ParseResult;
 
 import java.util.*;
 
@@ -79,9 +79,13 @@ public class Parser {
 
 		advanceNewlines(result);
 
+		if (currentToken.matches(TokenTypes.RBRACKET)) return result.success(new EmptyNode(currentToken.startPosition));
+
 		Node statement = result.register(statement());
 		if (result.error != null) return result;
 		statements.add(statement);
+
+		boolean moreStatements = true;
 
 		while (true) {
 			int newlineCount = 0;
@@ -90,17 +94,20 @@ public class Parser {
 				advance();
 				newlineCount++;
 			}
-			if (newlineCount == 0) break;
+			if (newlineCount == 0) moreStatements = false;
+			if (!moreStatements || currentToken.matches(TokenTypes.RBRACKET) || currentToken.matches(TokenTypes.RPAREN) || currentToken.matches(TokenTypes.EOF))
+				break;
 
-			statement = result.tryRegister(statement());
-			if (statement == null) {
-				reverse(result.toReverseCount);
+			statement = result.register(statement());
+			if (result.error != null) {
+				reverse(result.advanceCount);
+				moreStatements = false;
 				continue;
 			}
 			statements.add(statement);
 
 		}
-
+		if (result.error != null) return result;
 		return result.success(new ListNode(statements, startPosition, currentToken.endPosition.copy()));
 	}
 
@@ -126,7 +133,7 @@ public class Parser {
 			advance();
 			return result.success(new BreakNode(startPosition, currentToken.endPosition));
 		}
-		expression = result.tryRegister(expression());
+		expression = result.register(expression());
 		if (result.error != null) return result;
 		return result.success(expression);
 	}
@@ -244,7 +251,8 @@ public class Parser {
 			if (currentToken.matches(TokenTypes.PERIOD)) {
 				advance();
 
-				if (!currentToken.matches(TokenTypes.IDENTIFIER)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected token: " + currentToken));
+				if (!currentToken.matches(TokenTypes.IDENTIFIER))
+					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected identifier"));
 
 				Token key = currentToken;
 
@@ -268,7 +276,8 @@ public class Parser {
 				Node key = result.register(expression());
 				if (result.error != null) return result;
 
-				if (!currentToken.matches(TokenTypes.RSQUARE)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected token: " + currentToken ));
+				if (!currentToken.matches(TokenTypes.RSQUARE))
+					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ']'"));
 
 				result.registerAdvancement();
 				advance();
@@ -309,7 +318,9 @@ public class Parser {
 			advance();
 			ArrayList<Node> argNodes = new ArrayList<>();
 
-			if (!currentToken.matches(TokenTypes.RPAREN)) {
+			if (currentToken.matches(TokenTypes.EOF) || currentToken.matches(TokenTypes.NEWLINE))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ')' or identifier"));
+			else if (!currentToken.matches(TokenTypes.RPAREN)) {
 				argNodes.add(result.register(expression()));
 				if (result.error != null)
 					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected token"));
@@ -383,7 +394,7 @@ public class Parser {
 			Node functionExpression = result.register(functionExpression());
 			if (result.error != null) return result;
 			return result.success(functionExpression);
-		}
+		} else if (currentToken.matches(TokenTypes.EOF)) return result;
 		return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected token: " + currentToken));
 	}
 
@@ -596,23 +607,27 @@ public class Parser {
 	public ParseResult forExpression() {
 		ParseResult result = new ParseResult();
 
-		if (!currentToken.matches(TokenTypes.KEYWORD, "for")) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected 'for'"));
+		if (!currentToken.matches(TokenTypes.KEYWORD, "for"))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected 'for'"));
 
 		result.registerAdvancement();
 		advance();
 
-		if (!currentToken.matches(TokenTypes.LPAREN)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '('"));
+		if (!currentToken.matches(TokenTypes.LPAREN))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '('"));
 
 		result.registerAdvancement();
 		advance();
 
-		if (!currentToken.matches(TokenTypes.IDENTIFIER)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected token: " + currentToken));
+		if (!currentToken.matches(TokenTypes.IDENTIFIER))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected identifier"));
 
 		Token varNameToken = currentToken;
 		result.registerAdvancement();
 		advance();
 
-		if (!currentToken.matches(TokenTypes.EQ)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '='"));
+		if (!currentToken.matches(TokenTypes.EQ))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '='"));
 
 		result.registerAdvancement();
 		advance();
@@ -784,7 +799,8 @@ public class Parser {
 				result.registerAdvancement();
 				advance();
 
-				if (!currentToken.matches(TokenTypes.IDENTIFIER)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected token: " + currentToken));
+				if (!currentToken.matches(TokenTypes.IDENTIFIER))
+					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected identifier"));
 
 				argNameTokens.add(currentToken);
 				result.registerAdvancement();
@@ -805,10 +821,14 @@ public class Parser {
 			result.registerAdvancement();
 			advance();
 
-			Node body = result.register(statements());
-			if (result.error != null) return result;
+			Node body = new EmptyNode(currentToken.startPosition);
+			if (!currentToken.matches(TokenTypes.RBRACKET)) {
+				body = result.register(statements());
+				if (result.error != null) return result;
+			}
 
-			if (!currentToken.matches(TokenTypes.RBRACKET)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
+			if (!currentToken.matches(TokenTypes.RBRACKET))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
 
 			result.registerAdvancement();
 			advance();

@@ -34,6 +34,7 @@ public class StringValue extends Value {
 
 	@Override
 	public RuntimeResult plus(Value other) {
-		return new RuntimeResult().success(new StringValue(getValue() + other.getValue(), context));
+		if (other instanceof NullValue) return illegalOperation(other);
+		else return new RuntimeResult().success(new StringValue(getValue() + other.getValue(), context));
 	}
 }
