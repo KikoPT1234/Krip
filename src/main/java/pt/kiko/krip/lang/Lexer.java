@@ -132,6 +132,17 @@ public class Lexer {
 				advance();
 			}
 			return null;
+		} else if (currentChar == '*') {
+			while (true) {
+				advance();
+				if (currentChar == '*') {
+					advance();
+					if (currentChar == '/') {
+						advance();
+						return null;
+					}
+				}
+			}
 		} else return new Token(TokenTypes.DIV, startPosition);
 	}
 

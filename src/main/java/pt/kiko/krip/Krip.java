@@ -7,7 +7,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import pt.kiko.krip.commands.KripCommand;
 import pt.kiko.krip.lang.*;
 import pt.kiko.krip.lang.results.LexResult;
 import pt.kiko.krip.lang.results.ParseResult;

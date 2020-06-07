@@ -94,4 +94,8 @@ abstract public class Value {
 		return new RuntimeResult().success(new BooleanValue(isTrue() || other.isTrue(), context));
 	}
 
+	protected RuntimeResult invalidType(Value value, Context context) {
+		return new RuntimeResult().failure(new RuntimeError(value.startPosition != null ? value.startPosition : startPosition, value.endPosition != null ? value.endPosition : endPosition, "Invalid type", context));
+	}
+
 }

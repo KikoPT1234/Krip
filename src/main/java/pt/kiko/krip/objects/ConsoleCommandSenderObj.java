@@ -2,7 +2,6 @@ package pt.kiko.krip.objects;
 
 import org.bukkit.command.ConsoleCommandSender;
 import pt.kiko.krip.lang.Context;
-import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
 
@@ -19,11 +18,21 @@ public class ConsoleCommandSenderObj extends ObjectValue {
 				RuntimeResult result = new RuntimeResult();
 				Value message = context.symbolTable.get("message");
 
-				if (!(message instanceof StringValue))
-					return result.failure(new RuntimeError(message.startPosition, message.endPosition, "Invalid type", context));
+				if (!(message instanceof StringValue)) return invalidType(message, context);
 
 				sender.sendMessage(message.getValue());
 				return result.success(new NullValue(context.parent));
+			}
+		});
+		value.put("hasPermission", new BuiltInFunctionValue("hasPermission", Collections.singletonList("message"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				Value message = context.symbolTable.get("message");
+
+				if (!(message instanceof StringValue)) return invalidType(message, context);
+
+				return result.success(new BooleanValue(sender.hasPermission(message.getValue()), context));
 			}
 		});
 	}

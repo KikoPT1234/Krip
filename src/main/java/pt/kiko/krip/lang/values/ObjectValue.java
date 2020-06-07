@@ -1,5 +1,6 @@
 package pt.kiko.krip.lang.values;
 
+import org.jetbrains.annotations.Nullable;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 
@@ -28,7 +29,7 @@ public class ObjectValue extends Value {
 		return this;
 	}
 
-	public Value get(String key) {
+	public @Nullable Value get(String key) {
 		return value.get(key);
 	}
 

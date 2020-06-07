@@ -315,10 +315,10 @@ public class Parser {
 		Node node = null;
 		while (currentToken.matches(TokenTypes.LPAREN)) {
 			result.registerAdvancement();
-			advance();
+			advance(result);
 			ArrayList<Node> argNodes = new ArrayList<>();
 
-			if (currentToken.matches(TokenTypes.EOF) || currentToken.matches(TokenTypes.NEWLINE))
+			if (currentToken.matches(TokenTypes.EOF))
 				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ')' or identifier"));
 			else if (!currentToken.matches(TokenTypes.RPAREN)) {
 				argNodes.add(result.register(expression()));
@@ -327,12 +327,12 @@ public class Parser {
 
 				while (currentToken.matches(TokenTypes.COMMA)) {
 					result.registerAdvancement();
-					advance();
+					advance(result);
 
 					argNodes.add(result.register(expression()));
 					if (result.error != null) return result;
 				}
-
+				advanceNewlines(result);
 				if (!currentToken.matches(TokenTypes.RPAREN))
 					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ')'"));
 

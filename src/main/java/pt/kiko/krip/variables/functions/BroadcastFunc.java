@@ -2,7 +2,6 @@ package pt.kiko.krip.variables.functions;
 
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
-import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.BuiltInFunctionValue;
 import pt.kiko.krip.lang.values.NullValue;
@@ -26,8 +25,7 @@ public class BroadcastFunc extends BuiltInFunctionValue {
 		RuntimeResult result = new RuntimeResult();
 		Value message = context.symbolTable.get("message");
 
-		if (!(message instanceof StringValue))
-			return result.failure(new RuntimeError(message.startPosition, message.endPosition, "Invalid type", context));
+		if (!(message instanceof StringValue)) return invalidType(message, context);
 
 		Krip.plugin.getServer().broadcastMessage(message.getValue());
 		return result.success(new NullValue(context.parent));
