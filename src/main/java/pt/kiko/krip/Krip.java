@@ -129,13 +129,11 @@ public class Krip extends JavaPlugin {
 		}
 
 		boolean created = true;
-		pluginFolder = getDataFolder();
-		if (!pluginFolder.exists()) created = pluginFolder.mkdir();
-		if (!created) getServer().getLogger().warning("Failed to create plugin directory");
 
+		pluginFolder = getDataFolder();
 		scriptFolder = new File(pluginFolder, "scripts");
-		if (!scriptFolder.exists()) created = scriptFolder.mkdir();
-		if (!created) getServer().getLogger().warning("Failed to create script directory");
+		if (!scriptFolder.exists()) created = scriptFolder.mkdirs();
+		if (!created) getServer().getLogger().warning("Failed to create plugin/script directory");
 
 		try {
 			loadClasses("pt.kiko.krip.variables");

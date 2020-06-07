@@ -2,16 +2,15 @@ package pt.kiko.krip;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BaseFunctionValue;
-import pt.kiko.krip.lang.values.ListValue;
-import pt.kiko.krip.lang.values.StringValue;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.ConsoleCommandSenderObj;
 import pt.kiko.krip.objects.PlayerObj;
 
 import java.util.Arrays;
@@ -34,7 +33,11 @@ public class CustomCommand implements TabExecutor {
 	@Override
 	public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 		List<Value> argValues = Arrays.stream(args).map(arg -> new StringValue(arg, context)).collect(Collectors.toList());
-		RuntimeResult result = function.execute(Arrays.asList(new PlayerObj((Player) commandSender, context), new ListValue(argValues, context)), context);
+
+		ObjectValue sender = commandSender instanceof Player ? new PlayerObj((Player) commandSender, context) : new ConsoleCommandSenderObj((ConsoleCommandSender) commandSender, context);
+		sender.set("isPlayer", new BooleanValue(commandSender instanceof Player, context));
+
+		RuntimeResult result = function.execute(Arrays.asList(sender, new ListValue(argValues, context)), context);
 		if (result.error != null) {
 			System.out.println(result.error.toString());
 		}
