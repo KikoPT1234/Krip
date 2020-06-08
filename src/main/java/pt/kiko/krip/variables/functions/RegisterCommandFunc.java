@@ -1,6 +1,7 @@
 package pt.kiko.krip.variables.functions;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.help.GenericCommandHelpTopic;
 import org.bukkit.help.HelpMap;
@@ -15,6 +16,7 @@ import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +41,8 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 
 		if (!(name instanceof StringValue)) return invalidType(name, context);
 		if (!(info instanceof ObjectValue || info instanceof NullValue)) return invalidType(info, context);
-		if (!(function instanceof BaseFunctionValue)) return invalidType(function, context);
+		if (!(function instanceof BaseFunctionValue || function instanceof NullValue))
+			return invalidType(function, context);
 
 		if (name.getValue().equals(""))
 			return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Command name must not be empty", context));
@@ -88,7 +91,7 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 			final Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
 			c.setAccessible(true);
 			command = c.newInstance(name.getValue(), Krip.plugin);
-			CustomCommand customCommand = new CustomCommand((BaseFunctionValue) function, (ListValue) args, command, context);
+			CustomCommand customCommand = new CustomCommand(function, (ListValue) args, command, context);
 			if (description != null) command.setDescription(description.getValue());
 			else command.setDescription("A Krip command");
 
@@ -144,12 +147,24 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 		}
 		assert command != null;
 
-		Krip.commandNames.put(name.getValue().toLowerCase(), function.startPosition.fileName);
+		Krip.commandNames.put(name.getValue().toLowerCase(), name.startPosition.fileName);
+		Command existingCmd = Krip.commandMap.getCommand(name.getValue().toLowerCase());
+		if (existingCmd != null) {
+			Krip.knownCommands.remove(existingCmd.getName());
+			Krip.knownCommands.remove("krip:" + existingCmd.getName());
+			existingCmd.unregister(Krip.commandMap);
+		}
 		Krip.commandMap.register("krip", command);
 
 		HelpMap help = Bukkit.getHelpMap();
 		HelpTopic t = new GenericCommandHelpTopic(command);
 		help.addTopic(t);
+
+		try {
+			Krip.syncCommandsMethod.invoke(Bukkit.getServer());
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+		}
 
 		return result.success(new NullValue(context.parent));
 	}

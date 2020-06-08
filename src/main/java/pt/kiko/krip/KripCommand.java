@@ -6,33 +6,19 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pt.kiko.krip.lang.results.RunResult;
 import pt.kiko.krip.lang.values.BaseFunctionValue;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class KripCommand implements TabExecutor {
-
-	private static Method syncCommandsMethod;
-
-	static {
-		try {
-			Class<?> craftServer;
-			String revision = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-			craftServer = Class.forName("org.bukkit.craftbukkit." + revision + ".CraftServer");
-
-			syncCommandsMethod = craftServer.getDeclaredMethod("syncCommands");
-			syncCommandsMethod.setAccessible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public KripCommand() {
 		PluginCommand command = Objects.requireNonNull(Krip.plugin.getServer().getPluginCommand("krip"));
@@ -61,7 +47,6 @@ public class KripCommand implements TabExecutor {
 						for (File file : files) {
 							results.add(Krip.run(Krip.plugin.loadFile(file), file.getName()));
 						}
-						syncCommandsMethod.invoke(Bukkit.getServer());
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -90,7 +75,6 @@ public class KripCommand implements TabExecutor {
 				Runnable task = () -> {
 					try {
 						RunResult result = Krip.run(Krip.plugin.loadFile(file), file.getName());
-						syncCommandsMethod.invoke(Bukkit.getServer());
 						if (result.error != null) {
 							commandSender.sendMessage(ChatColor.RED + "Error while loading " + file.getName() + ": " + ChatColor.DARK_RED + result.error.details);
 							commandSender.sendMessage(ChatColor.RED + "Check the logs for more info");
@@ -126,6 +110,8 @@ public class KripCommand implements TabExecutor {
 		});
 		namesToRemove.forEach(name -> Krip.context.symbolTable.remove(name));
 		Krip.commandNames.clear();
+		Krip.tasks.forEach((fileName, tasks) -> tasks.forEach(BukkitTask::cancel));
+		Krip.tasks.clear();
 	}
 
 	private void reset(File file) {
@@ -158,6 +144,13 @@ public class KripCommand implements TabExecutor {
 			Krip.knownCommands.remove("krip:" + name.toLowerCase());
 			Krip.commandNames.remove(name.toLowerCase());
 		});
+		AtomicReference<List<BukkitTask>> tasksToRemove = new AtomicReference<>();
+		Krip.tasks.forEach((fileName, tasks) -> {
+			if (fileName.equals(file.getName())) tasksToRemove.set(tasks);
+		});
+		if (tasksToRemove.get() != null && tasksToRemove.get().size() > 0)
+			tasksToRemove.get().forEach(BukkitTask::cancel);
+		Krip.tasks.remove(file.getName());
 	}
 
 	@Override

@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
 
 public class CustomCommand implements TabExecutor {
 
-	private final BaseFunctionValue function;
+	private final Value<?> function;
 	private final ListValue args;
 	private final Context context;
 	private final List<String> optionalArgs = new ArrayList<>();
 	public Command command;
 
-	public CustomCommand(BaseFunctionValue function, ListValue args, Command command, Context context) {
+	public CustomCommand(Value<?> function, ListValue args, Command command, Context context) {
 		this.function = function;
 		if (args != null) this.args = args;
 		else this.args = new ListValue(new ArrayList<>(), context);
@@ -41,6 +41,8 @@ public class CustomCommand implements TabExecutor {
 
 	@Override
 	public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+		if (!(function instanceof BaseFunctionValue)) return true;
+
 		List<Value<?>> requiredArgs = this.args.value.stream().filter(arg -> !optionalArgs.contains(arg.getValue())).collect(Collectors.toList());
 		if (args.length < requiredArgs.size()) return false;
 		List<Value<?>> argValues = Arrays.stream(args).map(arg -> new StringValue(arg, context)).collect(Collectors.toList());
@@ -48,7 +50,7 @@ public class CustomCommand implements TabExecutor {
 		ObjectValue sender = commandSender instanceof Player ? new OnlinePlayerObj((Player) commandSender, context) : new ConsoleCommandSenderObj((ConsoleCommandSender) commandSender, context);
 		sender.set("isPlayer", new BooleanValue(commandSender instanceof Player, context));
 
-		RuntimeResult result = function.execute(Arrays.asList(sender, new ListValue(argValues, context)), context);
+		RuntimeResult result = ((BaseFunctionValue) function).execute(Arrays.asList(sender, new ListValue(argValues, context)), context);
 		if (result.error != null) {
 			System.out.println(result.error.toString());
 		}

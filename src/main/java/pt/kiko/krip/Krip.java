@@ -6,6 +6,7 @@ import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.*;
 import pt.kiko.krip.lang.results.LexResult;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -34,6 +36,9 @@ public class Krip extends JavaPlugin {
 	public static Map<String, String> commandNames = new HashMap<>();
 	public static SimpleCommandMap commandMap;
 	public static Map<String, Command> knownCommands;
+	public static Map<String, List<BukkitTask>> tasks = new HashMap<>();
+
+	public static Method syncCommandsMethod;
 
 	public static RunResult run(String code, String fileName) {
 		RunResult result = new RunResult();
@@ -96,7 +101,7 @@ public class Krip extends JavaPlugin {
 		}
 	}
 
-	public static void registerValue(String name, Value value) {
+	public static void registerValue(String name, Value<?> value) {
 		context.symbolTable.set(name, value, true);
 		registeredNames.add(name);
 	}
@@ -123,6 +128,13 @@ public class Krip extends JavaPlugin {
 			knownCommandsField.setAccessible(true);
 			commandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getPluginManager());
 			knownCommands = (Map<String, Command>) knownCommandsField.get(commandMap);
+
+			Class<?> craftServer;
+			String revision = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+			craftServer = Class.forName("org.bukkit.craftbukkit." + revision + ".CraftServer");
+
+			syncCommandsMethod = craftServer.getDeclaredMethod("syncCommands");
+			syncCommandsMethod.setAccessible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
