@@ -11,7 +11,7 @@ import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
 import pt.kiko.krip.objects.ConsoleCommandSenderObj;
-import pt.kiko.krip.objects.PlayerObj;
+import pt.kiko.krip.objects.OnlinePlayerObj;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +24,7 @@ public class CustomCommand implements TabExecutor {
 	private final BaseFunctionValue function;
 	private final ListValue args;
 	private final Context context;
+	private final List<String> optionalArgs = new ArrayList<>();
 	public Command command;
 
 	public CustomCommand(BaseFunctionValue function, ListValue args, Command command, Context context) {
@@ -34,12 +35,17 @@ public class CustomCommand implements TabExecutor {
 		this.context = context;
 	}
 
+	public void addOptionalArg(String argName) {
+		optionalArgs.add(argName);
+	}
+
 	@Override
 	public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-		if (args.length < this.args.value.size()) return false;
-		List<Value> argValues = Arrays.stream(args).map(arg -> new StringValue(arg, context)).collect(Collectors.toList());
+		List<Value<?>> requiredArgs = this.args.value.stream().filter(arg -> !optionalArgs.contains(arg.getValue())).collect(Collectors.toList());
+		if (args.length < requiredArgs.size()) return false;
+		List<Value<?>> argValues = Arrays.stream(args).map(arg -> new StringValue(arg, context)).collect(Collectors.toList());
 
-		ObjectValue sender = commandSender instanceof Player ? new PlayerObj((Player) commandSender, context) : new ConsoleCommandSenderObj((ConsoleCommandSender) commandSender, context);
+		ObjectValue sender = commandSender instanceof Player ? new OnlinePlayerObj((Player) commandSender, context) : new ConsoleCommandSenderObj((ConsoleCommandSender) commandSender, context);
 		sender.set("isPlayer", new BooleanValue(commandSender instanceof Player, context));
 
 		RuntimeResult result = function.execute(Arrays.asList(sender, new ListValue(argValues, context)), context);

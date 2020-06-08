@@ -3,9 +3,7 @@ package pt.kiko.krip.lang.values;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 
-public class BooleanValue extends Value {
-
-	protected final boolean value;
+public class BooleanValue extends Value<Boolean> {
 
 	public BooleanValue(boolean value, Context context) {
 		super(context);
@@ -18,7 +16,12 @@ public class BooleanValue extends Value {
 	}
 
 	@Override
-	public Value copy() {
+	public void setValue(Boolean value) {
+		this.value = value;
+	}
+
+	@Override
+	public Value<Boolean> copy() {
 		return new BooleanValue(value, context).setPosition(startPosition, endPosition);
 	}
 
@@ -28,22 +31,21 @@ public class BooleanValue extends Value {
 	}
 
 	@Override
-	public RuntimeResult equal(Value other) {
+	public RuntimeResult equal(Value<?> other) {
 		if (other instanceof ListValue) {
 			return new RuntimeResult().success(new BooleanValue(getValue().equals(other.getValue()), context));
 		} else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
-	public RuntimeResult notEquals(Value other) {
+	public RuntimeResult notEquals(Value<?> other) {
 		if (other instanceof ListValue) {
 			return new RuntimeResult().success(new BooleanValue(!getValue().equals(other.getValue()), context));
 		} else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 
 	@Override
-	public RuntimeResult plus(Value other) {
-		if (other instanceof StringValue) return new RuntimeResult().success(new StringValue(getValue() + other.getValue(), context));
-		else return illegalOperation(other);
+	public void makePrototype() {
+
 	}
 }

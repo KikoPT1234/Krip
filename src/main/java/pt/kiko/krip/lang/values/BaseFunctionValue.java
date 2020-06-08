@@ -7,14 +7,20 @@ import pt.kiko.krip.lang.results.RuntimeResult;
 
 import java.util.List;
 
-abstract public class BaseFunctionValue extends Value {
+abstract public class BaseFunctionValue extends Value<String> {
 
-	public String name;
+	public String value;
 	public List<String> argNames;
+
+	public BaseFunctionValue(String name, List<String> argNames, Value<?> parent, Context context) {
+		super(parent, context);
+		this.value = name;
+		this.argNames = argNames;
+	}
 
 	public BaseFunctionValue(String name, List<String> argNames, Context context) {
 		super(context);
-		this.name = name;
+		this.value = name;
 		this.argNames = argNames;
 	}
 
@@ -25,15 +31,15 @@ abstract public class BaseFunctionValue extends Value {
 	}
 
 	public Context generateNewContext() {
-		Context newContext = new Context("<function " + (name == null ? "anonymous" : name) + ">", context, startPosition);
+		Context newContext = new Context("<function " + (value == null ? "anonymous" : value) + ">", context, startPosition);
 		newContext.symbolTable = new SymbolTable(newContext.symbolTable.parent != null ? newContext.symbolTable.parent : newContext.parent.symbolTable);
 		return newContext;
 	}
 
-	public RuntimeResult populateArgs(@NotNull List<String> argNames, List<Value> args, Context context) {
+	public RuntimeResult populateArgs(@NotNull List<String> argNames, List<Value<?>> args, Context context) {
 		argNames.forEach((argName) -> {
 			int index = argNames.indexOf(argName);
-			Value argValue = args.size() - 1 >= index ? args.get(index) : new NullValue(context);
+			Value<?> argValue = args.size() - 1 >= index ? args.get(index) : new NullValue(context);
 			context.symbolTable.set(argName, argValue, false);
 		});
 		return new RuntimeResult().success(new NullValue(context));
@@ -41,22 +47,37 @@ abstract public class BaseFunctionValue extends Value {
 
 	@Override
 	public String getValue() {
-		return "<function " + (name == null ? "anonymous" : name) + ">";
+		return "<function " + (value == null ? "anonymous" : value) + ">";
 	}
 
 	@Override
-	public RuntimeResult equal(Value other) {
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	@Override
+	public RuntimeResult equal(Value<?> other) {
 		if (other instanceof BaseFunctionValue)
-			return new RuntimeResult().success(new BooleanValue(name.equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(value.equals(other.getValue()), context));
 		else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
-	public RuntimeResult notEquals(Value other) {
+	public RuntimeResult notEquals(Value<?> other) {
 		if (other instanceof BaseFunctionValue)
-			return new RuntimeResult().success(new BooleanValue(!name.equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(!value.equals(other.getValue()), context));
 		else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 
-	abstract public RuntimeResult execute(List<Value> args, Context ctx);
+	@Override
+	public RuntimeResult plus(Value<?> other) {
+		return illegalOperation(other);
+	}
+
+	@Override
+	public void makePrototype() {
+
+	}
+
+	abstract public RuntimeResult execute(List<Value<?>> args, Context ctx);
 }

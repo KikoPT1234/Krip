@@ -23,7 +23,7 @@ public class BroadcastFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value message = context.symbolTable.get("message");
+		Value<?> message = context.symbolTable.get("message");
 
 		if (!(message instanceof StringValue)) return invalidType(message, context);
 

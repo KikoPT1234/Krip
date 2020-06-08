@@ -9,12 +9,16 @@ import java.util.List;
 
 public class BuiltInFunctionValue extends BaseFunctionValue {
 
+	public BuiltInFunctionValue(String name, List<String> argNames, Value<?> parent, Context context) {
+		super(name, argNames, parent, context);
+	}
+
 	public BuiltInFunctionValue(String name, List<String> argNames, Context context) {
 		super(name, argNames, context);
 	}
 
 	@Override
-	public RuntimeResult execute(List<Value> args, Context ctx) {
+	public RuntimeResult execute(List<Value<?>> args, Context ctx) {
 		RuntimeResult result = new RuntimeResult();
 		Context context = generateNewContext();
 		context.parent = ctx;
@@ -22,7 +26,7 @@ public class BuiltInFunctionValue extends BaseFunctionValue {
 		result.register(populateArgs(argNames, args, context));
 		if (result.shouldReturn()) return result;
 
-		Value value = result.register(run(context));
+		Value<?> value = result.register(run(context));
 		if (result.shouldReturn()) return result;
 		return result.success(value);
 	}
@@ -32,9 +36,9 @@ public class BuiltInFunctionValue extends BaseFunctionValue {
 	}
 
 	@Override
-	public Value copy() {
+	public Value<String> copy() {
 		ResultRunnable func = this::run;
-		return new BuiltInFunctionValue(name, argNames, context) {
+		return new BuiltInFunctionValue(value, argNames, context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				return func.run(context);

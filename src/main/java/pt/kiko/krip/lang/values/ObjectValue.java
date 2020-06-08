@@ -9,18 +9,29 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ObjectValue extends Value {
+public class ObjectValue extends Value<Map<String, Value<?>>> {
 
-	protected Map<String, Value> value;
+	public Map<String, Value<?>> value;
 	private int tabAmount = 1;
 
-	public ObjectValue(Map<String, Value> object, Context context) {
+	public ObjectValue(Map<String, Value<?>> object, Value<?> parent, Context context) {
+		super(parent, context);
+
+		this.value = object;
+	}
+
+	public ObjectValue(Map<String, Value<?>> object, Context context) {
 		super(context);
 
 		this.value = object;
 	}
 
-	public void setValue(Map<String, Value> value) {
+	@Override
+	public String getValue() {
+		return toString();
+	}
+
+	public void setValue(Map<String, Value<?>> value) {
 		this.value = value;
 	}
 
@@ -29,21 +40,16 @@ public class ObjectValue extends Value {
 		return this;
 	}
 
-	public @Nullable Value get(String key) {
+	public @Nullable Value<?> get(String key) {
 		return value.get(key);
 	}
 
-	public void set(String key, Value value) {
+	public void set(String key, Value<?> value) {
 		this.value.put(key, value);
 	}
 
 	@Override
-	public String getValue() {
-		return toString();
-	}
-
-	@Override
-	public Value copy() {
+	public Value<Map<String, Value<?>>> copy() {
 		return new ObjectValue(new HashMap<>(value), context).setPosition(startPosition, endPosition);
 	}
 
@@ -60,22 +66,21 @@ public class ObjectValue extends Value {
 	}
 
 	@Override
-	public RuntimeResult equal(Value other) {
+	public RuntimeResult equal(Value<?> other) {
 		if (other instanceof ObjectValue) {
 			return new RuntimeResult().success(new BooleanValue(getValue().equals(other.getValue()), context));
 		} else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
-	public RuntimeResult notEquals(Value other) {
+	public RuntimeResult notEquals(Value<?> other) {
 		if (other instanceof ObjectValue) {
 			return new RuntimeResult().success(new BooleanValue(!getValue().equals(other.getValue()), context));
 		} else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 
 	@Override
-	public RuntimeResult plus(Value other) {
-		if (other instanceof StringValue) return new RuntimeResult().success(new StringValue(getValue() + other.getValue(), context));
-		else return illegalOperation(other);
+	public void makePrototype() {
+
 	}
 }

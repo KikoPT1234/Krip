@@ -26,7 +26,7 @@ public class Characters {
     static Map<String, String> escapedCharacters = new HashMap<>();
 
     static {
-        Characters.escapedCharacters.put("n", "\n");
-        Characters.escapedCharacters.put("t", "\t");
+        Characters.escapedCharacters.put("n", "\\n");
+        Characters.escapedCharacters.put("t", "\\t");
     }
 }

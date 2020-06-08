@@ -155,8 +155,10 @@ public class Lexer {
 
 		while (currentChar != Character.MIN_VALUE && (!String.valueOf(currentChar).equals("\"") || isEscapedCharacter)) {
 			if (isEscapedCharacter) {
-				if (Characters.escapedCharacters.containsKey(String.valueOf(currentChar))) stringBuilder.append(Characters.escapedCharacters.get(String.valueOf(currentChar)));
+				if (Characters.escapedCharacters.containsKey(String.valueOf(currentChar)))
+					stringBuilder.append(Characters.escapedCharacters.get(String.valueOf(currentChar))).append(Characters.escapedCharacters.get(String.valueOf(currentChar)));
 				else stringBuilder.append(currentChar);
+				isEscapedCharacter = false;
 			} else {
 				if (String.valueOf(currentChar).equals("\\")) isEscapedCharacter = true;
 				else stringBuilder.append(currentChar);

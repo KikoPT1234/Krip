@@ -21,8 +21,8 @@ public class onEventFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value name = context.symbolTable.get("eventName");
-		Value func = context.symbolTable.get("function");
+		Value<?> name = context.symbolTable.get("eventName");
+		Value<?> func = context.symbolTable.get("function");
 
 		if (!(name instanceof StringValue)) return invalidType(name, context);
 		if (!(func instanceof BaseFunctionValue)) return invalidType(func, context);

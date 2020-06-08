@@ -32,6 +32,6 @@ public class RuntimeError extends Error {
 			context = context.parent;
 		}
 
-		return "Traceback:" + string;
+		return "Trace-back:" + string;
 	}
 }

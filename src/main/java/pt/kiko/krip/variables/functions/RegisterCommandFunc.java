@@ -33,9 +33,9 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 	public synchronized RuntimeResult run(@NotNull Context context) {
 		RuntimeResult result = new RuntimeResult();
 
-		Value name = context.symbolTable.get("name");
-		Value info = context.symbolTable.get("info");
-		Value function = context.symbolTable.get("function");
+		Value<?> name = context.symbolTable.get("name");
+		Value<?> info = context.symbolTable.get("info");
+		Value<?> function = context.symbolTable.get("function");
 
 		if (!(name instanceof StringValue)) return invalidType(name, context);
 		if (!(info instanceof ObjectValue || info instanceof NullValue)) return invalidType(info, context);
@@ -44,12 +44,12 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 		if (name.getValue().equals(""))
 			return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Command name must not be empty", context));
 
-		Value description = null;
-		Value permission = null;
-		Value permissionMessage = null;
-		Value usage = null;
-		Value args = null;
-		Value aliases = null;
+		Value<?> description = null;
+		Value<?> permission = null;
+		Value<?> permissionMessage = null;
+		Value<?> usage = null;
+		Value<?> args = null;
+		Value<?> aliases = null;
 
 		if (info instanceof ObjectValue) {
 			ObjectValue infoObj = (ObjectValue) info;
@@ -99,15 +99,25 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 			if (usage != null) command.setUsage(usage.getValue());
 			else if (args != null) {
 				StringBuilder builder = new StringBuilder();
-				builder.append("/").append(command.getName()).append(" ");
-				Value[] list = ((ListValue) args).value.toArray(new Value[]{});
+				builder.append("/").append(command.getName().toLowerCase()).append(" ");
+				Value<?>[] list = ((ListValue) args).value.toArray(new Value[]{});
+				boolean isOptional = false;
 
-				for (Value arg : list) {
+				for (Value<?> arg : list) {
 					if (!(arg instanceof StringValue)) return invalidType(arg, context);
 					else if (arg.getValue().equals(""))
 						return result.failure(new RuntimeError(arg.startPosition, arg.endPosition, "Argument name must not be empty", context));
 
-					builder.append("<").append(arg.getValue()).append("> ");
+					String value = arg.getValue();
+					if (value.endsWith("?")) {
+						isOptional = true;
+						((StringValue) arg).setValue(value.substring(0, value.length() - 1));
+						value = arg.getValue();
+						customCommand.addOptionalArg(value);
+						builder.append("[").append(value).append("] ");
+					} else if (isOptional)
+						return result.failure(new RuntimeError(arg.startPosition, arg.endPosition, "Required argument must not follow optional argument", context));
+					else builder.append("<").append(value).append("> ");
 				}
 
 				command.setUsage(builder.toString());
@@ -115,9 +125,9 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 
 			if (aliases != null) {
 				List<String> aliasStrings = new ArrayList<>();
-				Value[] list = ((ListValue) aliases).value.toArray(new Value[]{});
+				Value<?>[] list = ((ListValue) aliases).value.toArray(new Value[]{});
 
-				for (Value alias : list) {
+				for (Value<?> alias : list) {
 					if (!(alias instanceof StringValue)) return invalidType(alias, context);
 					else if (alias.getValue().equals(""))
 						return result.failure(new RuntimeError(alias.startPosition, alias.endPosition, "Alias must not be empty", context));
@@ -134,7 +144,7 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 		}
 		assert command != null;
 
-		Krip.commandNames.put(name.getValue(), function.startPosition.fileName);
+		Krip.commandNames.put(name.getValue().toLowerCase(), function.startPosition.fileName);
 		Krip.commandMap.register("krip", command);
 
 		HelpMap help = Bukkit.getHelpMap();

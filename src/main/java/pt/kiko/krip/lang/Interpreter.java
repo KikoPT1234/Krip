@@ -53,12 +53,12 @@ abstract public class Interpreter {
 
 	static RuntimeResult visitListNode(@NotNull ListNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		ArrayList<Value> elements = new ArrayList<>();
+		ArrayList<Value<?>> elements = new ArrayList<>();
 		Node[] nodes = {};
 		nodes = node.nodes.toArray(nodes);
 
 		for (Node elementNode : nodes) {
-			Value element = result.register(visit(elementNode, context));
+			Value<?> element = result.register(visit(elementNode, context));
 			if (result.shouldReturn()) return result;
 			elements.add(element);
 		}
@@ -69,66 +69,66 @@ abstract public class Interpreter {
 	static RuntimeResult visitBinaryOperationNode(@NotNull BinaryOperationNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 
-		Value left = result.register(visit(node.left, context));
+		Value<?> left = result.register(visit(node.left, context));
 		if (result.shouldReturn()) return result;
 
-		Value right = result.register(visit(node.right, context));
+		Value<?> right = result.register(visit(node.right, context));
 		if (result.shouldReturn()) return result;
 
 		if (node.operationToken.matches(TokenTypes.PLUS)) {
-			Value operationResult = result.register(left.plus(right));
+			Value<?> operationResult = result.register(left.plus(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.MINUS)) {
-			Value operationResult = result.register(left.minus(right));
+			Value<?> operationResult = result.register(left.minus(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.MUL)) {
-			Value operationResult = result.register(left.mul(right));
+			Value<?> operationResult = result.register(left.mul(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.DIV)) {
-			Value operationResult = result.register(left.div(right));
+			Value<?> operationResult = result.register(left.div(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.POW)) {
-			Value operationResult = result.register(left.pow(right));
+			Value<?> operationResult = result.register(left.pow(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.MOD)) {
-			Value operationResult = result.register(left.mod(right));
+			Value<?> operationResult = result.register(left.mod(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.EE)) {
-			Value operationResult = result.register(left.equal(right));
+			Value<?> operationResult = result.register(left.equal(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.NE)) {
-			Value operationResult = result.register(left.notEquals(right));
+			Value<?> operationResult = result.register(left.notEquals(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.LT)) {
-			Value operationResult = result.register(left.lessThan(right));
+			Value<?> operationResult = result.register(left.lessThan(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.LTE)) {
-			Value operationResult = result.register(left.lessThanOrEqual(right));
+			Value<?> operationResult = result.register(left.lessThanOrEqual(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.GT)) {
-			Value operationResult = result.register(left.greaterThan(right));
+			Value<?> operationResult = result.register(left.greaterThan(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.GTE)) {
-			Value operationResult = result.register(left.greaterThanOrEqual(right));
+			Value<?> operationResult = result.register(left.greaterThanOrEqual(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.AND)) {
-			Value operationResult = result.register(left.and(right));
+			Value<?> operationResult = result.register(left.and(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.OR)) {
-			Value operationResult = result.register(left.or(right));
+			Value<?> operationResult = result.register(left.or(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else return left.illegalOperation(right);
@@ -136,11 +136,12 @@ abstract public class Interpreter {
 
 	static RuntimeResult visitUnaryOperationNode(@NotNull UnaryOperationNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value value = result.register(visit(node.node, context)).setPosition(node.startPosition, node.endPosition);
+		Value<?> value = result.register(visit(node.node, context)).setPosition(node.startPosition, node.endPosition);
 		if (result.shouldReturn()) return result;
 
 		if (node.operationToken.matches(TokenTypes.MINUS)) return value.mul(new NumberValue(-1, context));
-		else if (node.operationToken.matches(TokenTypes.NOT)) return result.success(new BooleanValue(!value.isTrue(), context));
+		else if (node.operationToken.matches(TokenTypes.NOT))
+			return result.success(new BooleanValue(!value.isTrue(), context));
 		else return result.success(value);
 	}
 
@@ -154,11 +155,11 @@ abstract public class Interpreter {
 			Node body = ifCase.body;
 			boolean shouldReturnNull = !ifCase.isExpression;
 
-			Value conditionValue = result.register(visit(condition, context));
+			Value<?> conditionValue = result.register(visit(condition, context));
 			if (result.shouldReturn()) return result;
 
 			if (conditionValue.isTrue()) {
-				Value expressionValue = result.register(visit(body, context));
+				Value<?> expressionValue = result.register(visit(body, context));
 				if (result.shouldReturn()) return result;
 
 				return result.success(shouldReturnNull ? new NullValue(context) : expressionValue);
@@ -166,7 +167,7 @@ abstract public class Interpreter {
 		}
 
 		if (node.elseCase != null) {
-			Value elseValue = result.register(visit(node.elseCase.body, context));
+			Value<?> elseValue = result.register(visit(node.elseCase.body, context));
 			if (result.shouldReturn()) return result;
 
 			return result.success(node.elseCase.isExpression ? elseValue : new NullValue(context));
@@ -176,11 +177,11 @@ abstract public class Interpreter {
 
 	static RuntimeResult visitObjectNode(@NotNull ObjectNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Map<String, Value> valueObj = new HashMap<>();
+		Map<String, Value<?>> valueObj = new HashMap<>();
 		ObjectValue objectValue = new ObjectValue(valueObj, context);
 
 		for (Map.Entry<String, Node> value : node.object.entrySet()) {
-			Value objValue = result.register(visit(value.getValue(), context));
+			Value<?> objValue = result.register(visit(value.getValue(), context));
 			if (result.shouldReturn()) return result;
 
 			if (objValue instanceof BaseFunctionValue) ((BaseFunctionValue) objValue).setThis(objectValue);
@@ -194,41 +195,45 @@ abstract public class Interpreter {
 
 	static RuntimeResult visitObjectAccessNode(@NotNull ObjectAccessNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value object = result.register(visit(node.objectNode, context));
+		Value<?> object = result.register(visit(node.objectNode, context));
 		if (result.shouldReturn()) return result;
 
-		if (!(object instanceof ObjectValue || object instanceof ListValue)) return result.failure(new RuntimeError(node.keyToken != null ? node.keyToken.startPosition : node.keyNode.startPosition, node.keyToken != null ? node.keyToken.endPosition : node.keyNode.endPosition, "Not an object/list", context));
-
-		if (node.keyToken != null && object instanceof ListValue) return result.failure(new RuntimeError(node.keyToken.startPosition, node.keyToken.endPosition, "Not an object", context));
+		String key = node.keyToken != null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValue();
+		Value<?> returnValue = null;
 
 		if (object instanceof ObjectValue) {
-			String key = node.keyToken != null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValue();
+
 			if (result.shouldReturn()) return result;
 
-			Value value = ((ObjectValue) object).get(key);
-
-			return result.success(value);
-		} else {
-			Value keyValue = result.register(visit(node.keyNode, context));
+			returnValue = ((ObjectValue) object).get(key);
+		} else if (object instanceof ListValue) {
+			Value<?> keyValue = result.register(visit(node.keyNode, context));
 			if (result.shouldReturn()) return result;
 
-			if (!(keyValue instanceof NumberValue) || keyValue.getValue().contains(".") || Integer.parseInt(keyValue.getValue()) < 0 || Integer.parseInt(keyValue.getValue()) > ((ListValue) object).value.size() - 1)
-				return result.success(new NullValue(context));
-
-			return result.success(((ListValue) object).value.get(Integer.parseInt(keyValue.getValue())));
+			if (keyValue instanceof NumberValue) {
+				returnValue = ((ListValue) object).value.get(Integer.parseInt(keyValue.getValue()));
+			}
 		}
+		if (returnValue == null) {
+			object.makePrototype();
+			returnValue = object.prototype.get(key);
+		}
+
+		return result.success(returnValue != null ? returnValue : new NullValue(context));
 	}
 
 	static RuntimeResult visitObjectAssignNode(@NotNull ObjectAssignNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value object = result.register(visit(node.objectNode, context));
+		Value<?> object = result.register(visit(node.objectNode, context));
 		if (result.shouldReturn()) return result;
 
-		if (!(object instanceof ObjectValue || object instanceof ListValue)) return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Not an object/list", context));
+		if (!(object instanceof ObjectValue || object instanceof ListValue))
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Not an object/list", context));
 
-		if (node.keyToken != null && object instanceof ListValue) return result.failure(new RuntimeError(node.keyToken.startPosition, node.keyToken.endPosition, "Not an object", context));
+		if (node.keyToken != null && object instanceof ListValue)
+			return result.failure(new RuntimeError(node.keyToken.startPosition, node.keyToken.endPosition, "Not an object", context));
 
-		Value value = result.register(visit(node.valueNode, context));
+		Value<?> value = result.register(visit(node.valueNode, context));
 		if (result.shouldReturn()) return result;
 
 		if (object instanceof ObjectValue) {
@@ -237,7 +242,7 @@ abstract public class Interpreter {
 
 			((ObjectValue) object).set(key, value);
 		} else {
-			Value keyValue = result.register(visit(node.keyNode, context));
+			Value<?> keyValue = result.register(visit(node.keyNode, context));
 			if (result.shouldReturn()) return result;
 
 			if (!(keyValue instanceof NumberValue) || keyValue.getValue().contains(".") || Integer.parseInt(keyValue.getValue()) < 0 || Integer.parseInt(keyValue.getValue()) > ((ListValue) object).value.size())
@@ -254,9 +259,10 @@ abstract public class Interpreter {
 	static RuntimeResult visitVarAccessNode(@NotNull VarAccessNode node, @NotNull Context context) {
 		RuntimeResult result = new RuntimeResult();
 		String varName = node.token.value;
-		Value value = context.symbolTable.get(varName);
+		Value<?> value = context.symbolTable.get(varName);
 
-		if (value == null) return result.failure(new RuntimeError(node.startPosition, node.endPosition, varName + " is not defined", context));
+		if (value == null)
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, varName + " is not defined", context));
 
 		value = value.setPosition(node.startPosition, node.endPosition);
 		return result.success(value);
@@ -266,12 +272,14 @@ abstract public class Interpreter {
 		RuntimeResult result = new RuntimeResult();
 		String varName = node.token.value;
 
-		Value value = result.register(visit(node.expression, context)).setPosition(node.token.startPosition, node.token.endPosition);
+		Value<?> value = result.register(visit(node.expression, context)).setPosition(node.token.startPosition, node.token.endPosition);
 		if (result.shouldReturn()) return result;
 
-		if (value == null) return result.failure(new RuntimeError(node.startPosition, node.endPosition, varName + " is not defined", context));
+		if (value == null)
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, varName + " is not defined", context));
 
-		if (context.symbolTable.has(varName)) return result.failure(new RuntimeError(node.startPosition, node.endPosition, "This variable already exists", context));
+		if (context.symbolTable.has(varName))
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "This variable already exists", context));
 
 		context.symbolTable.set(varName, value, node.isFinal);
 		return result.success(value);
@@ -282,31 +290,34 @@ abstract public class Interpreter {
 
 		String varName = node.token.value;
 
-		Value value = result.register(visit(node.expression, context)).setPosition(node.token.startPosition, node.token.endPosition);
+		Value<?> value = result.register(visit(node.expression, context)).setPosition(node.token.startPosition, node.token.endPosition);
 		if (result.shouldReturn()) return result;
 
 		boolean successful = context.symbolTable.setExisting(varName, value);
 
-		if (!successful) return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Variable not found or is constant", context));
+		if (!successful)
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Variable not found or is constant", context));
 
 		return result.success(value);
 	}
 
 	static RuntimeResult visitForNode(@NotNull ForNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		List<Value> elements = new ArrayList<>();
+		List<Value<?>> elements = new ArrayList<>();
 
-		Value startValue = result.register(visit(node.startValueNode, context));
+		Value<?> startValue = result.register(visit(node.startValueNode, context));
 		if (result.shouldReturn()) return result;
 
-		Value endValue = result.register(visit(node.endValueNode, context));
+		Value<?> endValue = result.register(visit(node.endValueNode, context));
 		if (result.shouldReturn()) return result;
 
-		if (!(startValue instanceof NumberValue && endValue instanceof NumberValue)) return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Not a number", context));
+		if (!(startValue instanceof NumberValue && endValue instanceof NumberValue))
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Not a number", context));
 
 		int i = Integer.parseInt(startValue.getValue());
 
-		if (i > Integer.parseInt(endValue.getValue())) return result.failure(new RuntimeError(node.startPosition, node.endPosition, "The start value mustn't be greater than the end value", context));
+		if (i > Integer.parseInt(endValue.getValue()))
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "The start value mustn't be greater than the end value", context));
 
 		Context forContext = new Context("for loop", context);
 		forContext.symbolTable = new SymbolTable(context.symbolTable);
@@ -315,7 +326,7 @@ abstract public class Interpreter {
 			forContext.symbolTable.set(node.varNameToken.value, new NumberValue(i, forContext), false);
 			i++;
 
-			Value value = result.register(visit(node.bodyNode, forContext));
+			Value<?> value = result.register(visit(node.bodyNode, forContext));
 
 			if (result.shouldReturn() && !result.loopShouldContinue && !result.loopShouldBreak) return result;
 
@@ -330,7 +341,7 @@ abstract public class Interpreter {
 
 	static RuntimeResult visitWhileNode(@NotNull WhileNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		List<Value> elements = new ArrayList<>();
+		List<Value<?>> elements = new ArrayList<>();
 
 		while (true) {
 			BooleanValue condition = (BooleanValue) result.register(visit(node.conditionNode, context));
@@ -341,7 +352,7 @@ abstract public class Interpreter {
 			Context whileContext = new Context("while loop", context);
 			whileContext.symbolTable = new SymbolTable(context.symbolTable);
 
-			Value value = result.register(visit(node.bodyNode, whileContext));
+			Value<?> value = result.register(visit(node.bodyNode, whileContext));
 
 			if (result.shouldReturn() && !result.loopShouldContinue && !result.loopShouldBreak) return result;
 
@@ -363,11 +374,12 @@ abstract public class Interpreter {
 		List<String> argNames = new ArrayList<>();
 		node.argNameTokens.forEach((token) -> argNames.add(token.value));
 
-		Value functionValue = new FunctionValue(functionName, body, argNames, node.shouldAutoReturn, context).setPosition(node.startPosition, node.endPosition);
+		Value<?> functionValue = new FunctionValue(functionName, body, argNames, node.shouldAutoReturn, context).setPosition(node.startPosition, node.endPosition);
 
 		boolean success = true;
 		if (node.varNameToken != null) success = context.symbolTable.set(functionName, functionValue, false);
-		if (!success) return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Cannot assign to constant variable", context));
+		if (!success)
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Cannot assign to constant variable", context));
 
 		return result.success(functionValue);
 	}
@@ -376,10 +388,10 @@ abstract public class Interpreter {
 		RuntimeResult result = new RuntimeResult();
 		Context callContext = new Context("<arguments>", context, node.startPosition);
 		callContext.symbolTable = new SymbolTable(context.symbolTable);
-		List<Value> args = node.argNodes.stream().map((arg) -> result.register(visit(arg, callContext))).collect(Collectors.toList());
+		List<Value<?>> args = node.argNodes.stream().map(arg -> result.register(visit(arg, callContext))).collect(Collectors.toList());
 		if (result.shouldReturn()) return result;
 
-		Value valueToCall = result.register(visit(node.nodeToCall, context));
+		Value<?> valueToCall = result.register(visit(node.nodeToCall, context));
 		if (result.shouldReturn()) return result;
 
 		if (!(valueToCall instanceof BaseFunctionValue))
@@ -387,7 +399,7 @@ abstract public class Interpreter {
 
 		valueToCall.setPosition(node.startPosition, node.endPosition);
 
-		Value returnValue = result.register(((BaseFunctionValue) valueToCall).execute(args, context));
+		Value<?> returnValue = result.register(((BaseFunctionValue) valueToCall).execute(args, context));
 		if (result.shouldReturn()) return result;
 		returnValue.setContext(context).setPosition(node.startPosition, node.endPosition);
 
@@ -396,7 +408,7 @@ abstract public class Interpreter {
 
 	static RuntimeResult visitReturnNode(@NotNull ReturnNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value value = new NullValue(context);
+		Value<?> value = new NullValue(context);
 
 		if (node.nodeToReturn != null) {
 			value = result.register(visit(node.nodeToReturn, context));

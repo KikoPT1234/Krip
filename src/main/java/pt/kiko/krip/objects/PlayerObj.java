@@ -1,8 +1,10 @@
 package pt.kiko.krip.objects;
 
-import org.bukkit.entity.Player;
+import org.bukkit.BanList;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.Context;
-import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
 
@@ -11,42 +13,39 @@ import java.util.HashMap;
 
 public class PlayerObj extends ObjectValue {
 
-	public PlayerObj(Player player, Context context) {
+	public OfflinePlayer player;
+
+	public PlayerObj(@NotNull OfflinePlayer player, Context context) {
 		super(new HashMap<>(), context);
+		this.player = player;
 		value.put("name", new StringValue(player.getName(), context));
-		value.put("displayName", new StringValue(player.getDisplayName(), context));
 		value.put("uuid", new StringValue(player.getUniqueId().toString(), context));
-		value.put("chat", new BuiltInFunctionValue("chat", Collections.singletonList("message"), context) {
+
+		value.put("ban", new BuiltInFunctionValue("ban", Collections.singletonList("reason"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value message = context.symbolTable.get("message");
+				Value<?> reason = context.symbolTable.get("reason");
 
-				if (!(message instanceof StringValue))
-					return result.failure(new RuntimeError(message.startPosition, message.endPosition, "Invalid type", context));
+				if (!(reason instanceof StringValue || reason instanceof NullValue))
+					return invalidType(reason, context);
 
-				player.chat(message.getValue());
-
+				Bukkit.getServer().getBanList(BanList.Type.NAME).addBan(player.getUniqueId().toString(), reason.getValue(), null, null);
 				return result.success(new NullValue(context.parent));
 			}
 		});
-		value.put("send", new BuiltInFunctionValue("send", Collections.singletonList("message"), context) {
-			@Override
-			public RuntimeResult run(Context context) {
-				player.sendMessage(context.symbolTable.get("message").getValue());
-				return new RuntimeResult().success(new NullValue(context));
-			}
-		});
-		value.put("hasPermission", new BuiltInFunctionValue("hasPermission", Collections.singletonList("permission"), context) {
+
+		value.put("unban", new BuiltInFunctionValue("unban", Collections.singletonList("reason"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value permission = context.symbolTable.get("permission");
+				Value<?> reason = context.symbolTable.get("reason");
 
-				if (!(permission instanceof StringValue))
-					return result.failure(new RuntimeError(permission.startPosition, permission.endPosition, "Invalid type", context));
+				if (!(reason instanceof StringValue || reason instanceof NullValue))
+					return invalidType(reason, context);
 
-				return result.success(new BooleanValue(player.hasPermission(permission.getValue()), context.parent));
+				Bukkit.getServer().getBanList(BanList.Type.NAME).pardon(player.getUniqueId().toString());
+				return result.success(new NullValue(context.parent));
 			}
 		});
 	}

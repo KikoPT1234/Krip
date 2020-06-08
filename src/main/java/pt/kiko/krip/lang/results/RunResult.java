@@ -6,9 +6,9 @@ import pt.kiko.krip.lang.values.Value;
 public class RunResult {
 
 	public Error error;
-	public Value value;
+	public Value<?> value;
 
-	public RunResult success(Value value) {
+	public RunResult success(Value<?> value) {
 		this.value = value;
 		return this;
 	}

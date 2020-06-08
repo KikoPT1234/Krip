@@ -20,7 +20,7 @@ public class TypeFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value value = context.symbolTable.get("value");
+		Value<?> value = context.symbolTable.get("value");
 
 		if (value instanceof NumberValue) return result.success(new StringValue("NUMBER", context.parent));
 		else if (value instanceof StringValue) return result.success(new StringValue("STRING", context.parent));
@@ -30,10 +30,5 @@ public class TypeFunc extends BuiltInFunctionValue {
 		else if (value instanceof ObjectValue) return result.success(new StringValue("OBJECT", context.parent));
 		else if (value instanceof BaseFunctionValue) return result.success(new StringValue("FUNCTION", context.parent));
 		else return result.success(new StringValue("UNKNOWN", context.parent));
-	}
-
-	@Override
-	public Value copy() {
-		return new TypeFunc().setPosition(startPosition, endPosition);
 	}
 }
