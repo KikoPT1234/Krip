@@ -12,6 +12,8 @@ public class OnlinePlayerObj extends PlayerObj {
 	public OnlinePlayerObj(Player player, Context context) {
 		super(player, context);
 
+		value.put("world", new WorldObj(player.getWorld(), context));
+
 		value.put("chat", new BuiltInFunctionValue("chat", Collections.singletonList("message"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
@@ -79,6 +81,14 @@ public class OnlinePlayerObj extends PlayerObj {
 
 				player.kickPlayer(reason.getValue());
 				return result.success(new NullValue(context.parent));
+			}
+		});
+
+		value.put("kill", new BuiltInFunctionValue("kill", Collections.emptyList(), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				player.damage(10000);
+				return new RuntimeResult().success(new NullValue(context.parent));
 			}
 		});
 	}

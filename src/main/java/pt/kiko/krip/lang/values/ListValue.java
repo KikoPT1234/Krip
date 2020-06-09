@@ -84,5 +84,61 @@ public class ListValue extends Value<List<Value<?>>> {
 				return result.success(new StringValue(String.join(string.getValue(), list), context));
 			}
 		});
+
+		prototype.set("forEach", new BuiltInFunctionValue("forEach", Collections.singletonList("function"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				Value<?> function = context.symbolTable.get("function");
+
+				if (!(function instanceof BaseFunctionValue)) return invalidType(function, context);
+
+				ListValue.this.value.forEach(value -> ((BaseFunctionValue) function).execute(Collections.singletonList(value), context));
+
+				return result.success(new NullValue(context.parent));
+			}
+		});
+
+		prototype.set("map", new BuiltInFunctionValue("map", Collections.singletonList("function"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				Value<?> function = context.symbolTable.get("function");
+
+				if (!(function instanceof BaseFunctionValue)) return invalidType(function, context);
+
+				List<Value<?>> returnValue = new ArrayList<>();
+				Value<?>[] list = ListValue.this.value.toArray(new Value[]{});
+
+				for (Value<?> listValue : list) {
+					returnValue.add(result.register(((BaseFunctionValue) function).execute(Collections.singletonList(listValue), context)));
+					if (result.shouldReturn()) return result;
+				}
+
+				return result.success(new ListValue(returnValue, context));
+			}
+		});
+
+		prototype.set("filter", new BuiltInFunctionValue("filter", Collections.singletonList("function"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				Value<?> function = context.symbolTable.get("function");
+
+				if (!(function instanceof BaseFunctionValue)) return invalidType(function, context);
+
+				List<Value<?>> returnValue = new ArrayList<>();
+				Value<?>[] list = ListValue.this.value.toArray(new Value[]{});
+
+				for (Value<?> listValue : list) {
+					Value<?> returnedValue = result.register(((BaseFunctionValue) function).execute(Collections.singletonList(listValue), context));
+					if (result.shouldReturn()) return result;
+
+					if (returnedValue.isTrue()) returnValue.add(returnedValue);
+				}
+
+				return result.success(new ListValue(returnValue, context));
+			}
+		});
 	}
 }

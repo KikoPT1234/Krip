@@ -3,13 +3,13 @@ package pt.kiko.krip.events;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerJoinEvent;
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.lang.EventInfo;
+import pt.kiko.krip.KripEvent;
 import pt.kiko.krip.lang.values.ObjectValue;
 import pt.kiko.krip.objects.PlayerObj;
 
 import java.util.HashMap;
 
-public class PlayerJoinEvt extends EventInfo {
+public class PlayerJoinEvt extends KripEvent {
 
 	static {
 		Krip.registerEvent(new PlayerJoinEvt());

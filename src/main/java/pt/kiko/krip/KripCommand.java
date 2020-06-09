@@ -60,7 +60,7 @@ public class KripCommand implements TabExecutor {
 					}
 				}
 				if (nOfErrors.get() == 0)
-					commandSender.sendMessage(ChatColor.GREEN + "Successfully loaded " + files.length + (files.length == 1 ? "script!" : " scripts!"));
+					commandSender.sendMessage(ChatColor.GREEN + "Successfully loaded " + files.length + (files.length == 1 ? " script!" : " scripts!"));
 				else
 					commandSender.sendMessage(ChatColor.RED + "There were " + nOfErrors.get() + " errors while loading " + files.length + " files");
 				return true;
@@ -91,7 +91,6 @@ public class KripCommand implements TabExecutor {
 
 	private void reset() {
 		Krip.events.forEach((name, info) -> info.functions.clear());
-		Krip.events.clear();
 		Krip.commandNames.forEach((name, fName) -> {
 			Command plCmd = Krip.commandMap.getCommand(name.toLowerCase());
 			assert plCmd != null;

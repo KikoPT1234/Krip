@@ -59,6 +59,7 @@ public class ObjectValue extends Value<Map<String, Value<?>>> {
 		AtomicInteger count = new AtomicInteger();
 		value.forEach((key, value) -> {
 			count.getAndIncrement();
+			if (value instanceof BaseFunctionValue) return;
 			returnString.append(String.join("", Collections.nCopies(tabAmount, "  "))).append(key).append(": ").append(value instanceof ObjectValue ? value.equals(this) ? "<circular>" : ((ObjectValue) value).setTabAmount(tabAmount + 1).toString() : value instanceof StringValue ? "\"" + value.toString() + "\"" : value.toString()).append(count.get() == this.value.size() ? "\n" : ",\n");
 		});
 		returnString.append(String.join("", Collections.nCopies(tabAmount - 1, "  "))).append("}");

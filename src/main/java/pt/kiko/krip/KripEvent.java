@@ -1,10 +1,10 @@
-package pt.kiko.krip.lang;
+package pt.kiko.krip;
 
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
-import pt.kiko.krip.Krip;
+import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.BaseFunctionValue;
 import pt.kiko.krip.lang.values.BuiltInFunctionValue;
@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-abstract public class EventInfo implements Listener {
+abstract public class KripEvent implements Listener {
 
 	public String name;
 	public List<BaseFunctionValue> functions = new ArrayList<>();
 	public Class<? extends Event> event;
 
-	public EventInfo(String name, Class<? extends Event> event) {
+	public KripEvent(String name, Class<? extends Event> event) {
 		this.name = name;
 		this.event = event;
 	}

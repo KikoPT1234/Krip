@@ -31,7 +31,7 @@ public class Krip extends JavaPlugin {
 
 	public static Context context = new Context("<program>");
 	public static Krip plugin;
-	public static Map<String, EventInfo> events = new HashMap<>();
+	public static Map<String, KripEvent> events = new HashMap<>();
 	public static List<String> registeredNames = new ArrayList<>();
 	public static Map<String, String> commandNames = new HashMap<>();
 	public static SimpleCommandMap commandMap;
@@ -106,9 +106,9 @@ public class Krip extends JavaPlugin {
 		registeredNames.add(name);
 	}
 
-	public static void registerEvent(EventInfo eventInfo) {
-		events.put(eventInfo.name, eventInfo);
-		plugin.getServer().getPluginManager().registerEvent(eventInfo.event, eventInfo, EventPriority.NORMAL, (listener, event) -> eventInfo.execute(event), plugin);
+	public static void registerEvent(KripEvent kripEvent) {
+		events.put(kripEvent.name, kripEvent);
+		plugin.getServer().getPluginManager().registerEvent(kripEvent.event, kripEvent, EventPriority.NORMAL, (listener, event) -> kripEvent.execute(event), plugin);
 	}
 
 	public File pluginFolder;
