@@ -272,11 +272,13 @@ abstract public class Interpreter {
 		RuntimeResult result = new RuntimeResult();
 		String varName = node.token.value;
 
-		Value<?> value = result.register(visit(node.expression, context)).setPosition(node.token.startPosition, node.token.endPosition);
+		Value<?> value = result.register(visit(node.expression, context));
 		if (result.shouldReturn()) return result;
 
 		if (value == null)
 			return result.failure(new RuntimeError(node.startPosition, node.endPosition, varName + " is not defined", context));
+
+		value.setPosition(node.token.startPosition, node.token.endPosition);
 
 		if (context.symbolTable.has(varName))
 			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "This variable already exists", context));

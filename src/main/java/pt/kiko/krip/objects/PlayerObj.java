@@ -1,5 +1,6 @@
 package pt.kiko.krip.objects;
 
+import org.bukkit.BanEntry;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -10,6 +11,7 @@ import pt.kiko.krip.lang.values.*;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class PlayerObj extends ObjectValue {
 
@@ -30,7 +32,9 @@ public class PlayerObj extends ObjectValue {
 				if (!(reason instanceof StringValue || reason instanceof NullValue))
 					return invalidType(reason, context);
 
-				Bukkit.getServer().getBanList(BanList.Type.NAME).addBan(player.getUniqueId().toString(), reason.getValue(), null, null);
+				BanEntry entry = Bukkit.getServer().getBanList(BanList.Type.NAME).addBan(player.getUniqueId().toString(), reason.getValue(), null, null);
+				assert entry != null;
+				if (player.isOnline()) Objects.requireNonNull(player.getPlayer()).kickPlayer(entry.getReason());
 				return result.success(new NullValue(context.parent));
 			}
 		});

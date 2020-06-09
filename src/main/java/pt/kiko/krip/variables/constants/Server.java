@@ -1,5 +1,6 @@
 package pt.kiko.krip.variables.constants;
 
+import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -60,7 +61,7 @@ public class Server extends ObjectValue {
 
 				if (!(name instanceof StringValue)) return invalidType(name, context);
 
-				OfflinePlayer player = null;
+				Player player = null;
 
 				if (name.getValue().length() == 32 || name.getValue().length() == 36)
 					player = Bukkit.getPlayer(UUID.fromString(name.getValue()));
@@ -69,7 +70,20 @@ public class Server extends ObjectValue {
 
 				if (player == null) return result.success(new NullValue(context.parent));
 
-				return result.success(new PlayerObj(player, context.parent));
+				return result.success(new OnlinePlayerObj(player, context.parent));
+			}
+		});
+
+		value.put("unban", new BuiltInFunctionValue("unban", Collections.singletonList("name"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				Value<?> name = context.symbolTable.get("name");
+
+				if (!(name instanceof StringValue)) return invalidType(name, context);
+
+				Bukkit.getServer().getBanList(BanList.Type.NAME).pardon(name.getValue());
+				return result.success(new NullValue(context.parent));
 			}
 		});
 	}

@@ -157,7 +157,12 @@ public class Krip extends JavaPlugin {
 
 		for (File file : scriptFolder.listFiles()) {
 			String code = loadFile(file);
-			run(code, file.getName());
+			try {
+				run(code, file.getName());
+			} catch (Exception e) {
+				e.printStackTrace();
+				getLogger().warning("There has been an error with Krip, it would be appreciated if it was reported!");
+			}
 		}
 
 		getServer().getLogger().info("Krip enabled!");

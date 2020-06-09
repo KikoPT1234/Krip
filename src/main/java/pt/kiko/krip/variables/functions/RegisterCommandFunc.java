@@ -154,11 +154,12 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 			Krip.knownCommands.remove("krip:" + existingCmd.getName());
 			existingCmd.unregister(Krip.commandMap);
 		}
-		Krip.commandMap.register("krip", command);
 
 		HelpMap help = Bukkit.getHelpMap();
 		HelpTopic t = new GenericCommandHelpTopic(command);
 		help.addTopic(t);
+
+		Krip.commandMap.register("krip", command);
 
 		try {
 			Krip.syncCommandsMethod.invoke(Bukkit.getServer());

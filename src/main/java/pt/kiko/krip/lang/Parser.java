@@ -10,6 +10,7 @@ import pt.kiko.krip.lang.results.CaseResult;
 import pt.kiko.krip.lang.results.ParseResult;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Parser {
 
@@ -45,6 +46,14 @@ public class Parser {
 	}
 
 	public void advanceNewlines(ParseResult result) {
+		while (currentToken.matches(TokenTypes.NEWLINE)) {
+			tokenIndex++;
+			updateCurrentToken();
+			result.registerAdvancement();
+		}
+	}
+
+	public void advanceNewlines(CaseResult result) {
 		while (currentToken.matches(TokenTypes.NEWLINE)) {
 			tokenIndex++;
 			updateCurrentToken();
@@ -529,27 +538,50 @@ public class Parser {
 
 			cases.add(new Case(condition, statements, false));
 
-			if (!currentToken.matches(TokenTypes.RBRACKET)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
+			if (!currentToken.matches(TokenTypes.RBRACKET))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
 
 			result.registerAdvancement();
 			advance();
+
+			AtomicInteger integer = new AtomicInteger();
+
+			while (currentToken.matches(TokenTypes.NEWLINE)) {
+				result.registerAdvancement();
+				advance();
+				integer.getAndIncrement();
+			}
 
 			if (currentToken.matches(TokenTypes.KEYWORD, "else if") || currentToken.matches(TokenTypes.KEYWORD, "else")) {
 				Cases allCases = result.register(elseOrElseIfExpression());
 
 				if (allCases.cases != null && allCases.cases.size() > 0) cases.addAll(allCases.cases);
 				elseCase = allCases.elseCase;
+			} else {
+				result.advanceCount -= integer.get();
+				reverse(integer.get());
 			}
 		} else {
 			Node expression = result.register(statement());
 			if (result.error != null) return result;
 			cases.add(new Case(condition, expression, true));
 
+			AtomicInteger integer = new AtomicInteger();
+
+			while (currentToken.matches(TokenTypes.NEWLINE)) {
+				result.registerAdvancement();
+				advance();
+				integer.getAndIncrement();
+			}
+
 			if (currentToken.matches(TokenTypes.KEYWORD, "else if") || currentToken.matches(TokenTypes.KEYWORD, "else")) {
 				Cases allCases = result.register(elseOrElseIfExpression());
 
 				if (allCases.cases != null && allCases.cases.size() > 0) cases.addAll(allCases.cases);
 				elseCase = allCases.elseCase;
+			} else {
+				result.advanceCount -= integer.get();
+				reverse(integer.get());
 			}
 		}
 		return result.success(new Cases(cases, elseCase));
@@ -580,7 +612,7 @@ public class Parser {
 			result.registerAdvancement();
 			advance();
 		} else {
-			Node expression = result.register(expression());
+			Node expression = result.register(statement());
 			if (result.error != null) return result;
 			cases.setElseCase(new ElseCase(expression, true));
 		}
