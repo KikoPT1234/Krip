@@ -211,6 +211,8 @@ final public class Interpreter {
 		if (result.shouldReturn()) return result;
 
 		String key = node.keyToken != null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValueString();
+		Position startPosition = node.keyToken != null ? node.keyToken.startPosition : node.keyNode.startPosition;
+		Position endPosition = node.keyToken != null ? node.keyToken.endPosition : node.keyNode.endPosition;
 		Value<?> returnValue = null;
 
 		if (object instanceof ObjectValue) {
@@ -231,7 +233,7 @@ final public class Interpreter {
 			returnValue = object.prototype.get(key);
 		}
 
-		return result.success(returnValue != null ? returnValue : new NullValue(context));
+		return result.success(returnValue != null ? returnValue.setPosition(startPosition, endPosition) : new NullValue(context).setPosition(startPosition, endPosition));
 	}
 
 	private static RuntimeResult visitObjectAssignNode(@NotNull ObjectAssignNode node, Context context) {
@@ -404,18 +406,18 @@ final public class Interpreter {
 
 	private static RuntimeResult visitCallNode(@NotNull CallNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Context callContext = new Context("<arguments>", context, node.startPosition);
-		callContext.symbolTable = new SymbolTable(context.symbolTable);
-		List<Value<?>> args = node.argNodes.stream().map(arg -> result.register(visit(arg, callContext))).collect(Collectors.toList());
-		if (result.shouldReturn()) return result;
 
 		Value<?> valueToCall = result.register(visit(node.nodeToCall, context));
 		if (result.shouldReturn()) return result;
 
 		if (!(valueToCall instanceof BaseFunctionValue))
 			return result.failure(new RuntimeError(valueToCall.startPosition, valueToCall.endPosition, "Not a function", context));
-
 		valueToCall.setPosition(node.startPosition, node.endPosition);
+
+		Context callContext = new Context("<arguments>", context, node.startPosition);
+		callContext.symbolTable = new SymbolTable(context.symbolTable);
+		List<Value<?>> args = node.argNodes.stream().map(arg -> result.register(visit(arg, callContext))).collect(Collectors.toList());
+		if (result.shouldReturn()) return result;
 
 		Value<?> returnValue = result.register(((BaseFunctionValue) valueToCall).execute(args, context));
 		if (result.shouldReturn()) return result;
