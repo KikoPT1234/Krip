@@ -27,6 +27,6 @@ public class FormatFunc extends BuiltInFunctionValue {
 
 		if (!(message instanceof StringValue)) return invalidType(message, context);
 
-		return result.success(new StringValue(ChatColor.translateAlternateColorCodes('&', message.getValue()), context.parent));
+		return result.success(new StringValue(ChatColor.translateAlternateColorCodes('&', message.getValueString()), context.parent));
 	}
 }

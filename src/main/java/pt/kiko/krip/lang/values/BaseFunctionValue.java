@@ -9,7 +9,6 @@ import java.util.List;
 
 abstract public class BaseFunctionValue extends Value<String> {
 
-	public String value;
 	public List<String> argNames;
 
 	public BaseFunctionValue(String name, List<String> argNames, Value<?> parent, Context context) {
@@ -46,7 +45,7 @@ abstract public class BaseFunctionValue extends Value<String> {
 	}
 
 	@Override
-	public String getValue() {
+	public String getValueString() {
 		return "<function " + (value == null ? "anonymous" : value) + ">";
 	}
 
@@ -58,14 +57,14 @@ abstract public class BaseFunctionValue extends Value<String> {
 	@Override
 	public RuntimeResult equal(Value<?> other) {
 		if (other instanceof BaseFunctionValue)
-			return new RuntimeResult().success(new BooleanValue(value.equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(value.equals(other.getValueString()), context));
 		else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
 	public RuntimeResult notEquals(Value<?> other) {
 		if (other instanceof BaseFunctionValue)
-			return new RuntimeResult().success(new BooleanValue(!value.equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(!value.equals(other.getValueString()), context));
 		else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 

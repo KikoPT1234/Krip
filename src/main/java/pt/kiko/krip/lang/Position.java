@@ -2,35 +2,72 @@ package pt.kiko.krip.lang;
 
 import com.sun.istack.internal.NotNull;
 
+/**
+ * Represents the position of a piece of code in the file
+ */
 public class Position {
 
-    public int col;
-    public int line;
-    public int index;
-    public String fileName;
-    public String fileText;
+	/**
+	 * The column
+	 */
+	public int col;
 
-    public Position(int col, int line, int index, String fileName, String fileText) {
-        this.col = col;
-        this.line = line;
-        this.index = index;
-        this.fileName = fileName;
-        this.fileText = fileText;
-    }
+	/**
+	 * The line
+	 */
+	public int line;
 
-    public void advance(@NotNull char currentChar) {
+	/**
+	 * The index
+	 */
+	public int index;
 
-        index++;
-        col++;
+	/**
+	 * The file name
+	 */
+	public String fileName;
 
-        if (currentChar == '\n') {
-            col = 0;
-            line++;
-        }
-    }
+	/**
+	 * The file text
+	 */
+	public String fileText;
 
-    public Position copy() {
-        return new Position(col, line, index, fileName, fileText);
-    }
+	/**
+	 * @param col      The column
+	 * @param line     The line
+	 * @param index    The index
+	 * @param fileName The file name
+	 * @param fileText The file text
+	 */
+	public Position(int col, int line, int index, String fileName, String fileText) {
+		this.col = col;
+		this.line = line;
+		this.index = index;
+		this.fileName = fileName;
+		this.fileText = fileText;
+	}
+
+	/**
+	 * Advances to the next column/line
+	 *
+	 * @param currentChar The current character, used to check if it should advance to the next line
+	 */
+	public void advance(@NotNull char currentChar) {
+
+		index++;
+		col++;
+
+		if (currentChar == '\n') {
+			col = 0;
+			line++;
+		}
+	}
+
+	/**
+	 * @return A new instance of this class
+	 */
+	public Position copy() {
+		return new Position(col, line, index, fileName, fileText);
+	}
 
 }

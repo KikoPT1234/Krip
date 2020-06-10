@@ -11,7 +11,7 @@ public class BooleanValue extends Value<Boolean> {
 	}
 
 	@Override
-	public String getValue() {
+	public String getValueString() {
 		return Boolean.toString(value);
 	}
 
@@ -33,14 +33,14 @@ public class BooleanValue extends Value<Boolean> {
 	@Override
 	public RuntimeResult equal(Value<?> other) {
 		if (other instanceof ListValue) {
-			return new RuntimeResult().success(new BooleanValue(getValue().equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(getValueString().equals(other.getValueString()), context));
 		} else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
 	public RuntimeResult notEquals(Value<?> other) {
 		if (other instanceof ListValue) {
-			return new RuntimeResult().success(new BooleanValue(!getValue().equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(!getValueString().equals(other.getValueString()), context));
 		} else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 

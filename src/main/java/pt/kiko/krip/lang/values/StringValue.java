@@ -16,7 +16,7 @@ public class StringValue extends Value<String> {
 	}
 
 	@Override
-	public String getValue() {
+	public String getValueString() {
 		return value;
 	}
 
@@ -32,12 +32,12 @@ public class StringValue extends Value<String> {
 
 	@Override
 	public RuntimeResult equal(Value<?> other) {
-		return new RuntimeResult().success(new BooleanValue(getValue().equals(other.getValue()), context));
+		return new RuntimeResult().success(new BooleanValue(getValueString().equals(other.getValueString()), context));
 	}
 
 	@Override
 	public RuntimeResult notEquals(Value<?> other) {
-		return new RuntimeResult().success(new BooleanValue(!getValue().equals(other.getValue()), context));
+		return new RuntimeResult().success(new BooleanValue(!getValueString().equals(other.getValueString()), context));
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class StringValue extends Value<String> {
 
 				if (!(regex instanceof StringValue)) return invalidType(regex, context);
 
-				return result.success(new ListValue(Arrays.stream(StringValue.this.getValue().split(regex.getValue())).map(string -> new StringValue(string, context)).collect(Collectors.toList()), context));
+				return result.success(new ListValue(Arrays.stream(StringValue.this.getValueString().split(regex.getValueString())).map(string -> new StringValue(string, context)).collect(Collectors.toList()), context));
 			}
 		});
 	}
@@ -59,7 +59,7 @@ public class StringValue extends Value<String> {
 	@Override
 	public RuntimeResult plus(Value<?> other) {
 		if (other instanceof NullValue)
-			return new RuntimeResult().success(new StringValue(getValue() + "null", context));
-		else return new RuntimeResult().success(new StringValue(getValue() + other.getValue(), context));
+			return new RuntimeResult().success(new StringValue(getValueString() + "null", context));
+		else return new RuntimeResult().success(new StringValue(getValueString() + other.getValueString(), context));
 	}
 }

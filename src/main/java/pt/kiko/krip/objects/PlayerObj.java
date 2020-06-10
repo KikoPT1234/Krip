@@ -32,7 +32,7 @@ public class PlayerObj extends ObjectValue {
 				if (!(reason instanceof StringValue || reason instanceof NullValue))
 					return invalidType(reason, context);
 
-				BanEntry entry = Bukkit.getServer().getBanList(BanList.Type.NAME).addBan(player.getUniqueId().toString(), reason.getValue(), null, null);
+				BanEntry entry = Bukkit.getServer().getBanList(BanList.Type.NAME).addBan(player.getUniqueId().toString(), reason.getValueString(), null, null);
 				assert entry != null;
 				if (player.isOnline()) Objects.requireNonNull(player.getPlayer()).kickPlayer(entry.getReason());
 				return result.success(new NullValue(context.parent));

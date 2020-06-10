@@ -6,10 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BaseFunctionValue;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.NullValue;
-import pt.kiko.krip.lang.values.ObjectValue;
+import pt.kiko.krip.lang.values.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +29,7 @@ abstract public class KripEvent implements Listener {
 
 	public void execute(Event event) {
 		ObjectValue eventObj = getEvent(event);
+		eventObj.set("isCancellable", new BooleanValue(event instanceof Cancellable, Krip.context));
 		if (event instanceof Cancellable && !((Cancellable) event).isCancelled())
 			eventObj.set("cancel", new BuiltInFunctionValue("cancel", new ArrayList<>(), Krip.context) {
 				@Override

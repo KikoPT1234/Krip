@@ -20,7 +20,7 @@ public class ConsoleCommandSenderObj extends ObjectValue {
 
 				if (!(message instanceof StringValue)) return invalidType(message, context);
 
-				sender.sendMessage(message.getValue());
+				sender.sendMessage(message.getValueString());
 				return result.success(new NullValue(context.parent));
 			}
 		});
@@ -32,7 +32,7 @@ public class ConsoleCommandSenderObj extends ObjectValue {
 
 				if (!(message instanceof StringValue)) return invalidType(message, context);
 
-				return result.success(new BooleanValue(sender.hasPermission(message.getValue()), context));
+				return result.success(new BooleanValue(sender.hasPermission(message.getValueString()), context));
 			}
 		});
 	}

@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ObjectValue extends Value<Map<String, Value<?>>> {
 
-	public Map<String, Value<?>> value;
 	private int tabAmount = 1;
 
 	public ObjectValue(Map<String, Value<?>> object, Value<?> parent, Context context) {
@@ -27,7 +26,7 @@ public class ObjectValue extends Value<Map<String, Value<?>>> {
 	}
 
 	@Override
-	public String getValue() {
+	public String getValueString() {
 		return toString();
 	}
 
@@ -69,14 +68,14 @@ public class ObjectValue extends Value<Map<String, Value<?>>> {
 	@Override
 	public RuntimeResult equal(Value<?> other) {
 		if (other instanceof ObjectValue) {
-			return new RuntimeResult().success(new BooleanValue(getValue().equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(getValueString().equals(other.getValueString()), context));
 		} else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
 	public RuntimeResult notEquals(Value<?> other) {
 		if (other instanceof ObjectValue) {
-			return new RuntimeResult().success(new BooleanValue(!getValue().equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(!getValueString().equals(other.getValueString()), context));
 		} else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 

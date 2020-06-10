@@ -10,7 +10,7 @@ public class NullValue extends Value<String> {
 	}
 
 	@Override
-	public String getValue() {
+	public String getValueString() {
 		return null;
 	}
 

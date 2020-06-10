@@ -1,4 +1,4 @@
-package pt.kiko.krip.events;
+package pt.kiko.krip.events.player;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerJoinEvent;

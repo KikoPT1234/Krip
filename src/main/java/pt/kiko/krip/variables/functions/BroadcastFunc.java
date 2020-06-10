@@ -27,7 +27,7 @@ public class BroadcastFunc extends BuiltInFunctionValue {
 
 		if (!(message instanceof StringValue)) return invalidType(message, context);
 
-		Krip.plugin.getServer().broadcastMessage(message.getValue());
+		Krip.plugin.getServer().broadcastMessage(message.getValueString());
 		return result.success(new NullValue(context.parent));
 	}
 }

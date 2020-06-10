@@ -13,7 +13,7 @@ abstract public class Error {
 	public Error(String name, Position startPosition, Position endPosition, String details) {
 		this.name = name;
 		if (startPosition != null) this.startPosition = startPosition.copy();
-		if (startPosition != null) this.endPosition = endPosition.copy();
+		if (endPosition != null) this.endPosition = endPosition.copy();
 		this.details = details;
 	}
 

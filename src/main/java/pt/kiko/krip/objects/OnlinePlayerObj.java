@@ -23,7 +23,7 @@ public class OnlinePlayerObj extends PlayerObj {
 				if (!(message instanceof StringValue))
 					return invalidType(message, context);
 
-				player.chat(message.getValue());
+				player.chat(message.getValueString());
 
 				return result.success(new NullValue(context.parent));
 			}
@@ -37,7 +37,7 @@ public class OnlinePlayerObj extends PlayerObj {
 
 				if (!(message instanceof StringValue)) return invalidType(message, context);
 
-				player.sendMessage(message.getValue());
+				player.sendMessage(message.getValueString());
 				return result.success(new NullValue(context.parent));
 			}
 		});
@@ -51,7 +51,7 @@ public class OnlinePlayerObj extends PlayerObj {
 				if (!(permission instanceof StringValue))
 					return invalidType(permission, context);
 
-				return result.success(new BooleanValue(player.hasPermission(permission.getValue()), context.parent));
+				return result.success(new BooleanValue(player.hasPermission(permission.getValueString()), context.parent));
 			}
 		});
 
@@ -64,7 +64,7 @@ public class OnlinePlayerObj extends PlayerObj {
 				if (!(name instanceof StringValue))
 					return invalidType(name, context);
 
-				player.setDisplayName(name.getValue());
+				player.setDisplayName(name.getValueString());
 
 				return result.success(new NullValue(context.parent));
 			}
@@ -79,7 +79,7 @@ public class OnlinePlayerObj extends PlayerObj {
 				if (!(reason instanceof StringValue || reason instanceof NullValue))
 					return invalidType(reason, context);
 
-				player.kickPlayer(reason.getValue());
+				player.kickPlayer(reason.getValueString());
 				return result.success(new NullValue(context.parent));
 			}
 		});

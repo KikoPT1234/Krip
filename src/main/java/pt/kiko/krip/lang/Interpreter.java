@@ -2,6 +2,7 @@ package pt.kiko.krip.lang;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.cases.Case;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.nodes.*;
@@ -14,14 +15,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-abstract public class Interpreter {
+/**
+ * The Interpreter is responsible for executing the parsed code
+ */
+final public class Interpreter {
 
+	/**
+	 * This will "visit" the specified Node instance
+	 *
+	 * @param node    The node to "visit"
+	 * @param context The context to run in
+	 * @return A RuntimeResult instance
+	 */
 	public static RuntimeResult visit(Node node, Context context) {
 		if (node == null) return new RuntimeResult().success(new NullValue(context));
 		else if (node instanceof NumberNode) return visitNumberNode((NumberNode) node, context);
 		else if (node instanceof StringNode) return visitStringNode((StringNode) node, context);
 		else if (node instanceof ListNode) return visitListNode((ListNode) node, context);
-		else if (node instanceof BinaryOperationNode) return visitBinaryOperationNode((BinaryOperationNode) node, context);
+		else if (node instanceof BinaryOperationNode)
+			return visitBinaryOperationNode((BinaryOperationNode) node, context);
 		else if (node instanceof UnaryOperationNode) return visitUnaryOperationNode((UnaryOperationNode) node, context);
 		else if (node instanceof IfNode) return visitIfNode((IfNode) node, context);
 		else if (node instanceof ForNode) return visitForNode((ForNode) node, context);
@@ -43,15 +55,15 @@ abstract public class Interpreter {
 			return new RuntimeResult().failure(new RuntimeError(node.startPosition, node.endPosition, "Unexpected node", context));
 	}
 
-	static RuntimeResult visitNumberNode(@NotNull NumberNode node, Context context) {
+	private static RuntimeResult visitNumberNode(@NotNull NumberNode node, Context context) {
 		return new RuntimeResult().success(new NumberValue(Double.parseDouble(node.token.value), context).setPosition(node.startPosition, node.endPosition));
 	}
 
-	static RuntimeResult visitStringNode(@NotNull StringNode node, Context context) {
+	private static RuntimeResult visitStringNode(@NotNull StringNode node, Context context) {
 		return new RuntimeResult().success(new StringValue(node.token.value, context).setPosition(node.startPosition, node.endPosition));
 	}
 
-	static RuntimeResult visitListNode(@NotNull ListNode node, Context context) {
+	private static RuntimeResult visitListNode(@NotNull ListNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		ArrayList<Value<?>> elements = new ArrayList<>();
 		Node[] nodes = {};
@@ -66,7 +78,7 @@ abstract public class Interpreter {
 		return result.success(new ListValue(elements, context).setPosition(node.startPosition, node.endPosition));
 	}
 
-	static RuntimeResult visitBinaryOperationNode(@NotNull BinaryOperationNode node, Context context) {
+	private static RuntimeResult visitBinaryOperationNode(@NotNull BinaryOperationNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 
 		Value<?> left = result.register(visit(node.left, context));
@@ -134,7 +146,7 @@ abstract public class Interpreter {
 		} else return left.illegalOperation(right);
 	}
 
-	static RuntimeResult visitUnaryOperationNode(@NotNull UnaryOperationNode node, Context context) {
+	private static RuntimeResult visitUnaryOperationNode(@NotNull UnaryOperationNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		Value<?> value = result.register(visit(node.node, context)).setPosition(node.startPosition, node.endPosition);
 		if (result.shouldReturn()) return result;
@@ -145,7 +157,7 @@ abstract public class Interpreter {
 		else return result.success(value);
 	}
 
-	static RuntimeResult visitIfNode(@NotNull IfNode node, Context context) {
+	private static RuntimeResult visitIfNode(@NotNull IfNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		Case[] cases = {};
 		cases = node.cases.toArray(cases);
@@ -175,7 +187,7 @@ abstract public class Interpreter {
 		return result.success(new NullValue(context));
 	}
 
-	static RuntimeResult visitObjectNode(@NotNull ObjectNode node, Context context) {
+	private static RuntimeResult visitObjectNode(@NotNull ObjectNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		Map<String, Value<?>> valueObj = new HashMap<>();
 		ObjectValue objectValue = new ObjectValue(valueObj, context);
@@ -193,12 +205,12 @@ abstract public class Interpreter {
 		return result.success(objectValue);
 	}
 
-	static RuntimeResult visitObjectAccessNode(@NotNull ObjectAccessNode node, Context context) {
+	private static RuntimeResult visitObjectAccessNode(@NotNull ObjectAccessNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		Value<?> object = result.register(visit(node.objectNode, context));
 		if (result.shouldReturn()) return result;
 
-		String key = node.keyToken != null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValue();
+		String key = node.keyToken != null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValueString();
 		Value<?> returnValue = null;
 
 		if (object instanceof ObjectValue) {
@@ -211,7 +223,7 @@ abstract public class Interpreter {
 			if (result.shouldReturn()) return result;
 
 			if (keyValue instanceof NumberValue) {
-				returnValue = ((ListValue) object).value.get(Integer.parseInt(keyValue.getValue()));
+				returnValue = ((ListValue) object).value.get(Integer.parseInt(keyValue.getValueString()));
 			}
 		}
 		if (returnValue == null) {
@@ -222,7 +234,7 @@ abstract public class Interpreter {
 		return result.success(returnValue != null ? returnValue : new NullValue(context));
 	}
 
-	static RuntimeResult visitObjectAssignNode(@NotNull ObjectAssignNode node, Context context) {
+	private static RuntimeResult visitObjectAssignNode(@NotNull ObjectAssignNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		Value<?> object = result.register(visit(node.objectNode, context));
 		if (result.shouldReturn()) return result;
@@ -237,7 +249,7 @@ abstract public class Interpreter {
 		if (result.shouldReturn()) return result;
 
 		if (object instanceof ObjectValue) {
-			String key = node.keyNode == null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValue();
+			String key = node.keyNode == null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValueString();
 			if (result.shouldReturn()) return result;
 
 			((ObjectValue) object).set(key, value);
@@ -245,18 +257,18 @@ abstract public class Interpreter {
 			Value<?> keyValue = result.register(visit(node.keyNode, context));
 			if (result.shouldReturn()) return result;
 
-			if (!(keyValue instanceof NumberValue) || keyValue.getValue().contains(".") || Integer.parseInt(keyValue.getValue()) < 0 || Integer.parseInt(keyValue.getValue()) > ((ListValue) object).value.size())
+			if (!(keyValue instanceof NumberValue) || keyValue.getValueString().contains(".") || Integer.parseInt(keyValue.getValueString()) < 0 || Integer.parseInt(keyValue.getValueString()) > ((ListValue) object).value.size())
 				return result.success(new NullValue(context));
 
-			if (Integer.parseInt(keyValue.getValue()) == ((ListValue) object).value.size())
+			if (Integer.parseInt(keyValue.getValueString()) == ((ListValue) object).value.size())
 				((ListValue) object).value.add(value);
-			else ((ListValue) object).value.set(Integer.parseInt(keyValue.getValue()), value);
+			else ((ListValue) object).value.set(Integer.parseInt(keyValue.getValueString()), value);
 
 		}
 		return result.success(object);
 	}
 
-	static RuntimeResult visitVarAccessNode(@NotNull VarAccessNode node, @NotNull Context context) {
+	private static RuntimeResult visitVarAccessNode(@NotNull VarAccessNode node, @NotNull Context context) {
 		RuntimeResult result = new RuntimeResult();
 		String varName = node.token.value;
 		Value<?> value = context.symbolTable.get(varName);
@@ -268,7 +280,7 @@ abstract public class Interpreter {
 		return result.success(value);
 	}
 
-	static RuntimeResult visitVarCreateNode(@NotNull VarCreateNode node, Context context) {
+	private static RuntimeResult visitVarCreateNode(@NotNull VarCreateNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		String varName = node.token.value;
 
@@ -287,7 +299,7 @@ abstract public class Interpreter {
 		return result.success(value);
 	}
 
-	static RuntimeResult visitVarAssignNode(@NotNull VarAssignNode node, Context context) {
+	private static RuntimeResult visitVarAssignNode(@NotNull VarAssignNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 
 		String varName = node.token.value;
@@ -297,13 +309,17 @@ abstract public class Interpreter {
 
 		boolean successful = context.symbolTable.setExisting(varName, value);
 
-		if (!successful)
-			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Variable not found or is constant", context));
-
+		if (!successful) {
+			if (!context.symbolTable.isConstantParents(varName)) {
+				Krip.globals.put(varName, value);
+				Krip.context.symbolTable.set(varName, value, false);
+			} else
+				return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Variable is constant", context));
+		}
 		return result.success(value);
 	}
 
-	static RuntimeResult visitForNode(@NotNull ForNode node, Context context) {
+	private static RuntimeResult visitForNode(@NotNull ForNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		List<Value<?>> elements = new ArrayList<>();
 
@@ -316,15 +332,15 @@ abstract public class Interpreter {
 		if (!(startValue instanceof NumberValue && endValue instanceof NumberValue))
 			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Not a number", context));
 
-		int i = Integer.parseInt(startValue.getValue());
+		int i = Integer.parseInt(startValue.getValueString());
 
-		if (i > Integer.parseInt(endValue.getValue()))
+		if (i > Integer.parseInt(endValue.getValueString()))
 			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "The start value mustn't be greater than the end value", context));
 
 		Context forContext = new Context("for loop", context);
 		forContext.symbolTable = new SymbolTable(context.symbolTable);
 
-		while (i <= Integer.parseInt(endValue.getValue())) {
+		while (i <= Integer.parseInt(endValue.getValueString())) {
 			forContext.symbolTable.set(node.varNameToken.value, new NumberValue(i, forContext), false);
 			i++;
 
@@ -341,7 +357,7 @@ abstract public class Interpreter {
 		return result.success(node.shouldReturnNull ? new NullValue(context) : new ListValue(elements, context).setPosition(node.startPosition, node.endPosition));
 	}
 
-	static RuntimeResult visitWhileNode(@NotNull WhileNode node, Context context) {
+	private static RuntimeResult visitWhileNode(@NotNull WhileNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		List<Value<?>> elements = new ArrayList<>();
 
@@ -367,7 +383,7 @@ abstract public class Interpreter {
 	}
 
 	@Contract(pure = true)
-	static RuntimeResult visitFunctionNode(@NotNull FunctionNode node, Context context) {
+	private static RuntimeResult visitFunctionNode(@NotNull FunctionNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		String functionName = (node.varNameToken != null && node.varNameToken.value != null) ? node.varNameToken.value : null;
 
@@ -386,7 +402,7 @@ abstract public class Interpreter {
 		return result.success(functionValue);
 	}
 
-	static RuntimeResult visitCallNode(@NotNull CallNode node, Context context) {
+	private static RuntimeResult visitCallNode(@NotNull CallNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		Context callContext = new Context("<arguments>", context, node.startPosition);
 		callContext.symbolTable = new SymbolTable(context.symbolTable);
@@ -408,7 +424,7 @@ abstract public class Interpreter {
 		return result.success(returnValue);
 	}
 
-	static RuntimeResult visitReturnNode(@NotNull ReturnNode node, Context context) {
+	private static RuntimeResult visitReturnNode(@NotNull ReturnNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		Value<?> value = new NullValue(context);
 
@@ -420,11 +436,11 @@ abstract public class Interpreter {
 		return result.successReturn(value);
 	}
 
-	static RuntimeResult visitContinueNode() {
+	private static RuntimeResult visitContinueNode() {
 		return new RuntimeResult().successContinue();
 	}
 
-	static RuntimeResult visitBreakNode() {
+	private static RuntimeResult visitBreakNode() {
 		return new RuntimeResult().successBreak();
 	}
 

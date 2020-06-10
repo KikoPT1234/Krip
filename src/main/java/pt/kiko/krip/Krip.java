@@ -15,9 +15,7 @@ import pt.kiko.krip.lang.results.RunResult;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.Value;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
@@ -27,9 +25,17 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Main class
+ *
+ * @author KikoPT1234
+ * @version 0.1.0
+ */
+
 public class Krip extends JavaPlugin {
 
 	public static Context context = new Context("<program>");
+	public static HashMap<String, Value<?>> globals = new HashMap<>();
 	public static Krip plugin;
 	public static Map<String, KripEvent> events = new HashMap<>();
 	public static List<String> registeredNames = new ArrayList<>();
@@ -39,7 +45,15 @@ public class Krip extends JavaPlugin {
 	public static Map<String, List<BukkitTask>> tasks = new HashMap<>();
 
 	public static Method syncCommandsMethod;
+	public File variableFile;
 
+	/**
+	 * Runs the specified code
+	 * @param code The code to run
+	 * @param fileName The file name to display on errors
+	 * @return A RunResult instance
+	 * @see RunResult
+	 */
 	public static RunResult run(String code, String fileName) {
 		RunResult result = new RunResult();
 
@@ -69,38 +83,6 @@ public class Krip extends JavaPlugin {
 		return result.success(runtimeResult.value);
 	}
 
-	public static void loadClasses(@NotNull String packageName) throws ClassNotFoundException, IOException {
-
-		String path = null;
-		try {
-			path = Krip.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-
-		assert path != null;
-
-		JarFile jarFile = new JarFile(path);
-		Enumeration<JarEntry> entries = jarFile.entries();
-
-		URL[] urls = { new URL("jar:file:" + path + "!/" + packageName.replace('.', '/')) };
-		URLClassLoader classLoader = URLClassLoader.newInstance(urls);
-		assert classLoader != null;
-
-		while (entries.hasMoreElements()) {
-			JarEntry je = entries.nextElement();
-
-			if (je.isDirectory() || !je.getName().endsWith(".class")) continue;
-
-			String className = je.getName().substring(0, je.getName().length() - 6);
-			className = className.replace("/", ".");
-
-			if (!className.startsWith(packageName)) continue;
-
-			Class.forName(className);
-		}
-	}
-
 	public static void registerValue(String name, Value<?> value) {
 		context.symbolTable.set(name, value, true);
 		registeredNames.add(name);
@@ -113,6 +95,49 @@ public class Krip extends JavaPlugin {
 
 	public File pluginFolder;
 	public File scriptFolder;
+
+	/**
+	 * Loads all classes on the specified package name
+	 *
+	 * @param packageName The name of the package
+	 */
+
+	public static void loadClasses(@NotNull String packageName) {
+
+		String path = null;
+		try {
+			path = Krip.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+
+		assert path != null;
+
+		try {
+			JarFile jarFile = new JarFile(path);
+			Enumeration<JarEntry> entries = jarFile.entries();
+
+			URL[] urls = {new URL("jar:file:" + path + "!/" + packageName.replace('.', '/'))};
+			URLClassLoader classLoader = URLClassLoader.newInstance(urls);
+			assert classLoader != null;
+
+			while (entries.hasMoreElements()) {
+				JarEntry je = entries.nextElement();
+
+				if (je.isDirectory() || !je.getName().endsWith(".class")) continue;
+
+				String className = je.getName().substring(0, je.getName().length() - 6);
+				className = className.replace("/", ".");
+
+				if (!className.startsWith(packageName)) continue;
+
+				Class.forName(className);
+			}
+		} catch (ClassNotFoundException | IOException e) {
+			plugin.getLogger().warning("Error while loading classes in package " + packageName);
+			e.printStackTrace();
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -143,15 +168,39 @@ public class Krip extends JavaPlugin {
 
 		pluginFolder = getDataFolder();
 		scriptFolder = new File(pluginFolder, "scripts");
+		variableFile = new File(pluginFolder, "globals");
 		if (!scriptFolder.exists()) created = scriptFolder.mkdirs();
-		if (!created) getServer().getLogger().warning("Failed to create plugin/script directory");
+		if (!created) getLogger().warning("Failed to create plugin/script directory");
+		if (!variableFile.exists()) {
+			try {
+				created = variableFile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if (!created) getLogger().warning("Failed to create plugin/script directory");
 
 		try {
-			loadClasses("pt.kiko.krip.variables");
-			loadClasses("pt.kiko.krip.events");
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
+			BufferedReader reader = new BufferedReader(new FileReader(variableFile));
+			if (reader.readLine() != null) {
+				FileInputStream fileInputStream = new FileInputStream(variableFile);
+				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+				globals = (HashMap<String, Value<?>>) objectInputStream.readObject();
+				globals.forEach((name, global) -> {
+					context.symbolTable.set(name, global, false);
+					registeredNames.add(name);
+					global.setContext(context);
+				});
+				objectInputStream.close();
+				fileInputStream.close();
+			}
+
+		} catch (IOException | ClassNotFoundException exception) {
+			exception.printStackTrace();
 		}
+
+		loadClasses("pt.kiko.krip.variables");
+		loadClasses("pt.kiko.krip.events");
 
 		new KripCommand();
 
@@ -161,12 +210,30 @@ public class Krip extends JavaPlugin {
 				run(code, file.getName());
 			} catch (Exception e) {
 				e.printStackTrace();
-				getLogger().warning("There has been an error with Krip, it would be appreciated if it was reported!");
+				getLogger().warning("There has been an error with Krip, please report it at https://github.com/KikoPT1234/Krip/issues");
 			}
 		}
 
 		getServer().getLogger().info("Krip enabled!");
 	}
+
+	@Override
+	public void onDisable() {
+		try {
+			FileOutputStream fileOutputStream = new FileOutputStream(variableFile);
+			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			objectOutputStream.writeObject(globals);
+			objectOutputStream.close();
+			fileOutputStream.close();
+		} catch (IOException exception) {
+			exception.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param file The File instance to load
+	 * @return The file data
+	 */
 
 	public String loadFile(File file) {
 		StringBuilder code = new StringBuilder();

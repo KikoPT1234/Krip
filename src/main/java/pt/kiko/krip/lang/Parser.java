@@ -12,30 +12,37 @@ import pt.kiko.krip.lang.results.ParseResult;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Responsible for checking the grammar and making a parse tree from a list of tokens
+ */
 public class Parser {
 
-	public int tokenIndex = -1;
-	public Token currentToken;
-	public ArrayList<Token> tokens;
+	private final ArrayList<Token> tokens;
+	private int tokenIndex = -1;
+	private Token currentToken;
 
+	/**
+	 * Makes a new instance
+	 *
+	 * @param tokens List of tokens to store
+	 */
 	public Parser(ArrayList<Token> tokens) {
 		this.tokens = tokens;
 		advance();
-
 	}
 
-	public void updateCurrentToken() {
+	private void updateCurrentToken() {
 		if (tokenIndex >= 0 && tokenIndex < tokens.size()) {
 			currentToken = tokens.get(tokenIndex);
 		}
 	}
 
-	public void advance() {
+	private void advance() {
 		tokenIndex++;
 		updateCurrentToken();
 	}
 
-	public void advance(ParseResult result) {
+	private void advance(ParseResult result) {
 		tokenIndex++;
 		updateCurrentToken();
 		while (currentToken.matches(TokenTypes.NEWLINE)) {
@@ -45,7 +52,7 @@ public class Parser {
 		}
 	}
 
-	public void advanceNewlines(ParseResult result) {
+	private void advanceNewlines(ParseResult result) {
 		while (currentToken.matches(TokenTypes.NEWLINE)) {
 			tokenIndex++;
 			updateCurrentToken();
@@ -53,24 +60,21 @@ public class Parser {
 		}
 	}
 
-	public void advanceNewlines(CaseResult result) {
-		while (currentToken.matches(TokenTypes.NEWLINE)) {
-			tokenIndex++;
-			updateCurrentToken();
-			result.registerAdvancement();
-		}
-	}
-
-	public void reverse() {
+	private void reverse() {
 		this.tokenIndex--;
 		updateCurrentToken();
 	}
 
-	public void reverse(int amount) {
+	private void reverse(int amount) {
 		this.tokenIndex -= amount;
 		updateCurrentToken();
 	}
 
+	/**
+	 * Parses the list of tokens
+	 *
+	 * @return A ParseResult instance
+	 */
 	public ParseResult parse() {
 		ParseResult result = statements();
 
@@ -81,7 +85,7 @@ public class Parser {
 		return result;
 	}
 
-	public ParseResult statements() {
+	private ParseResult statements() {
 		ParseResult result = new ParseResult();
 		ArrayList<Node> statements = new ArrayList<>();
 		Position startPosition = currentToken.startPosition.copy();
@@ -120,7 +124,7 @@ public class Parser {
 		return result.success(new ListNode(statements, startPosition, currentToken.endPosition.copy()));
 	}
 
-	public ParseResult statement() {
+	private ParseResult statement() {
 		ParseResult result = new ParseResult();
 		Position startPosition = currentToken.startPosition.copy();
 		Node expression;
@@ -147,7 +151,7 @@ public class Parser {
 		return result.success(expression);
 	}
 
-	public ParseResult expression() {
+	private ParseResult expression() {
 		ParseResult result = new ParseResult();
 
 		if (currentToken.matches(TokenTypes.KEYWORD, "let") || currentToken.matches(TokenTypes.KEYWORD, "const")) {
@@ -156,7 +160,8 @@ public class Parser {
 			result.registerAdvancement();
 			advance();
 
-			if (!currentToken.matches(TokenTypes.IDENTIFIER)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected identifier"));
+			if (!currentToken.matches(TokenTypes.IDENTIFIER))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected identifier"));
 
 			Token varNameToken = currentToken;
 			result.registerAdvancement();
@@ -198,11 +203,11 @@ public class Parser {
 		return result.success(node);
 	}
 
-	public ParseResult comparisonExpression() {
+	private ParseResult comparisonExpression() {
 		return binaryOperation(this::arithmeticExpression, new TokenTypes[]{TokenTypes.EE, TokenTypes.NE, TokenTypes.LT, TokenTypes.LTE, TokenTypes.GT, TokenTypes.GTE});
 	}
 
-	public ParseResult arithmeticExpression() {
+	private ParseResult arithmeticExpression() {
 		ParseResult result = new ParseResult();
 
 		if (currentToken.matches(TokenTypes.NOT)) {
@@ -217,11 +222,11 @@ public class Parser {
 		return binaryOperation(this::term, new TokenTypes[]{TokenTypes.PLUS, TokenTypes.MINUS});
 	}
 
-	public ParseResult term() {
+	private ParseResult term() {
 		return binaryOperation(this::factor, new TokenTypes[]{TokenTypes.MUL, TokenTypes.DIV, TokenTypes.MOD});
 	}
 
-	public ParseResult factor() {
+	private ParseResult factor() {
 		ParseResult result = new ParseResult();
 		Token token = currentToken;
 
@@ -237,11 +242,11 @@ public class Parser {
 		return power();
 	}
 
-	public ParseResult power() {
+	private ParseResult power() {
 		return binaryOperation(this::objectAccess, new TokenTypes[]{TokenTypes.POW});
 	}
 
-	public ParseResult objectAccess() {
+	private ParseResult objectAccess() {
 		ParseResult result = new ParseResult();
 		Node call = result.register(call());
 		if (result.error != null) return result;
@@ -309,7 +314,7 @@ public class Parser {
 		return result.success(call);
 	}
 
-	public ParseResult call() {
+	private ParseResult call() {
 		ParseResult result = new ParseResult();
 		Node atom = result.register(atom());
 		if (result.error != null) return result;
@@ -320,7 +325,7 @@ public class Parser {
 		else return result.success(node);
 	}
 
-	public ParseResult callSyntax(ParseResult result, Node atom) {
+	private ParseResult callSyntax(ParseResult result, Node atom) {
 		Node node = null;
 		while (currentToken.matches(TokenTypes.LPAREN)) {
 			result.registerAdvancement();
@@ -354,7 +359,7 @@ public class Parser {
 		return result.success(node);
 	}
 
-	public ParseResult atom() {
+	private ParseResult atom() {
 		ParseResult result = new ParseResult();
 
 		if (currentToken.matches(TokenTypes.NUMBER)) {
@@ -411,11 +416,12 @@ public class Parser {
 
 	// <OBJECT EXPRESSION>
 
-	public ParseResult objectExpression() {
+	private ParseResult objectExpression() {
 		ParseResult result = new ParseResult();
 		Position startPosition = currentToken.startPosition.copy();
 
-		if (!currentToken.matches(TokenTypes.LBRACKET)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '{'"));
+		if (!currentToken.matches(TokenTypes.LBRACKET))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '{'"));
 
 		result.registerAdvancement();
 		advance(result);
@@ -457,12 +463,13 @@ public class Parser {
 
 	// <LIST EXPRESSION>
 
-	public ParseResult listExpression() {
+	private ParseResult listExpression() {
 		ParseResult result = new ParseResult();
 		ArrayList<Node> nodes = new ArrayList<>();
 		Position startPosition = currentToken.startPosition.copy();
 
-		if (!currentToken.matches(TokenTypes.LSQUARE)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '['"));
+		if (!currentToken.matches(TokenTypes.LSQUARE))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '['"));
 
 		result.registerAdvancement();
 		advance(result);
@@ -497,7 +504,7 @@ public class Parser {
 
 	// <IF EXPRESSIONS>
 
-	public ParseResult ifExpression() {
+	private ParseResult ifExpression() {
 		CaseResult result = new CaseResult();
 		Cases allCases = result.register(ifExpressionCases("if"));
 		if (result.error != null) return new ParseResult().failure(result.error);
@@ -506,17 +513,19 @@ public class Parser {
 		else return new ParseResult().success(new IfNode(allCases.cases, allCases.elseCase));
 	}
 
-	public CaseResult ifExpressionCases(String caseKeyword) {
+	private CaseResult ifExpressionCases(String caseKeyword) {
 		CaseResult result = new CaseResult();
 		List<Case> cases = new ArrayList<>();
 		ElseCase elseCase = null;
 
-		if (!currentToken.matches(TokenTypes.KEYWORD, caseKeyword)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '" + caseKeyword + "'"));
+		if (!currentToken.matches(TokenTypes.KEYWORD, caseKeyword))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '" + caseKeyword + "'"));
 
 		result.registerAdvancement();
 		advance();
 
-		if (!currentToken.matches(TokenTypes.LPAREN)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '('"));
+		if (!currentToken.matches(TokenTypes.LPAREN))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '('"));
 
 		result.registerAdvancement();
 		advance();
@@ -587,11 +596,11 @@ public class Parser {
 		return result.success(new Cases(cases, elseCase));
 	}
 
-	public CaseResult elseIfExpression() {
+	private CaseResult elseIfExpression() {
 		return ifExpressionCases("else if");
 	}
 
-	public CaseResult elseExpression() {
+	private CaseResult elseExpression() {
 		CaseResult result = new CaseResult();
 		Cases cases = new Cases();
 
@@ -619,7 +628,7 @@ public class Parser {
 		return result.success(cases);
 	}
 
-	public CaseResult elseOrElseIfExpression() {
+	private CaseResult elseOrElseIfExpression() {
 		CaseResult result = new CaseResult();
 		Cases cases = new Cases();
 
@@ -636,7 +645,7 @@ public class Parser {
 
 	// <FOR EXPRESSION>
 
-	public ParseResult forExpression() {
+	private ParseResult forExpression() {
 		ParseResult result = new ParseResult();
 
 		if (!currentToken.matches(TokenTypes.KEYWORD, "for"))
@@ -705,15 +714,17 @@ public class Parser {
 
 	// <WHILE EXPRESSION>
 
-	public ParseResult whileExpression() {
+	private ParseResult whileExpression() {
 		ParseResult result = new ParseResult();
 
-		if (!currentToken.matches(TokenTypes.KEYWORD, "while")) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected 'while'"));
+		if (!currentToken.matches(TokenTypes.KEYWORD, "while"))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected 'while'"));
 
 		result.registerAdvancement();
 		advance();
 
-		if (!currentToken.matches(TokenTypes.LPAREN)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '('"));
+		if (!currentToken.matches(TokenTypes.LPAREN))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '('"));
 
 		result.registerAdvancement();
 		advance();
@@ -751,7 +762,7 @@ public class Parser {
 
 	// <FUNCTION EXPRESSION>
 
-	public ParseResult functionExpression() {
+	private ParseResult functionExpression() {
 		ParseResult result = new ParseResult();
 		Token varNameToken = null;
 		boolean isArrowFunction = false;
@@ -872,14 +883,15 @@ public class Parser {
 
 
 			return result.success(new FunctionNode(bodyNode, true, null, argNameTokens));
-		} else return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '=>' or '{'"));
+		} else
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '=>' or '{'"));
 	}
 
 	// </FUNCTION EXPRESSION>
 
 	// -------------------------------
 
-	public ParseResult binaryOperation(@NotNull ParseRunnable func, TokenTypes[] types) {
+	private ParseResult binaryOperation(@NotNull ParseRunnable func, TokenTypes[] types) {
 		ParseResult result = new ParseResult();
 		Node left = result.register(func.run());
 		if (result.error != null) return result;

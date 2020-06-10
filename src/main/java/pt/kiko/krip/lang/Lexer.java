@@ -9,11 +9,21 @@ import pt.kiko.krip.lang.results.LexResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * The Lexer is responsible for making tokens from the given code string
+ */
+
 public class Lexer {
 
 	String code;
 	Position position;
 	char currentChar;
+
+	/**
+	 * @param code     The code to make tokens from
+	 * @param fileName The file name for errors
+	 * @see Token
+	 */
 
 	public Lexer(@NotNull String code, String fileName) {
 		this.code = code.replaceAll("\\r", "");
@@ -21,12 +31,24 @@ public class Lexer {
 		advance();
 	}
 
+	/**
+	 * Advances to the next character
+	 */
+
 	public void advance() {
 		position.advance(currentChar);
 		if (position.index < code.length()) {
 			currentChar = code.charAt(position.index);
 		} else currentChar = Character.MIN_VALUE;
 	}
+
+	/**
+	 * Makes the tokens
+	 *
+	 * @return A LexResult containing the list of tokens
+	 * @see LexResult
+	 * @see Token
+	 */
 
 	public LexResult makeTokens() {
 
@@ -123,6 +145,12 @@ public class Lexer {
 
 	}
 
+	/**
+	 * Either makes a division token or skips a comment
+	 *
+	 * @return A token if it's a division, null if it's a comment
+	 */
+
 	private @Nullable Token makeDivOrComment() {
 		Position startPosition = position.copy();
 		advance();
@@ -145,6 +173,12 @@ public class Lexer {
 			}
 		} else return new Token(TokenTypes.DIV, startPosition);
 	}
+
+	/**
+	 * Makes a string token
+	 *
+	 * @return The string token
+	 */
 
 	@Contract(" -> new")
 	private @NotNull Token makeString() {
@@ -169,6 +203,12 @@ public class Lexer {
 		return new Token(TokenTypes.STRING, stringBuilder.toString(), startPosition, position);
 	}
 
+	/**
+	 * Makes a number token
+	 *
+	 * @return The number token
+	 */
+
 	@Contract(" -> new")
 	private @NotNull Token makeNumber() {
 
@@ -190,6 +230,12 @@ public class Lexer {
 
 		return new Token(TokenTypes.NUMBER, numberString.toString(), startPosition, position);
 	}
+
+	/**
+	 * Makes an identifier or a keyword token
+	 *
+	 * @return The identifier/keyword token
+	 */
 
 	@Contract(" -> new")
 	private @NotNull Token makeIdentifier() {
@@ -229,6 +275,12 @@ public class Lexer {
 		return new Token(tokenType, identifierString, startPosition, position);
 	}
 
+	/**
+	 * Makes an equals or an arrow token
+	 *
+	 * @return The equals/arrow token
+	 */
+
 	@Contract(" -> new")
 	private @NotNull Token makeEqualsOrArrow() {
 		Position startPosition = position.copy();
@@ -243,6 +295,12 @@ public class Lexer {
 		} else return new Token(TokenTypes.EQ, startPosition);
 	}
 
+	/**
+	 * Makes a not or a not equals token
+	 *
+	 * @return The not/not equals token
+	 */
+
 	@Contract(" -> new")
 	private @NotNull Token makeNot() {
 		Position startPosition = position.copy();
@@ -254,6 +312,12 @@ public class Lexer {
 		} else return new Token(TokenTypes.NOT, startPosition);
 	}
 
+	/**
+	 * Makes a less than token
+	 *
+	 * @return The less than token
+	 */
+
 	@Contract(" -> new")
 	private @NotNull Token makeLessThan() {
 		Position startPosition = position.copy();
@@ -264,6 +328,12 @@ public class Lexer {
 			return new Token(TokenTypes.LTE, startPosition, position);
 		} else return new Token(TokenTypes.LT, startPosition);
 	}
+
+	/**
+	 * Makes a greater than token
+	 *
+	 * @return The greater than token
+	 */
 
 	@Contract(" -> new")
 	private @NotNull Token makeGreaterThan() {

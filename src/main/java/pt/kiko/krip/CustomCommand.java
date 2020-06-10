@@ -43,7 +43,7 @@ public class CustomCommand implements TabExecutor {
 	public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 		if (!(function instanceof BaseFunctionValue)) return true;
 
-		List<Value<?>> requiredArgs = this.args.value.stream().filter(arg -> !optionalArgs.contains(arg.getValue())).collect(Collectors.toList());
+		List<Value<?>> requiredArgs = this.args.value.stream().filter(arg -> !optionalArgs.contains(arg.getValueString())).collect(Collectors.toList());
 		if (args.length < requiredArgs.size()) return false;
 		List<Value<?>> argValues = Arrays.stream(args).map(arg -> new StringValue(arg, context)).collect(Collectors.toList());
 

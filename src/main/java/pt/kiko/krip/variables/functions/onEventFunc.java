@@ -27,9 +27,9 @@ public class onEventFunc extends BuiltInFunctionValue {
 		if (!(name instanceof StringValue)) return invalidType(name, context);
 		if (!(func instanceof BaseFunctionValue)) return invalidType(func, context);
 
-		if (!Krip.events.containsKey(name.getValue()))
+		if (!Krip.events.containsKey(name.getValueString()))
 			return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Invalid event", context));
-		Krip.events.get(name.getValue()).addFunction((BaseFunctionValue) func);
+		Krip.events.get(name.getValueString()).addFunction((BaseFunctionValue) func);
 
 		return result.success(new NullValue(context.parent));
 	}

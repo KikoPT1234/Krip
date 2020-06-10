@@ -11,105 +11,111 @@ public class NumberValue extends Value<Double> {
 	}
 
 	@Override
-	public String getValue() {
+	public String getValueString() {
 		if (Math.floor(value) == value) return Integer.toString(value.intValue());
 		else return Double.toString(value);
 	}
 
 	@Override
 	public void setValue(Double value) {
-
+		this.value = value;
 	}
 
 	@Override
 	public RuntimeResult plus(Value<?> other) {
 		if (other instanceof StringValue)
-			return new RuntimeResult().success(new StringValue(getValue() + other.getValue(), context));
-		else if (other instanceof NumberValue)
-			return new RuntimeResult().success(new NumberValue(value + Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+			return new RuntimeResult().success(new StringValue(getValueString() + other.getValueString(), context));
+		else if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new NumberValue(value + (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult minus(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new NumberValue(value - Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new NumberValue(value - (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult mul(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new NumberValue(value * Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new NumberValue(value * (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult div(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new NumberValue(value / Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new NumberValue(value / (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult pow(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new NumberValue(Math.pow(value, Double.parseDouble(other.getValue())), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new NumberValue(Math.pow(value, numberValue.getValue()), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult mod(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new NumberValue(value % Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new NumberValue(value % (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult lessThan(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new BooleanValue(value < Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new BooleanValue(value < (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult lessThanOrEqual(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new BooleanValue(value <= Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new BooleanValue(value <= (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult greaterThan(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new BooleanValue(value > Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new BooleanValue(value > (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult greaterThanOrEqual(Value<?> other) {
-		if (other instanceof NumberValue)
-			return new RuntimeResult().success(new BooleanValue(value >= Double.parseDouble(other.getValue()), context));
-		else return illegalOperation(other);
+		if (other instanceof NumberValue) {
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new BooleanValue(value >= (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
 	}
 
 	@Override
 	public RuntimeResult equal(Value<?> other) {
 		if (other instanceof NumberValue) {
-			if (Math.floor(value) == value)
-				return new RuntimeResult().success(new BooleanValue(value == Integer.parseInt(other.getValue()), context));
-			else
-				return new RuntimeResult().success(new BooleanValue(value == Double.parseDouble(other.getValue()), context));
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new BooleanValue(value == (double) numberValue.getValue(), context));
 		} else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
 	public RuntimeResult notEquals(Value<?> other) {
 		if (other instanceof NumberValue) {
-			if (Math.floor(value) == value)
-				return new RuntimeResult().success(new BooleanValue(value != Integer.parseInt(other.getValue()), context));
-			else
-				return new RuntimeResult().success(new BooleanValue(value != Double.parseDouble(other.getValue()), context));
+			NumberValue numberValue = (NumberValue) other;
+			return new RuntimeResult().success(new BooleanValue(value != (double) numberValue.getValue(), context));
 		} else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 

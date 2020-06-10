@@ -3,30 +3,51 @@ package pt.kiko.krip.lang;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Characters {
-    static String digits = "0123456789";
-    static String letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    static String lettersDigits = digits + letters;
+/**
+ * Holds some static fields used for lexing
+ */
+final public class Characters {
 
-    static String[] keywords = {
-            "const",
-            "let",
-            "function",
-            "if",
-            "else if",
-            "else",
-            "for",
-            "to",
-            "while",
-            "return",
-            "break",
-            "continue"
-    };
+	/**
+	 * Numbers
+	 */
+	static String digits = "0123456789";
 
-    static Map<String, String> escapedCharacters = new HashMap<>();
+	/**
+	 * Letters
+	 */
+	static String letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    static {
-        Characters.escapedCharacters.put("n", "\\n");
-        Characters.escapedCharacters.put("t", "\\t");
-    }
+	/**
+	 * Letters and digits (and '_')
+	 */
+	static String lettersDigits = digits + letters + "_";
+
+	/**
+	 * Array of keywords
+	 */
+	static String[] keywords = {
+			"const",
+			"let",
+			"function",
+			"if",
+			"else if",
+			"else",
+			"for",
+			"to",
+			"while",
+			"return",
+			"break",
+			"continue"
+	};
+
+	/**
+	 * Map of escaped characters
+	 */
+	static Map<String, String> escapedCharacters = new HashMap<>();
+
+	static {
+		Characters.escapedCharacters.put("n", "\\n");
+		Characters.escapedCharacters.put("t", "\\t");
+	}
 }

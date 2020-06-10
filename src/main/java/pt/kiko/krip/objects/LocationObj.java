@@ -11,8 +11,11 @@ import java.util.Objects;
 
 public class LocationObj extends ObjectValue {
 
+    public Location location;
+
     public LocationObj(@NotNull Location location, Context context) {
         super(new HashMap<>(), context);
+        this.location = location;
         value.put("x", new NumberValue(location.getX(), context));
         value.put("y", new NumberValue(location.getY(), context));
         value.put("z", new NumberValue(location.getZ(), context));

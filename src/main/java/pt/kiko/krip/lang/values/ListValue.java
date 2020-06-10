@@ -19,7 +19,7 @@ public class ListValue extends Value<List<Value<?>>> {
 	}
 
 	@Override
-	public String getValue() {
+	public String getValueString() {
 		return toString();
 	}
 
@@ -36,14 +36,14 @@ public class ListValue extends Value<List<Value<?>>> {
 	@Override
 	public RuntimeResult equal(Value<?> other) {
 		if (other instanceof ListValue) {
-			return new RuntimeResult().success(new BooleanValue(getValue().equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(getValueString().equals(other.getValueString()), context));
 		} else return new RuntimeResult().success(new BooleanValue(false, context));
 	}
 
 	@Override
 	public RuntimeResult notEquals(Value<?> other) {
 		if (other instanceof ListValue) {
-			return new RuntimeResult().success(new BooleanValue(!getValue().equals(other.getValue()), context));
+			return new RuntimeResult().success(new BooleanValue(!getValueString().equals(other.getValueString()), context));
 		} else return new RuntimeResult().success(new BooleanValue(true, context));
 	}
 
@@ -57,8 +57,8 @@ public class ListValue extends Value<List<Value<?>>> {
 
 		value.forEach(value -> {
 			count.getAndIncrement();
-			if (value instanceof StringValue) string.append("\"").append(value.getValue()).append("\"");
-			else string.append(value.getValue());
+			if (value instanceof StringValue) string.append("\"").append(value.getValueString()).append("\"");
+			else string.append(value.getValueString());
 
 			if (count.get() != this.value.size()) string.append(", ");
 		});
@@ -80,8 +80,8 @@ public class ListValue extends Value<List<Value<?>>> {
 
 				if (!(string instanceof StringValue)) return invalidType(string, context);
 
-				List<String> list = ListValue.this.value.stream().map(Value::getValue).collect(Collectors.toList());
-				return result.success(new StringValue(String.join(string.getValue(), list), context));
+				List<String> list = ListValue.this.value.stream().map(Value::getValueString).collect(Collectors.toList());
+				return result.success(new StringValue(String.join(string.getValueString(), list), context));
 			}
 		});
 

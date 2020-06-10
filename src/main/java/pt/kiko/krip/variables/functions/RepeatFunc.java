@@ -32,14 +32,14 @@ public class RepeatFunc extends BuiltInFunctionValue {
 		if (!(ticks instanceof NumberValue)) return invalidType(ticks, context);
 		if (!(function instanceof BaseFunctionValue)) return invalidType(function, context);
 
-		double tickNumber = Double.parseDouble(ticks.getValue());
+		double tickNumber = Double.parseDouble(ticks.getValueString());
 
 		if (Math.floor(tickNumber) != tickNumber)
 			return result.failure(new RuntimeError(ticks.startPosition, ticks.endPosition, "Number of ticks must be whole", context));
 		if (Math.floor(tickNumber) <= 0)
 			return result.failure(new RuntimeError(ticks.startPosition, ticks.endPosition, "Number of ticks must be greater than 0", context));
 
-		BukkitTask task = Bukkit.getScheduler().runTaskTimer(Krip.plugin, () -> ((BaseFunctionValue) function).execute(Collections.emptyList(), context), 0, Integer.parseInt(ticks.getValue()));
+		BukkitTask task = Bukkit.getScheduler().runTaskTimer(Krip.plugin, () -> ((BaseFunctionValue) function).execute(Collections.emptyList(), context), 0, Integer.parseInt(ticks.getValueString()));
 
 		if (!Krip.tasks.containsKey(startPosition.fileName)) Krip.tasks.put(startPosition.fileName, new ArrayList<>());
 		Krip.tasks.get(startPosition.fileName).add(task);
