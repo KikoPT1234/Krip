@@ -3,7 +3,6 @@ package pt.kiko.krip;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitRunnable;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
@@ -38,14 +37,11 @@ abstract public class KripEvent implements Listener {
 					return new RuntimeResult().success(new NullValue(context.parent));
 				}
 			});
-		functions.forEach(function -> new BukkitRunnable() {
-			@Override
-			public void run() {
-				RuntimeResult result = new RuntimeResult();
-				result.register(function.execute(Collections.singletonList(eventObj), function.context));
-				if (result.error != null) System.out.println(result.error.toString());
-			}
-		}.run());
+		functions.forEach(function -> {
+			RuntimeResult result = new RuntimeResult();
+			result.register(function.execute(Collections.singletonList(eventObj), function.context));
+			if (result.error != null) System.out.println(result.error.toString());
+		});
 	}
 
 	protected abstract ObjectValue getEvent(Event event);
