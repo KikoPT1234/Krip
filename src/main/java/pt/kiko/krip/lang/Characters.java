@@ -38,7 +38,10 @@ final public class Characters {
 			"while",
 			"return",
 			"break",
-			"continue"
+			"continue",
+			"try",
+			"catch",
+			"finally"
 	};
 
 	/**

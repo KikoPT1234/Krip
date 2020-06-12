@@ -1,7 +1,7 @@
 package pt.kiko.krip.lang.results;
 
 import org.jetbrains.annotations.NotNull;
-import pt.kiko.krip.lang.errors.Error;
+import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.values.Value;
 
 /**
@@ -19,7 +19,7 @@ public class RuntimeResult {
 	/**
 	 * The error, if any
 	 */
-	public Error error;
+	public RuntimeError error;
 
 	/**
 	 * The value for a function to return, if any
@@ -113,7 +113,7 @@ public class RuntimeResult {
 	 * @param error The error to assign
 	 * @return The instance
 	 */
-	public RuntimeResult failure(Error error) {
+	public RuntimeResult failure(RuntimeError error) {
 		reset();
 		this.error = error;
 		return this;

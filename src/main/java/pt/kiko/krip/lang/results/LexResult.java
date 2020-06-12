@@ -1,7 +1,7 @@
 package pt.kiko.krip.lang.results;
 
 import pt.kiko.krip.lang.Token;
-import pt.kiko.krip.lang.errors.Error;
+import pt.kiko.krip.lang.errors.LexError;
 
 import java.util.ArrayList;
 
@@ -13,7 +13,7 @@ public class LexResult {
 	/**
 	 * The error, if any
 	 */
-	public Error error;
+	public LexError error;
 
 	/**
 	 * The list of tokens, if any
@@ -37,7 +37,7 @@ public class LexResult {
 	 * @param error The value to assign
 	 * @return The instance
 	 */
-	public LexResult failure(Error error) {
+	public LexResult failure(LexError error) {
 		this.error = error;
 		return this;
 	}

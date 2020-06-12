@@ -145,6 +145,94 @@ public class Parser {
 			result.registerAdvancement();
 			advance();
 			return result.success(new BreakNode(startPosition, currentToken.endPosition));
+		} else if (currentToken.matches(TokenTypes.KEYWORD, "try")) {
+			Position endPosition;
+
+			result.registerAdvancement();
+			advance(result);
+
+			if (!currentToken.matches(TokenTypes.LBRACKET))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '{'"));
+
+			result.registerAdvancement();
+			advance(result);
+
+			Node tryStatements = result.register(statements());
+			if (result.error != null) return result;
+
+			if (!currentToken.matches(TokenTypes.RBRACKET))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
+
+			result.registerAdvancement();
+			advance(result);
+
+			if (!currentToken.matches(TokenTypes.KEYWORD, "catch"))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected 'catch'"));
+
+			result.registerAdvancement();
+			advance();
+
+			Token errorNameToken = null;
+
+			if (currentToken.matches(TokenTypes.LPAREN)) {
+				result.registerAdvancement();
+				advance(result);
+
+				if (!currentToken.matches(TokenTypes.IDENTIFIER))
+					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected token: " + currentToken));
+				errorNameToken = currentToken;
+
+				result.registerAdvancement();
+				advance(result);
+
+				if (!currentToken.matches(TokenTypes.RPAREN))
+					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ')'"));
+
+				result.registerAdvancement();
+				advance();
+			}
+
+			if (!currentToken.matches(TokenTypes.LBRACKET))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '{'"));
+
+			result.registerAdvancement();
+			advance(result);
+
+			Node catchStatements = result.register(statements());
+			if (result.error != null) return result;
+
+			if (!currentToken.matches(TokenTypes.RBRACKET))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
+
+			endPosition = currentToken.endPosition;
+
+			result.registerAdvancement();
+			advance();
+
+			Node finallyStatements = null;
+			if (currentToken.matches(TokenTypes.KEYWORD, "finally")) {
+				result.registerAdvancement();
+				advance(result);
+
+				if (!currentToken.matches(TokenTypes.LBRACKET))
+					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '{'"));
+
+				result.registerAdvancement();
+				advance(result);
+
+				finallyStatements = result.register(statements());
+				if (result.error != null) return result;
+
+				if (!currentToken.matches(TokenTypes.RBRACKET))
+					return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
+
+				endPosition = currentToken.endPosition;
+
+				result.registerAdvancement();
+				advance();
+			}
+
+			return result.success(new TryCatchNode(startPosition, endPosition, tryStatements, catchStatements, errorNameToken, finallyStatements));
 		}
 		expression = result.register(expression());
 		if (result.error != null) return result;
@@ -878,6 +966,7 @@ public class Parser {
 
 			return result.success(new FunctionNode(body, false, varNameToken, argNameTokens));
 		} else if (isArrowFunction) {
+			advanceNewlines(result);
 			Node bodyNode = result.register(expression());
 			if (result.error != null) return result;
 

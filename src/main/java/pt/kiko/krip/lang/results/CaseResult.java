@@ -2,7 +2,7 @@ package pt.kiko.krip.lang.results;
 
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.cases.Cases;
-import pt.kiko.krip.lang.errors.Error;
+import pt.kiko.krip.lang.errors.SyntaxError;
 import pt.kiko.krip.lang.nodes.Node;
 
 /**
@@ -13,7 +13,7 @@ public class CaseResult {
 	/**
 	 * The error, if any
 	 */
-	public Error error;
+	public SyntaxError error;
 
 	/**
 	 * The cases, if any
@@ -74,7 +74,7 @@ public class CaseResult {
 	 * @param error The value to assign
 	 * @return The instance
 	 */
-	public CaseResult failure(Error error) {
+	public CaseResult failure(SyntaxError error) {
 		this.error = error;
 		return this;
 	}

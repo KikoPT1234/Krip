@@ -1,7 +1,7 @@
 package pt.kiko.krip.lang.results;
 
 import org.jetbrains.annotations.NotNull;
-import pt.kiko.krip.lang.errors.Error;
+import pt.kiko.krip.lang.errors.SyntaxError;
 import pt.kiko.krip.lang.nodes.Node;
 
 /**
@@ -19,7 +19,7 @@ public class ParseResult {
 	/**
 	 * The error, if any
 	 */
-	public Error error;
+	public SyntaxError error;
 
 	/**
 	 * The number of tokens advanced since the creation of the instance
@@ -82,7 +82,7 @@ public class ParseResult {
 	 * @param error The error to assign
 	 * @return The instance
 	 */
-	public ParseResult failure(Error error) {
+	public ParseResult failure(SyntaxError error) {
 		this.error = error;
 		return this;
 	}

@@ -46,6 +46,7 @@ final public class Interpreter {
 		else if (node instanceof VarAssignNode) return visitVarAssignNode((VarAssignNode) node, context);
 		else if (node instanceof FunctionNode) return visitFunctionNode((FunctionNode) node, context);
 		else if (node instanceof CallNode) return visitCallNode((CallNode) node, context);
+		else if (node instanceof TryCatchNode) return visitTryCatchNode((TryCatchNode) node, context);
 		else if (node instanceof ReturnNode) return visitReturnNode((ReturnNode) node, context);
 		else if (node instanceof ContinueNode) return visitContinueNode();
 		else if (node instanceof BreakNode) return visitBreakNode();
@@ -424,6 +425,37 @@ final public class Interpreter {
 		returnValue.setContext(context).setPosition(node.startPosition, node.endPosition);
 
 		return result.success(returnValue);
+	}
+
+	private static RuntimeResult visitTryCatchNode(@NotNull TryCatchNode node, Context context) {
+		RuntimeResult result = new RuntimeResult();
+		Context tryContext = new Context("<try>", context);
+		tryContext.symbolTable = new SymbolTable(context.symbolTable);
+
+		result.register(visit(node.tryNode, tryContext));
+		if (result.error != null) {
+			ErrorValue errorValue = new ErrorValue(result.error, node.startPosition, node.endPosition, context);
+
+			Context catchContext = new Context("<catch>", context);
+			catchContext.symbolTable = new SymbolTable(context.symbolTable);
+			if (node.errorNameToken != null) catchContext.symbolTable.set(node.errorNameToken.value, errorValue, false);
+
+			result.error = null;
+
+			result.register(visit(node.catchNode, catchContext));
+			if (result.shouldReturn()) return result;
+		}
+
+		if (node.finallyNode != null) {
+			Context finallyContext = new Context("<finally>", context);
+			finallyContext.symbolTable = new SymbolTable(context.symbolTable);
+
+			result.register(visit(node.finallyNode, finallyContext));
+
+			if (result.shouldReturn()) return result;
+		}
+
+		return result.success(new NullValue(context));
 	}
 
 	private static RuntimeResult visitReturnNode(@NotNull ReturnNode node, Context context) {
