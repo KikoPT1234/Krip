@@ -6,7 +6,7 @@ import pt.kiko.krip.Krip;
 import pt.kiko.krip.KripEvent;
 import pt.kiko.krip.lang.values.ObjectValue;
 import pt.kiko.krip.objects.LocationObj;
-import pt.kiko.krip.objects.PlayerObj;
+import pt.kiko.krip.objects.OnlinePlayerObj;
 
 import java.util.HashMap;
 
@@ -25,7 +25,7 @@ public class PlayerRespawnEvt extends KripEvent {
 		assert event instanceof PlayerRespawnEvent;
 		ObjectValue eventObj = new ObjectValue(new HashMap<>(), Krip.context);
 
-		eventObj.set("player", new PlayerObj(((PlayerRespawnEvent) event).getPlayer(), Krip.context));
+		eventObj.set("player", new OnlinePlayerObj(((PlayerRespawnEvent) event).getPlayer(), Krip.context));
 		eventObj.set("location", new LocationObj(((PlayerRespawnEvent) event).getRespawnLocation(), Krip.context));
 
 		return eventObj;

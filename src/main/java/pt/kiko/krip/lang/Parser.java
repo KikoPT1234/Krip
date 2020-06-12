@@ -272,16 +272,54 @@ public class Parser {
 			result.registerAdvancement();
 			advance();
 
-			if (!currentToken.matches(TokenTypes.EQ)) {
+			if (!currentToken.matches(TokenTypes.EQ) && !currentToken.matches(TokenTypes.PLUS) && !currentToken.matches(TokenTypes.MINUS) && !currentToken.matches(TokenTypes.MUL) && !currentToken.matches(TokenTypes.DIV)) {
 				reverse();
+				result.advanceCount--;
 			} else {
-				result.registerAdvancement();
-				advance();
+				if (!currentToken.matches(TokenTypes.EQ) && !currentToken.matches(TokenTypes.MUL) && !currentToken.matches(TokenTypes.DIV)) {
+					Token token = currentToken;
 
-				Node expression = result.register(expression());
-				if (result.error != null) return result;
+					result.registerAdvancement();
+					advance();
 
-				return result.success(new VarAssignNode(varNameToken, expression));
+					if (!currentToken.matches(token.type)) {
+						reverse();
+						result.advanceCount--;
+					} else {
+						result.registerAdvancement();
+						advance();
+
+						return result.success(new VarAssignNode(varNameToken, new BinaryOperationNode(new VarAccessNode(varNameToken), token, new NumberNode(new Token(TokenTypes.NUMBER, "1", token.startPosition)))));
+					}
+				}
+				if (!currentToken.matches(TokenTypes.EQ)) {
+					Token token = currentToken;
+
+					result.registerAdvancement();
+					advance();
+
+					if (!currentToken.matches(TokenTypes.EQ)) {
+						reverse(2);
+						result.advanceCount -= 2;
+					} else {
+						result.registerAdvancement();
+						advance();
+
+						Node right = result.register(expression());
+						if (result.error != null) return result;
+
+						return result.success(new VarAssignNode(varNameToken, new BinaryOperationNode(new VarAccessNode(varNameToken), token, right)));
+					}
+				} else {
+					result.registerAdvancement();
+					advance();
+
+					Node expression = result.register(expression());
+					if (result.error != null) return result;
+
+					return result.success(new VarAssignNode(varNameToken, expression));
+
+				}
 			}
 		}
 

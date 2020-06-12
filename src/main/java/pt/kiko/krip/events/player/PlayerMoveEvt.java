@@ -6,7 +6,7 @@ import pt.kiko.krip.Krip;
 import pt.kiko.krip.KripEvent;
 import pt.kiko.krip.lang.values.ObjectValue;
 import pt.kiko.krip.objects.LocationObj;
-import pt.kiko.krip.objects.PlayerObj;
+import pt.kiko.krip.objects.OnlinePlayerObj;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -29,7 +29,7 @@ public class PlayerMoveEvt extends KripEvent {
         ObjectValue eventObj = new ObjectValue(new HashMap<>(), Krip.context);
         eventObj.set("to", new LocationObj(Objects.requireNonNull(evt.getTo()), Krip.context));
         eventObj.set("from", new LocationObj(evt.getFrom(), Krip.context));
-        eventObj.set("player", new PlayerObj(evt.getPlayer(), Krip.context));
+        eventObj.set("player", new OnlinePlayerObj(evt.getPlayer(), Krip.context));
         return eventObj;
     }
 }

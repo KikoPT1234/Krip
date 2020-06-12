@@ -310,15 +310,17 @@ final public class Interpreter {
 		Value<?> value = result.register(visit(node.expression, context)).setPosition(node.token.startPosition, node.token.endPosition);
 		if (result.shouldReturn()) return result;
 
-		boolean successful = context.symbolTable.setExisting(varName, value);
+		if (Krip.globals.containsKey(varName)) {
+			Krip.globals.remove(varName);
+			Krip.globals.put(varName, value);
+			Krip.context.symbolTable.set(varName, value, false);
+		} else {
+			boolean successful = context.symbolTable.setExisting(varName, value);
 
-		if (!successful) {
-			if (!context.symbolTable.isConstantParents(varName)) {
-				Krip.globals.put(varName, value);
-				Krip.context.symbolTable.set(varName, value, false);
-			} else
+			if (!successful)
 				return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Variable is constant", context));
 		}
+
 		return result.success(value);
 	}
 

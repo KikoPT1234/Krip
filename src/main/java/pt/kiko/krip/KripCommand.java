@@ -105,7 +105,7 @@ public class KripCommand implements TabExecutor {
 		Krip.commandNames.clear();
 		List<String> namesToRemove = new ArrayList<>();
 		Krip.context.symbolTable.symbols.forEach((key, value) -> {
-			if (!Krip.registeredNames.contains(key)) namesToRemove.add(key);
+			if (!Krip.registeredNames.contains(key) && !Krip.globals.containsKey(key)) namesToRemove.add(key);
 		});
 		namesToRemove.forEach(name -> Krip.context.symbolTable.remove(name));
 		Krip.commandNames.clear();
@@ -123,7 +123,7 @@ public class KripCommand implements TabExecutor {
 		});
 		List<String> namesToRemove = new ArrayList<>();
 		Krip.context.symbolTable.symbols.forEach((key, value) -> {
-			if (!Krip.registeredNames.contains(key) && value.startPosition.fileName.equals(file.getName()))
+			if (!Krip.registeredNames.contains(key) && !Krip.globals.containsKey(key) && value.startPosition.fileName.equals(file.getName()))
 				namesToRemove.add(key);
 		});
 		namesToRemove.forEach(name -> Krip.context.symbolTable.remove(name));

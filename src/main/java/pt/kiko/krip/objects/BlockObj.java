@@ -34,7 +34,7 @@ public class BlockObj extends ObjectValue {
 
 				if (!(materialName instanceof StringValue)) return invalidType(materialName, context);
 
-				Material material = Material.getMaterial(materialName.getValueString());
+				Material material = Material.getMaterial(materialName.getValueString().replace(' ', '_').toUpperCase());
 
 				if (material == null)
 					return result.failure(new RuntimeError(startPosition, endPosition, "Material not found", context));
