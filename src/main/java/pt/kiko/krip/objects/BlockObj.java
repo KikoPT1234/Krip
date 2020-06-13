@@ -42,28 +42,28 @@ public class BlockObj extends ObjectValue {
 				block.setType(material);
 
 				BlockObj.this.value.put("type", new StringValue(material.toString(), context));
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 
 		value.put("isEmpty", new BuiltInFunctionValue("isEmpty", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(block.isEmpty(), context.parent));
+				return new RuntimeResult().success(new BooleanValue(block.isEmpty(), context));
 			}
 		});
 
 		value.put("isLiquid", new BuiltInFunctionValue("isLiquid", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(block.isLiquid(), context.parent));
+				return new RuntimeResult().success(new BooleanValue(block.isLiquid(), context));
 			}
 		});
 
 		value.put("isPassable", new BuiltInFunctionValue("isPassable", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(block.isPassable(), context.parent));
+				return new RuntimeResult().success(new BooleanValue(block.isPassable(), context));
 			}
 		});
 	}

@@ -44,9 +44,9 @@ public class WorldObj extends ObjectValue {
                 if (y instanceof NumberValue && z instanceof NullValue) return invalidType(z, context);
 
                 if (x instanceof LocationObj)
-                    return result.success(new BlockObj(world.getBlockAt(((LocationObj) x).location), context.parent));
+                    return result.success(new BlockObj(world.getBlockAt(((LocationObj) x).location), context));
                 else
-                    return result.success(new BlockObj(world.getBlockAt(Integer.parseInt(x.getValueString()), Integer.parseInt(y.getValueString()), Integer.parseInt(z.getValueString())), context.parent));
+                    return result.success(new BlockObj(world.getBlockAt(Integer.parseInt(x.getValueString()), Integer.parseInt(y.getValueString()), Integer.parseInt(z.getValueString())), context));
             }
         });
     }

@@ -22,6 +22,6 @@ public class WarnFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		Bukkit.getLogger().warning(context.symbolTable.get("value").toString());
-		return new RuntimeResult().success(new NullValue(context.parent));
+		return new RuntimeResult().success(new NullValue(context));
 	}
 }

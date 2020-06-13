@@ -39,6 +39,6 @@ public class WaitFunc extends BuiltInFunctionValue {
 			return result.failure(new RuntimeError(startPosition, endPosition, "Error while waiting " + millis + " milliseconds: " + e.getMessage(), context));
 		}
 
-		return result.success(new NullValue(context.parent));
+		return result.success(new NullValue(context));
 	}
 }

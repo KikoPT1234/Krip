@@ -187,9 +187,9 @@ public class Krip extends JavaPlugin {
 				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 				globals = (HashMap<String, Value<?>>) objectInputStream.readObject();
 				globals.forEach((name, global) -> {
+					global.setContext(context);
 					context.symbolTable.set(name, global, false);
 					registeredNames.add(name);
-					global.setContext(context);
 				});
 				objectInputStream.close();
 				fileInputStream.close();

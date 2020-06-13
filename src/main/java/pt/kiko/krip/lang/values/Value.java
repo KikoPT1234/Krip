@@ -69,7 +69,7 @@ abstract public class Value<T> implements Serializable {
 		prototype.set("toString", new BuiltInFunctionValue("toString", Collections.emptyList(), this, context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new StringValue(Value.this.getValueString(), context.parent));
+				return new RuntimeResult().success(new StringValue(Value.this.getValueString(), context));
 			}
 		});
 	}

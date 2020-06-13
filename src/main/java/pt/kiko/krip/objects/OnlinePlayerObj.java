@@ -31,7 +31,7 @@ public class OnlinePlayerObj extends PlayerObj {
 
 				player.chat(message.getValueString());
 
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 
@@ -44,7 +44,7 @@ public class OnlinePlayerObj extends PlayerObj {
 				if (!(message instanceof StringValue)) return invalidType(message, context);
 
 				player.sendMessage(message.getValueString());
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 
@@ -57,7 +57,7 @@ public class OnlinePlayerObj extends PlayerObj {
 				if (!(permission instanceof StringValue))
 					return invalidType(permission, context);
 
-				return result.success(new BooleanValue(player.hasPermission(permission.getValueString()), context.parent));
+				return result.success(new BooleanValue(player.hasPermission(permission.getValueString()), context));
 			}
 		});
 
@@ -72,7 +72,7 @@ public class OnlinePlayerObj extends PlayerObj {
 
 				player.setDisplayName(name.getValueString());
 
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 
@@ -86,7 +86,7 @@ public class OnlinePlayerObj extends PlayerObj {
 					return invalidType(reason, context);
 
 				player.kickPlayer(reason.getValueString());
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 
@@ -94,7 +94,7 @@ public class OnlinePlayerObj extends PlayerObj {
 			@Override
 			public RuntimeResult run(Context context) {
 				player.damage(10000);
-				return new RuntimeResult().success(new NullValue(context.parent));
+				return new RuntimeResult().success(new NullValue(context));
 			}
 		});
 
@@ -133,7 +133,7 @@ public class OnlinePlayerObj extends PlayerObj {
 
 				Bukkit.getScheduler().runTask(Krip.plugin, () -> effect.apply(player));
 
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 	}

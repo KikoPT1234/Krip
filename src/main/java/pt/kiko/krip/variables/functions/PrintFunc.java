@@ -21,6 +21,6 @@ public class PrintFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		System.out.println(context.symbolTable.get("value").toString());
-		return new RuntimeResult().success(new NullValue(context.parent));
+		return new RuntimeResult().success(new NullValue(context));
 	}
 }

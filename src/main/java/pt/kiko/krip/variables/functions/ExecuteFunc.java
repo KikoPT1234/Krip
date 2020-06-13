@@ -30,6 +30,6 @@ public class ExecuteFunc extends BuiltInFunctionValue {
 
 		Bukkit.getScheduler().runTask(Krip.plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.getValueString()));
 
-		return result.success(new NullValue(context.parent));
+		return result.success(new NullValue(context));
 	}
 }

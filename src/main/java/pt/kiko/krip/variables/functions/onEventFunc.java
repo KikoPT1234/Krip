@@ -31,6 +31,6 @@ public class onEventFunc extends BuiltInFunctionValue {
 			return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Invalid event", context));
 		Krip.events.get(name.getValueString()).addFunction((BaseFunctionValue) func);
 
-		return result.success(new NullValue(context.parent));
+		return result.success(new NullValue(context));
 	}
 }

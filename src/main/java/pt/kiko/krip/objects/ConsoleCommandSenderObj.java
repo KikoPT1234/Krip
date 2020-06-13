@@ -21,7 +21,7 @@ public class ConsoleCommandSenderObj extends ObjectValue {
 				if (!(message instanceof StringValue)) return invalidType(message, context);
 
 				sender.sendMessage(message.getValueString());
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 		value.put("hasPermission", new BuiltInFunctionValue("hasPermission", Collections.singletonList("message"), context) {

@@ -103,13 +103,13 @@ public class SymbolTable {
 	 * @param value The value to set
 	 * @return true if successful, false otherwise
 	 */
-	public boolean setExisting(String name, Value<?> value) {
-		if (isConstantParents(name)) return false;
+	public String setExisting(String name, Value<?> value) {
+		if (isConstantParents(name)) return "constant";
 		if (symbols.containsKey(name)) {
 			symbols.put(name, value);
-			return true;
+			return "success";
 		} else if (parent != null) return parent.setExisting(name, value);
-		else return false;
+		else return "not found";
 	}
 
 	/**

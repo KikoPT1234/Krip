@@ -83,4 +83,11 @@ public class ObjectValue extends Value<Map<String, Value<?>>> {
 	public void makePrototype() {
 
 	}
+
+	@Override
+	public Value<Map<String, Value<?>>> setContext(Context context) {
+		super.setContext(context);
+		value.forEach((name, value) -> value.setContext(context));
+		return this;
+	}
 }

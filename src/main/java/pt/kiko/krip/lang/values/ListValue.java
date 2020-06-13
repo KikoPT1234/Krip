@@ -95,7 +95,7 @@ public class ListValue extends Value<List<Value<?>>> {
 
 				ListValue.this.value.forEach(value -> ((BaseFunctionValue) function).execute(Collections.singletonList(value), context));
 
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 

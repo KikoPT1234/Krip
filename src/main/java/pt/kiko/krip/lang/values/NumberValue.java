@@ -3,6 +3,8 @@ package pt.kiko.krip.lang.values;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 
+import java.math.BigDecimal;
+
 public class NumberValue extends Value<Double> {
 
 	public NumberValue(double number, Context context) {
@@ -12,8 +14,7 @@ public class NumberValue extends Value<Double> {
 
 	@Override
 	public String getValueString() {
-		if (Math.floor(value) == value) return Integer.toString(value.intValue());
-		else return Double.toString(value);
+		return new BigDecimal(value.toString()).stripTrailingZeros().toPlainString();
 	}
 
 	@Override
@@ -132,5 +133,9 @@ public class NumberValue extends Value<Double> {
 	@Override
 	public void makePrototype() {
 
+	}
+
+	public boolean isWhole() {
+		return Math.floor(value) == value;
 	}
 }

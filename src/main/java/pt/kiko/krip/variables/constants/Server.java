@@ -30,7 +30,7 @@ public class Server extends ObjectValue {
 			@Override
 			public RuntimeResult run(Context context) {
 				List<OfflinePlayer> offlinePlayers = Arrays.asList(Bukkit.getOfflinePlayers());
-				return new RuntimeResult().success(new ListValue(offlinePlayers.stream().map(player -> new PlayerObj(player, context)).collect(Collectors.toList()), context.parent));
+				return new RuntimeResult().success(new ListValue(offlinePlayers.stream().map(player -> new PlayerObj(player, context)).collect(Collectors.toList()), context));
 			}
 		});
 
@@ -38,7 +38,7 @@ public class Server extends ObjectValue {
 			@Override
 			public RuntimeResult run(Context context) {
 				List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
-				return new RuntimeResult().success(new ListValue(players.stream().map(player -> new OnlinePlayerObj(player, context)).collect(Collectors.toList()), context.parent));
+				return new RuntimeResult().success(new ListValue(players.stream().map(player -> new OnlinePlayerObj(player, context)).collect(Collectors.toList()), context));
 			}
 		});
 
@@ -61,7 +61,7 @@ public class Server extends ObjectValue {
 				if (player.getName() == null)
 					return result.failure(new RuntimeError(startPosition, endPosition, "Player not found", context));
 
-				return result.success(new PlayerObj(player, context.parent));
+				return result.success(new PlayerObj(player, context));
 			}
 		});
 
@@ -80,9 +80,9 @@ public class Server extends ObjectValue {
 
 				if (player == null) player = Bukkit.getPlayer(name.getValueString());
 
-				if (player == null) return result.success(new NullValue(context.parent));
+				if (player == null) return result.success(new NullValue(context));
 
-				return result.success(new OnlinePlayerObj(player, context.parent));
+				return result.success(new OnlinePlayerObj(player, context));
 			}
 		});
 
@@ -95,7 +95,7 @@ public class Server extends ObjectValue {
 				if (!(name instanceof StringValue)) return invalidType(name, context);
 
 				Bukkit.getServer().getBanList(BanList.Type.NAME).pardon(name.getValueString());
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 
@@ -109,8 +109,8 @@ public class Server extends ObjectValue {
 
 				World world = Bukkit.getWorld(name.getValueString());
 
-				if (world == null) return result.success(new NullValue(context.parent));
-				return result.success(new WorldObj(world, context.parent));
+				if (world == null) return result.success(new NullValue(context));
+				return result.success(new WorldObj(world, context));
 			}
 		});
 	}

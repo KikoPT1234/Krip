@@ -35,7 +35,7 @@ public class PlayerObj extends ObjectValue {
 				BanEntry entry = Bukkit.getServer().getBanList(BanList.Type.NAME).addBan(player.getUniqueId().toString(), reason.getValueString(), null, null);
 				assert entry != null;
 				if (player.isOnline()) Objects.requireNonNull(player.getPlayer()).kickPlayer(entry.getReason());
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 
@@ -49,7 +49,7 @@ public class PlayerObj extends ObjectValue {
 					return invalidType(reason, context);
 
 				Bukkit.getServer().getBanList(BanList.Type.NAME).pardon(player.getUniqueId().toString());
-				return result.success(new NullValue(context.parent));
+				return result.success(new NullValue(context));
 			}
 		});
 	}

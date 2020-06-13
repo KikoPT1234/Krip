@@ -167,6 +167,6 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 			e.printStackTrace();
 		}
 
-		return result.success(new NullValue(context.parent));
+		return result.success(new NullValue(context));
 	}
 }

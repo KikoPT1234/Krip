@@ -315,10 +315,15 @@ final public class Interpreter {
 			Krip.globals.put(varName, value);
 			Krip.context.symbolTable.set(varName, value, false);
 		} else {
-			boolean successful = context.symbolTable.setExisting(varName, value);
+			String setState = context.symbolTable.setExisting(varName, value);
 
-			if (!successful)
-				return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Variable is constant", context));
+			if (!setState.equals("success")) {
+				if (setState.equals("not found")) {
+					Krip.globals.put(varName, value);
+					Krip.context.symbolTable.set(varName, value, false);
+				} else
+					return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Variable is constant", context));
+			}
 		}
 
 		return result.success(value);
