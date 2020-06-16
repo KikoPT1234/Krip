@@ -54,6 +54,8 @@ public class ObjectValue extends Value<Map<String, Value<?>>> {
 
 	@Override
 	public String toString() {
+		if (tabAmount >= 3) return "[Object]";
+
 		StringBuilder returnString = new StringBuilder(value.size() > 0 ? "{\n" : "{");
 		AtomicInteger count = new AtomicInteger();
 		value.forEach((key, value) -> {

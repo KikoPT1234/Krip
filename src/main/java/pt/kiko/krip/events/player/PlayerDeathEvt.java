@@ -1,9 +1,11 @@
 package pt.kiko.krip.events.player;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.KripEvent;
+import pt.kiko.krip.lang.values.NumberValue;
 import pt.kiko.krip.lang.values.ObjectValue;
 import pt.kiko.krip.lang.values.StringValue;
 import pt.kiko.krip.objects.OnlinePlayerObj;
@@ -25,8 +27,13 @@ public class PlayerDeathEvt extends KripEvent {
 		assert event instanceof PlayerDeathEvent;
 		ObjectValue eventObj = new ObjectValue(new HashMap<>(), Krip.context);
 
-		eventObj.set("player", new OnlinePlayerObj(((PlayerDeathEvent) event).getEntity(), Krip.context));
+		Player victim = ((PlayerDeathEvent) event).getEntity();
+
+		eventObj.set("victim", new OnlinePlayerObj(victim, Krip.context));
 		eventObj.set("message", new StringValue(((PlayerDeathEvent) event).getDeathMessage(), Krip.context));
+		eventObj.set("droppedExp", new NumberValue(((PlayerDeathEvent) event).getDroppedExp(), Krip.context));
+
+		if (victim.getKiller() != null) eventObj.set("attacker", new OnlinePlayerObj(victim.getKiller(), Krip.context));
 
 		return eventObj;
 	}

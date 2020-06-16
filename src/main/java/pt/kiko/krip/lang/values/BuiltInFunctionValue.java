@@ -7,7 +7,7 @@ import pt.kiko.krip.lang.results.RuntimeResult;
 
 import java.util.List;
 
-public class BuiltInFunctionValue extends BaseFunctionValue {
+abstract public class BuiltInFunctionValue extends BaseFunctionValue {
 
 	public BuiltInFunctionValue(String name, List<String> argNames, Value<?> parent, Context context) {
 		super(name, argNames, parent, context);
@@ -31,9 +31,8 @@ public class BuiltInFunctionValue extends BaseFunctionValue {
 		return result.success(value);
 	}
 
-	public @NotNull RuntimeResult run(Context context) {
-		return null;
-	}
+	abstract public @NotNull
+	RuntimeResult run(Context context);
 
 	@Override
 	public Value<String> copy() {

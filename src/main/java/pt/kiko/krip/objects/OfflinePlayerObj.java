@@ -13,11 +13,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class PlayerObj extends ObjectValue {
+public class OfflinePlayerObj extends ObjectValue {
 
 	public OfflinePlayer player;
 
-	public PlayerObj(@NotNull OfflinePlayer player, Context context) {
+	public OfflinePlayerObj(@NotNull OfflinePlayer player, Context context) {
 		super(new HashMap<>(), context);
 		this.player = player;
 		value.put("name", new StringValue(player.getName(), context));

@@ -10,8 +10,8 @@ import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.OfflinePlayerObj;
 import pt.kiko.krip.objects.OnlinePlayerObj;
-import pt.kiko.krip.objects.PlayerObj;
 import pt.kiko.krip.objects.WorldObj;
 
 import java.util.*;
@@ -30,7 +30,7 @@ public class Server extends ObjectValue {
 			@Override
 			public RuntimeResult run(Context context) {
 				List<OfflinePlayer> offlinePlayers = Arrays.asList(Bukkit.getOfflinePlayers());
-				return new RuntimeResult().success(new ListValue(offlinePlayers.stream().map(player -> new PlayerObj(player, context)).collect(Collectors.toList()), context));
+				return new RuntimeResult().success(new ListValue(offlinePlayers.stream().map(player -> new OfflinePlayerObj(player, context)).collect(Collectors.toList()), context));
 			}
 		});
 
@@ -42,7 +42,7 @@ public class Server extends ObjectValue {
 			}
 		});
 
-		value.put("getPlayer", new BuiltInFunctionValue("getPlayer", Collections.singletonList("uuid"), context) {
+		value.put("getOfflinePlayer", new BuiltInFunctionValue("getOfflinePlayer", Collections.singletonList("uuid"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
@@ -61,7 +61,7 @@ public class Server extends ObjectValue {
 				if (player.getName() == null)
 					return result.failure(new RuntimeError(startPosition, endPosition, "Player not found", context));
 
-				return result.success(new PlayerObj(player, context));
+				return result.success(new OfflinePlayerObj(player, context));
 			}
 		});
 

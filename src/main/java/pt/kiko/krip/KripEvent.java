@@ -33,7 +33,7 @@ abstract public class KripEvent implements Listener {
 
 		eventObj.set("createdAt", new DateObj(Krip.context));
 
-		if (event instanceof Cancellable && !((Cancellable) event).isCancelled())
+		if (event instanceof Cancellable && !((Cancellable) event).isCancelled()) {
 			eventObj.set("cancel", new BuiltInFunctionValue("cancel", new ArrayList<>(), Krip.context) {
 				@Override
 				public RuntimeResult run(Context context) {
@@ -41,6 +41,13 @@ abstract public class KripEvent implements Listener {
 					return new RuntimeResult().success(new NullValue(context));
 				}
 			});
+			eventObj.set("isCancelled", new BuiltInFunctionValue("isCancelled", Collections.emptyList(), Krip.context) {
+				@Override
+				public RuntimeResult run(Context context) {
+					return new RuntimeResult().success(new BooleanValue(((Cancellable) event).isCancelled(), context));
+				}
+			});
+		}
 		functions.forEach(function -> {
 			RuntimeResult result = new RuntimeResult();
 			result.register(function.execute(Collections.singletonList(eventObj), function.context));

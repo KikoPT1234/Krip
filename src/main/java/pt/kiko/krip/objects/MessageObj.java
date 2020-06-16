@@ -12,7 +12,7 @@ public class MessageObj extends ObjectValue {
 
 	public MessageObj(@NotNull AsyncPlayerChatEvent event, Context context) {
 		super(new HashMap<>(), context);
-		value.put("player", new PlayerObj(event.getPlayer(), context));
+		value.put("player", new OnlinePlayerObj(event.getPlayer(), context));
 		value.put("content", new StringValue(event.getMessage(), context));
 	}
 

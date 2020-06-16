@@ -90,7 +90,10 @@ public class Krip extends JavaPlugin {
 
 	public static void registerEvent(KripEvent kripEvent) {
 		events.put(kripEvent.name, kripEvent);
-		plugin.getServer().getPluginManager().registerEvent(kripEvent.event, kripEvent, EventPriority.NORMAL, (listener, event) -> kripEvent.execute(event), plugin);
+		plugin.getServer().getPluginManager().registerEvent(kripEvent.event, kripEvent, EventPriority.NORMAL, (listener, event) -> {
+			if (!kripEvent.event.isInstance(event)) return;
+			kripEvent.execute(event);
+		}, plugin);
 	}
 
 	public File pluginFolder;
