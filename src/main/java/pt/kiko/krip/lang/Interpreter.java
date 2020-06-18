@@ -197,7 +197,10 @@ final public class Interpreter {
 			Value<?> objValue = result.register(visit(value.getValue(), context));
 			if (result.shouldReturn()) return result;
 
-			if (objValue instanceof BaseFunctionValue) ((BaseFunctionValue) objValue).setThis(objectValue);
+			if (objValue instanceof BaseFunctionValue) {
+				((BaseFunctionValue) objValue).setThis(objectValue);
+				((BaseFunctionValue) objValue).setValue(value.getKey());
+			}
 
 			valueObj.put(value.getKey(), objValue);
 		}
@@ -255,6 +258,7 @@ final public class Interpreter {
 			String key = node.keyNode == null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValueString();
 			if (result.shouldReturn()) return result;
 
+			if (value instanceof BaseFunctionValue) ((BaseFunctionValue) value).setValue(key);
 			((ObjectValue) object).set(key, value);
 		} else {
 			Value<?> keyValue = result.register(visit(node.keyNode, context));

@@ -40,12 +40,12 @@ public class KripCommand implements TabExecutor {
 			String fileName = args[1];
 			if (fileName.equals("all")) {
 				reset();
-				File[] files = Krip.plugin.scriptFolder.listFiles();
+				File[] files = Krip.scriptFolder.listFiles();
 				List<RunResult> results = new ArrayList<>();
 				Runnable task = () -> {
 					try {
 						for (File file : files) {
-							results.add(Krip.run(Krip.plugin.loadFile(file), file.getName()));
+							results.add(Krip.run(Krip.loadFile(file), file.getName()));
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -66,7 +66,7 @@ public class KripCommand implements TabExecutor {
 				return true;
 			} else {
 				if (fileName.split("\\.").length == 1) fileName += ".kp";
-				File file = new File(Krip.plugin.scriptFolder, fileName);
+				File file = new File(Krip.scriptFolder, fileName);
 				if (!file.exists()) {
 					commandSender.sendMessage(ChatColor.RED + "File not found: " + file.getName());
 					return true;
@@ -74,7 +74,7 @@ public class KripCommand implements TabExecutor {
 				reset(file);
 				Runnable task = () -> {
 					try {
-						RunResult result = Krip.run(Krip.plugin.loadFile(file), file.getName());
+						RunResult result = Krip.run(Krip.loadFile(file), file.getName());
 						if (result.error != null) {
 							commandSender.sendMessage(ChatColor.RED + "Error while loading " + file.getName() + ": " + ChatColor.DARK_RED + result.error.details);
 							commandSender.sendMessage(ChatColor.RED + "Check the logs for more info");
@@ -156,7 +156,7 @@ public class KripCommand implements TabExecutor {
 	public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 		if (args.length == 1) return Arrays.asList("reload", "rl");
 		else if (args.length == 2 && (args[0].equals("reload") || args[0].equals("rl"))) {
-			List<String> names = Arrays.stream(Krip.plugin.scriptFolder.listFiles()).map(File::getName).collect(Collectors.toList());
+			List<String> names = Arrays.stream(Krip.scriptFolder.listFiles()).map(File::getName).collect(Collectors.toList());
 			names.add("all");
 			return names;
 		}

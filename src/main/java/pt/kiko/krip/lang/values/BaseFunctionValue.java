@@ -46,7 +46,7 @@ abstract public class BaseFunctionValue extends Value<String> {
 
 	@Override
 	public String getValueString() {
-		return "<function " + (value == null ? "anonymous" : value) + ">";
+		return "function " + (value == null ? "anonymous" : value) + "(" + String.join(", ", argNames) + ")";
 	}
 
 	@Override

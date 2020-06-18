@@ -113,6 +113,14 @@ public class Server extends ObjectValue {
 				return result.success(new WorldObj(world, context));
 			}
 		});
+
+		value.put("getWorlds", new BuiltInFunctionValue("getWorlds", Collections.emptyList(), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				List<Value<?>> worlds = Krip.plugin.getServer().getWorlds().stream().map(world -> new WorldObj(world, context)).collect(Collectors.toList());
+				return new RuntimeResult().success(new ListValue(worlds, context));
+			}
+		});
 	}
 
 }

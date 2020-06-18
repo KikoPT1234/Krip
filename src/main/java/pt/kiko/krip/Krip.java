@@ -1,9 +1,14 @@
 package pt.kiko.krip;
 
+import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.event.EventPriority;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -45,11 +50,18 @@ public class Krip extends JavaPlugin {
 	public static Map<String, List<BukkitTask>> tasks = new HashMap<>();
 
 	public static Method syncCommandsMethod;
-	public File variableFile;
+	public static File pluginFolder;
+	public static File scriptFolder;
+	public static File variableFile;
+
+	public static Economy economy;
+	public static Chat chat;
+	public static Permission permission;
 
 	/**
 	 * Runs the specified code
-	 * @param code The code to run
+	 *
+	 * @param code     The code to run
 	 * @param fileName The file name to display on errors
 	 * @return A RunResult instance
 	 * @see RunResult
@@ -96,9 +108,6 @@ public class Krip extends JavaPlugin {
 		}, plugin);
 	}
 
-	public File pluginFolder;
-	public File scriptFolder;
-
 	/**
 	 * Loads all classes on the specified package name
 	 *
@@ -142,11 +151,54 @@ public class Krip extends JavaPlugin {
 		}
 	}
 
+	/**
+	 * @param file The File instance to load
+	 * @return The file data
+	 */
+
+	public static @NotNull String loadFile(File file) {
+		StringBuilder code = new StringBuilder();
+
+		try {
+			Scanner scanner = new Scanner(file);
+			while (scanner.hasNextLine()) {
+				String data = scanner.nextLine();
+				code.append(data).append("\n");
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return code.toString();
+	}
+
+	private static void loadVault() {
+		Plugin vault = plugin.getServer().getPluginManager().getPlugin("Vault");
+		if (vault == null) return;
+
+		RegisteredServiceProvider<Economy> econRsp = plugin.getServer().getServicesManager().getRegistration(Economy.class);
+		if (econRsp == null) return;
+		plugin.getLogger().info("Vault found, enabling support");
+		economy = econRsp.getProvider();
+
+		RegisteredServiceProvider<Chat> chatRsp = plugin.getServer().getServicesManager().getRegistration(Chat.class);
+		if (chatRsp == null) return;
+		chat = chatRsp.getProvider();
+
+		RegisteredServiceProvider<Permission> permRsp = plugin.getServer().getServicesManager().getRegistration(Permission.class);
+		if (permRsp == null) return;
+		permission = permRsp.getProvider();
+
+		plugin.getLogger().info("Vault loaded!");
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
 
 		Krip.plugin = this;
+
+		loadVault();
 
 		try {
 			SimplePluginManager pluginManager = (SimplePluginManager) Bukkit.getPluginManager();
@@ -231,26 +283,5 @@ public class Krip extends JavaPlugin {
 		} catch (IOException exception) {
 			exception.printStackTrace();
 		}
-	}
-
-	/**
-	 * @param file The File instance to load
-	 * @return The file data
-	 */
-
-	public String loadFile(File file) {
-		StringBuilder code = new StringBuilder();
-
-		try {
-			Scanner scanner = new Scanner(file);
-			while (scanner.hasNextLine()) {
-				String data = scanner.nextLine();
-				code.append(data).append("\n");
-			}
-			scanner.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return code.toString();
 	}
 }

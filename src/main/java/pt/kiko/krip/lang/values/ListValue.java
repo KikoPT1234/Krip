@@ -140,5 +140,26 @@ public class ListValue extends Value<List<Value<?>>> {
 				return result.success(new ListValue(returnValue, context));
 			}
 		});
+
+		prototype.set("find", new BuiltInFunctionValue("find", Collections.singletonList("function"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				Value<?> function = context.symbolTable.get("function");
+
+				if (!(function instanceof BaseFunctionValue)) return invalidType(function, context);
+
+				Value<?>[] list = ListValue.this.value.toArray(new Value[]{});
+
+				for (Value<?> value : list) {
+					Value<?> returnedValue = result.register(((BaseFunctionValue) function).execute(Collections.singletonList(value), context));
+					if (result.shouldReturn()) return result;
+
+					if (returnedValue.isTrue()) return result.success(returnedValue);
+				}
+
+				return result.success(new NullValue(context));
+			}
+		});
 	}
 }
