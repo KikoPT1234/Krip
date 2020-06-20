@@ -21,16 +21,16 @@ import java.util.stream.Collectors;
 
 public class CustomCommand implements TabExecutor {
 
-	private final Value<?> function;
-	private final ListValue args;
+	private final KripValue<?> function;
+	private final KripList args;
 	private final Context context;
 	private final List<String> optionalArgs = new ArrayList<>();
 	public Command command;
 
-	public CustomCommand(Value<?> function, ListValue args, Command command, Context context) {
+	public CustomCommand(KripValue<?> function, KripList args, Command command, Context context) {
 		this.function = function;
 		if (args != null) this.args = args;
-		else this.args = new ListValue(new ArrayList<>(), context);
+		else this.args = new KripList(new ArrayList<>(), context);
 		this.command = command;
 		this.context = context;
 	}
@@ -41,16 +41,16 @@ public class CustomCommand implements TabExecutor {
 
 	@Override
 	public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-		if (!(function instanceof BaseFunctionValue)) return true;
+		if (!(function instanceof KripBaseFunction)) return true;
 
-		List<Value<?>> requiredArgs = this.args.value.stream().filter(arg -> !optionalArgs.contains(arg.getValueString())).collect(Collectors.toList());
+		List<KripValue<?>> requiredArgs = this.args.value.stream().filter(arg -> !optionalArgs.contains(arg.getValueString())).collect(Collectors.toList());
 		if (args.length < requiredArgs.size()) return false;
-		List<Value<?>> argValues = Arrays.stream(args).map(arg -> new StringValue(arg, context)).collect(Collectors.toList());
+		List<KripValue<?>> argValues = Arrays.stream(args).map(arg -> new KripString(arg, context)).collect(Collectors.toList());
 
-		ObjectValue sender = commandSender instanceof Player ? new OnlinePlayerObj((Player) commandSender, context) : new ConsoleCommandSenderObj((ConsoleCommandSender) commandSender, context);
-		sender.set("isPlayer", new BooleanValue(commandSender instanceof Player, context));
+		KripObject sender = commandSender instanceof Player ? new OnlinePlayerObj((Player) commandSender, context) : new ConsoleCommandSenderObj((ConsoleCommandSender) commandSender, context);
+		sender.set("isPlayer", new KripBoolean(commandSender instanceof Player, context));
 
-		RuntimeResult result = ((BaseFunctionValue) function).execute(Arrays.asList(sender, new ListValue(argValues, context)), context);
+		RuntimeResult result = ((KripBaseFunction) function).execute(Arrays.asList(sender, new KripList(argValues, context)), context);
 		if (result.error != null) {
 			System.out.println(result.error.toString());
 		}

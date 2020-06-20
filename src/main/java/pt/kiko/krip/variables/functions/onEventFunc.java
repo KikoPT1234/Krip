@@ -8,7 +8,7 @@ import pt.kiko.krip.lang.values.*;
 
 import java.util.Arrays;
 
-public class onEventFunc extends BuiltInFunctionValue {
+public class onEventFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("onEvent", new onEventFunc());
@@ -21,16 +21,16 @@ public class onEventFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> name = context.symbolTable.get("eventName");
-		Value<?> func = context.symbolTable.get("function");
+		KripValue<?> name = context.symbolTable.get("eventName");
+		KripValue<?> func = context.symbolTable.get("function");
 
-		if (!(name instanceof StringValue)) return invalidType(name, context);
-		if (!(func instanceof BaseFunctionValue)) return invalidType(func, context);
+		if (!(name instanceof KripString)) return invalidType(name, context);
+		if (!(func instanceof KripBaseFunction)) return invalidType(func, context);
 
 		if (!Krip.events.containsKey(name.getValueString()))
 			return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Invalid event", context));
-		Krip.events.get(name.getValueString()).addFunction((BaseFunctionValue) func);
+		Krip.events.get(name.getValueString()).addFunction((KripBaseFunction) func);
 
-		return result.success(new NullValue(context));
+		return result.success(new KripNull(context));
 	}
 }

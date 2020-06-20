@@ -4,7 +4,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerMoveEvent;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.KripEvent;
-import pt.kiko.krip.lang.values.ObjectValue;
+import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.objects.LocationObj;
 import pt.kiko.krip.objects.OnlinePlayerObj;
 
@@ -21,15 +21,15 @@ public class PlayerMoveEvt extends KripEvent {
         super("PlayerMoveEvent", PlayerMoveEvent.class);
     }
 
-    @Override
-    protected ObjectValue getEvent(Event event) {
-        assert event instanceof PlayerMoveEvent;
-        PlayerMoveEvent evt = (PlayerMoveEvent) event;
+	@Override
+	protected KripObject getEvent(Event event) {
+		assert event instanceof PlayerMoveEvent;
+		PlayerMoveEvent evt = (PlayerMoveEvent) event;
 
-        ObjectValue eventObj = new ObjectValue(new HashMap<>(), Krip.context);
-        eventObj.set("to", new LocationObj(Objects.requireNonNull(evt.getTo()), Krip.context));
-        eventObj.set("from", new LocationObj(evt.getFrom(), Krip.context));
-        eventObj.set("player", new OnlinePlayerObj(evt.getPlayer(), Krip.context));
-        return eventObj;
-    }
+		KripObject eventObj = new KripObject(new HashMap<>(), Krip.context);
+		eventObj.set("to", new LocationObj(Objects.requireNonNull(evt.getTo()), Krip.context));
+		eventObj.set("from", new LocationObj(evt.getFrom(), Krip.context));
+		eventObj.set("player", new OnlinePlayerObj(evt.getPlayer(), Krip.context));
+		return eventObj;
+	}
 }

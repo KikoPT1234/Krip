@@ -15,7 +15,7 @@ import java.util.List;
 abstract public class KripEvent implements Listener {
 
 	public String name;
-	public List<BaseFunctionValue> functions = new ArrayList<>();
+	public List<KripBaseFunction> functions = new ArrayList<>();
 	public Class<? extends Event> event;
 
 	public KripEvent(String name, Class<? extends Event> event) {
@@ -23,28 +23,28 @@ abstract public class KripEvent implements Listener {
 		this.event = event;
 	}
 
-	public void addFunction(BaseFunctionValue function) {
+	public void addFunction(KripBaseFunction function) {
 		functions.add(function);
 	}
 
 	public void execute(Event event) {
-		ObjectValue eventObj = getEvent(event);
-		eventObj.set("isCancellable", new BooleanValue(event instanceof Cancellable, Krip.context));
+		KripObject eventObj = getEvent(event);
+		eventObj.set("isCancellable", new KripBoolean(event instanceof Cancellable, Krip.context));
 
 		eventObj.set("createdAt", new DateObj(Krip.context));
 
 		if (event instanceof Cancellable && !((Cancellable) event).isCancelled()) {
-			eventObj.set("cancel", new BuiltInFunctionValue("cancel", new ArrayList<>(), Krip.context) {
+			eventObj.set("cancel", new KripJavaFunction("cancel", new ArrayList<>(), Krip.context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					((Cancellable) event).setCancelled(true);
-					return new RuntimeResult().success(new NullValue(context));
+					return new RuntimeResult().success(new KripNull(context));
 				}
 			});
-			eventObj.set("isCancelled", new BuiltInFunctionValue("isCancelled", Collections.emptyList(), Krip.context) {
+			eventObj.set("isCancelled", new KripJavaFunction("isCancelled", Collections.emptyList(), Krip.context) {
 				@Override
 				public RuntimeResult run(Context context) {
-					return new RuntimeResult().success(new BooleanValue(((Cancellable) event).isCancelled(), context));
+					return new RuntimeResult().success(new KripBoolean(((Cancellable) event).isCancelled(), context));
 				}
 			});
 		}
@@ -55,6 +55,6 @@ abstract public class KripEvent implements Listener {
 		});
 	}
 
-	protected abstract ObjectValue getEvent(Event event);
+	protected abstract KripObject getEvent(Event event);
 
 }

@@ -1,9 +1,9 @@
 package pt.kiko.krip.variables.constants;
 
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.lang.values.BooleanValue;
+import pt.kiko.krip.lang.values.KripBoolean;
 
-public class False extends BooleanValue {
+public class False extends KripBoolean {
 
 	static {
 		Krip.registerValue("false", new False());

@@ -4,7 +4,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.server.ServerLoadEvent;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.KripEvent;
-import pt.kiko.krip.lang.values.ObjectValue;
+import pt.kiko.krip.lang.values.KripObject;
 
 import java.util.HashMap;
 
@@ -19,7 +19,7 @@ public class ServerStartEvt extends KripEvent {
 	}
 
 	@Override
-	protected ObjectValue getEvent(Event event) {
-		return new ObjectValue(new HashMap<>(), Krip.context);
+	protected KripObject getEvent(Event event) {
+		return new KripObject(new HashMap<>(), Krip.context);
 	}
 }

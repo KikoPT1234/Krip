@@ -7,19 +7,19 @@ import pt.kiko.krip.lang.results.RuntimeResult;
 
 import java.util.List;
 
-public class FunctionValue extends BaseFunctionValue {
+public class KripFunction extends KripBaseFunction {
 
 	public Node body;
 	public boolean shouldAutoReturn;
 
-	public FunctionValue(String name, Node body, List<String> argNames, boolean shouldAutoReturn, Context context) {
+	public KripFunction(String name, Node body, List<String> argNames, boolean shouldAutoReturn, Context context) {
 		super(name, argNames, context);
 		this.body = body;
 		this.shouldAutoReturn = shouldAutoReturn;
 	}
 
 	@Override
-	public RuntimeResult execute(List<Value<?>> args, Context ctx) {
+	public RuntimeResult execute(List<KripValue<?>> args, Context ctx) {
 		RuntimeResult result = new RuntimeResult();
 		Context context = generateNewContext();
 		context.parent = ctx;
@@ -27,16 +27,16 @@ public class FunctionValue extends BaseFunctionValue {
 		result.register(populateArgs(argNames, args, context));
 		if (result.shouldReturn()) return result;
 
-		Value<?> value = result.register(Interpreter.visit(body, context));
+		KripValue<?> value = result.register(Interpreter.visit(body, context));
 		if (result.shouldReturn() && result.funcReturnValue == null) return result;
 
-		Value<?> returnValue = shouldAutoReturn ? value : result.funcReturnValue;
-		if (returnValue == null) returnValue = new NullValue(this.context);
+		KripValue<?> returnValue = shouldAutoReturn ? value : result.funcReturnValue;
+		if (returnValue == null) returnValue = new KripNull(this.context);
 		return result.success(returnValue);
 	}
 
 	@Override
-	public Value<String> copy() {
-		return new FunctionValue(value, body, argNames, shouldAutoReturn, context).setPosition(startPosition, endPosition);
+	public KripValue<String> copy() {
+		return new KripFunction(value, body, argNames, shouldAutoReturn, context).setPosition(startPosition, endPosition);
 	}
 }

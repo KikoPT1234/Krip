@@ -6,16 +6,16 @@ import pt.kiko.krip.lang.errors.RuntimeError;
 
 import java.util.HashMap;
 
-public class ErrorValue extends ObjectValue {
+public class KripError extends KripObject {
 
 	public RuntimeError error;
 
-	public ErrorValue(RuntimeError error, Position startPosition, Position endPosition, Context context) {
+	public KripError(RuntimeError error, Position startPosition, Position endPosition, Context context) {
 		super(new HashMap<>(), context);
 		setPosition(startPosition, endPosition);
 		this.error = error;
 
-		value.put("details", new StringValue(error.details, context));
+		value.put("details", new KripString(error.details, context));
 	}
 
 	@Override

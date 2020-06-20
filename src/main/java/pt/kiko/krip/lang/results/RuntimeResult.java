@@ -2,7 +2,7 @@ package pt.kiko.krip.lang.results;
 
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.errors.RuntimeError;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripValue;
 
 /**
  * Represents the result of the Interpreter
@@ -14,7 +14,7 @@ public class RuntimeResult {
 	/**
 	 * The value, if any
 	 */
-	public Value<?> value;
+	public KripValue<?> value;
 
 	/**
 	 * The error, if any
@@ -24,7 +24,7 @@ public class RuntimeResult {
 	/**
 	 * The value for a function to return, if any
 	 */
-	public Value<?> funcReturnValue;
+	public KripValue<?> funcReturnValue;
 
 	/**
 	 * Whether a loop (if any) should continue
@@ -53,7 +53,7 @@ public class RuntimeResult {
 	 * @param result The RuntimeResult to register
 	 * @return The value field of the RuntimeResult instance
 	 */
-	public Value<?> register(@NotNull RuntimeResult result) {
+	public KripValue<?> register(@NotNull RuntimeResult result) {
 		if (result.shouldReturn()) error = result.error;
 		funcReturnValue = result.funcReturnValue;
 		loopShouldContinue = result.loopShouldContinue;
@@ -67,7 +67,7 @@ public class RuntimeResult {
 	 * @param value The value to assign
 	 * @return The instance
 	 */
-	public RuntimeResult success(Value<?> value) {
+	public RuntimeResult success(KripValue<?> value) {
 		reset();
 		this.value = value;
 		return this;
@@ -79,7 +79,7 @@ public class RuntimeResult {
 	 * @param value The value to assign
 	 * @return The instance
 	 */
-	public RuntimeResult successReturn(Value<?> value) {
+	public RuntimeResult successReturn(KripValue<?> value) {
 		reset();
 		this.funcReturnValue = value;
 		return this;

@@ -18,7 +18,7 @@ import pt.kiko.krip.lang.results.LexResult;
 import pt.kiko.krip.lang.results.ParseResult;
 import pt.kiko.krip.lang.results.RunResult;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripValue;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -40,7 +40,7 @@ import java.util.jar.JarFile;
 public class Krip extends JavaPlugin {
 
 	public static Context context = new Context("<program>");
-	public static HashMap<String, Value<?>> globals = new HashMap<>();
+	public static HashMap<String, KripValue<?>> globals = new HashMap<>();
 	public static Krip plugin;
 	public static Map<String, KripEvent> events = new HashMap<>();
 	public static List<String> registeredNames = new ArrayList<>();
@@ -95,7 +95,7 @@ public class Krip extends JavaPlugin {
 		return result.success(runtimeResult.value);
 	}
 
-	public static void registerValue(String name, Value<?> value) {
+	public static void registerValue(String name, KripValue<?> value) {
 		context.symbolTable.set(name, value, true);
 		registeredNames.add(name);
 	}
@@ -240,7 +240,7 @@ public class Krip extends JavaPlugin {
 			if (reader.readLine() != null) {
 				FileInputStream fileInputStream = new FileInputStream(variableFile);
 				ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-				globals = (HashMap<String, Value<?>>) objectInputStream.readObject();
+				globals = (HashMap<String, KripValue<?>>) objectInputStream.readObject();
 				globals.forEach((name, global) -> {
 					global.setContext(context);
 					context.symbolTable.set(name, global, false);

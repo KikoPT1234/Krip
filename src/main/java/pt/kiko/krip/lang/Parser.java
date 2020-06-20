@@ -52,7 +52,25 @@ public class Parser {
 		}
 	}
 
+	private void advance(CaseResult result) {
+		tokenIndex++;
+		updateCurrentToken();
+		while (currentToken.matches(TokenTypes.NEWLINE)) {
+			tokenIndex++;
+			updateCurrentToken();
+			result.registerAdvancement();
+		}
+	}
+
 	private void advanceNewlines(ParseResult result) {
+		while (currentToken.matches(TokenTypes.NEWLINE)) {
+			tokenIndex++;
+			updateCurrentToken();
+			result.registerAdvancement();
+		}
+	}
+
+	private void advanceNewlines(CaseResult result) {
 		while (currentToken.matches(TokenTypes.NEWLINE)) {
 			tokenIndex++;
 			updateCurrentToken();
@@ -384,7 +402,7 @@ public class Parser {
 			count++;
 		}
 
-		if (!currentToken.matches(TokenTypes.PERIOD) || !currentToken.matches(TokenTypes.LSQUARE)) reverse(count);
+		if (!currentToken.matches(TokenTypes.PERIOD) && !currentToken.matches(TokenTypes.LSQUARE)) reverse(count);
 
 		while (currentToken.matches(TokenTypes.PERIOD) || currentToken.matches(TokenTypes.LSQUARE)) {
 			result.registerAdvancement();
@@ -435,6 +453,14 @@ public class Parser {
 				call = new ObjectAccessNode(call, key);
 			}
 			if (currentToken.matches(TokenTypes.LPAREN)) call = result.register(callSyntax(result, call));
+
+			count = 0;
+			while (currentToken.matches(TokenTypes.NEWLINE)) {
+				result.registerAdvancement();
+				advance();
+				count++;
+			}
+			if (!currentToken.matches(TokenTypes.PERIOD) && !currentToken.matches(TokenTypes.LSQUARE)) reverse(count);
 		}
 
 		return result.success(call);
@@ -609,6 +635,7 @@ public class Parser {
 			while (currentToken.matches(TokenTypes.COMMA)) {
 				result.registerAdvancement();
 				advance(result);
+				if (currentToken.matches(TokenTypes.RSQUARE)) break;
 
 				nodes.add(result.register(expression()));
 				if (result.error != null) return result;
@@ -654,15 +681,18 @@ public class Parser {
 			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '('"));
 
 		result.registerAdvancement();
-		advance();
+		advance(result);
 
 		Node condition = result.register(expression());
 		if (result.error != null) return result;
 
-		if (!currentToken.matches(TokenTypes.RPAREN)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ')'"));
+		advanceNewlines(result);
+
+		if (!currentToken.matches(TokenTypes.RPAREN))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ')'"));
 
 		result.registerAdvancement();
-		advance();
+		advance(result);
 
 		if (currentToken.matches(TokenTypes.LBRACKET)) {
 			result.registerAdvancement();
@@ -697,6 +727,8 @@ public class Parser {
 				reverse(integer.get());
 			}
 		} else {
+			advanceNewlines(result);
+
 			Node expression = result.register(statement());
 			if (result.error != null) return result;
 			cases.add(new Case(condition, expression, true));
@@ -731,7 +763,7 @@ public class Parser {
 		Cases cases = new Cases();
 
 		result.registerAdvancement();
-		advance();
+		advance(result);
 
 		if (currentToken.matches(TokenTypes.LBRACKET)) {
 			result.registerAdvancement();
@@ -747,6 +779,8 @@ public class Parser {
 			result.registerAdvancement();
 			advance();
 		} else {
+			advanceNewlines(result);
+
 			Node expression = result.register(statement());
 			if (result.error != null) return result;
 			cases.setElseCase(new ElseCase(expression, true));
@@ -1022,12 +1056,22 @@ public class Parser {
 		ParseResult result = new ParseResult();
 		Node left = result.register(func.run());
 		if (result.error != null) return result;
+		int count = 0;
 
+		while (currentToken.matches(TokenTypes.NEWLINE)) {
+			result.registerAdvancement();
+			advance();
+			count++;
+		}
+		if (!Arrays.asList(types).contains(currentToken.type)) {
+			result.advanceCount -= count;
+			reverse(count);
+		}
 		while (Arrays.asList(types).contains(currentToken.type)) {
 			Token operationToken = currentToken;
 
 			result.registerAdvancement();
-			advance();
+			advance(result);
 
 			Node right = result.register(func.run());
 			if (result.error != null) return result;

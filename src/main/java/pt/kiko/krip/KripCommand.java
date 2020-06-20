@@ -10,7 +10,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pt.kiko.krip.lang.results.RunResult;
-import pt.kiko.krip.lang.values.BaseFunctionValue;
+import pt.kiko.krip.lang.values.KripBaseFunction;
 
 import java.io.File;
 import java.util.*;
@@ -115,7 +115,7 @@ public class KripCommand implements TabExecutor {
 
 	private void reset(File file) {
 		Krip.events.forEach((name, event) -> {
-			List<BaseFunctionValue> functionsToRemove = new ArrayList<>();
+			List<KripBaseFunction> functionsToRemove = new ArrayList<>();
 			event.functions.forEach(function -> {
 				if (function.startPosition.fileName.equals(file.getName())) functionsToRemove.add(function);
 			});

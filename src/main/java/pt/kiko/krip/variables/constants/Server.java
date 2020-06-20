@@ -17,7 +17,7 @@ import pt.kiko.krip.objects.WorldObj;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Server extends ObjectValue {
+public class Server extends KripObject {
 
 	static {
 		Krip.registerValue("server", new Server());
@@ -26,29 +26,29 @@ public class Server extends ObjectValue {
 	public Server() {
 		super(new HashMap<>(), Krip.context);
 
-		value.put("getOfflinePlayers", new BuiltInFunctionValue("getOfflinePlayers", Collections.emptyList(), context) {
+		value.put("getOfflinePlayers", new KripJavaFunction("getOfflinePlayers", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				List<OfflinePlayer> offlinePlayers = Arrays.asList(Bukkit.getOfflinePlayers());
-				return new RuntimeResult().success(new ListValue(offlinePlayers.stream().map(player -> new OfflinePlayerObj(player, context)).collect(Collectors.toList()), context));
+				return new RuntimeResult().success(new KripList(offlinePlayers.stream().map(player -> new OfflinePlayerObj(player, context)).collect(Collectors.toList()), context));
 			}
 		});
 
-		value.put("getOnlinePlayers", new BuiltInFunctionValue("getOnlinePlayers", Collections.emptyList(), context) {
+		value.put("getOnlinePlayers", new KripJavaFunction("getOnlinePlayers", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
-				return new RuntimeResult().success(new ListValue(players.stream().map(player -> new OnlinePlayerObj(player, context)).collect(Collectors.toList()), context));
+				return new RuntimeResult().success(new KripList(players.stream().map(player -> new OnlinePlayerObj(player, context)).collect(Collectors.toList()), context));
 			}
 		});
 
-		value.put("getOfflinePlayer", new BuiltInFunctionValue("getOfflinePlayer", Collections.singletonList("uuid"), context) {
+		value.put("getOfflinePlayer", new KripJavaFunction("getOfflinePlayer", Collections.singletonList("uuid"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> uuid = context.symbolTable.get("uuid");
+				KripValue<?> uuid = context.symbolTable.get("uuid");
 
-				if (!(uuid instanceof StringValue)) return invalidType(uuid, context);
+				if (!(uuid instanceof KripString)) return invalidType(uuid, context);
 
 				OfflinePlayer player;
 
@@ -65,13 +65,13 @@ public class Server extends ObjectValue {
 			}
 		});
 
-		value.put("getOnlinePlayer", new BuiltInFunctionValue("getOnlinePlayer", Collections.singletonList("name"), context) {
+		value.put("getOnlinePlayer", new KripJavaFunction("getOnlinePlayer", Collections.singletonList("name"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> name = context.symbolTable.get("name");
+				KripValue<?> name = context.symbolTable.get("name");
 
-				if (!(name instanceof StringValue)) return invalidType(name, context);
+				if (!(name instanceof KripString)) return invalidType(name, context);
 
 				Player player = null;
 
@@ -80,45 +80,45 @@ public class Server extends ObjectValue {
 
 				if (player == null) player = Bukkit.getPlayer(name.getValueString());
 
-				if (player == null) return result.success(new NullValue(context));
+				if (player == null) return result.success(new KripNull(context));
 
 				return result.success(new OnlinePlayerObj(player, context));
 			}
 		});
 
-		value.put("unban", new BuiltInFunctionValue("unban", Collections.singletonList("name"), context) {
+		value.put("unban", new KripJavaFunction("unban", Collections.singletonList("name"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> name = context.symbolTable.get("name");
+				KripValue<?> name = context.symbolTable.get("name");
 
-				if (!(name instanceof StringValue)) return invalidType(name, context);
+				if (!(name instanceof KripString)) return invalidType(name, context);
 
 				Bukkit.getServer().getBanList(BanList.Type.NAME).pardon(name.getValueString());
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("getWorld", new BuiltInFunctionValue("getWorld", Collections.singletonList("name"), context) {
+		value.put("getWorld", new KripJavaFunction("getWorld", Collections.singletonList("name"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> name = context.symbolTable.get("name");
+				KripValue<?> name = context.symbolTable.get("name");
 
-				if (!(name instanceof StringValue)) return invalidType(name, context);
+				if (!(name instanceof KripString)) return invalidType(name, context);
 
 				World world = Bukkit.getWorld(name.getValueString());
 
-				if (world == null) return result.success(new NullValue(context));
+				if (world == null) return result.success(new KripNull(context));
 				return result.success(new WorldObj(world, context));
 			}
 		});
 
-		value.put("getWorlds", new BuiltInFunctionValue("getWorlds", Collections.emptyList(), context) {
+		value.put("getWorlds", new KripJavaFunction("getWorlds", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				List<Value<?>> worlds = Krip.plugin.getServer().getWorlds().stream().map(world -> new WorldObj(world, context)).collect(Collectors.toList());
-				return new RuntimeResult().success(new ListValue(worlds, context));
+				List<KripValue<?>> worlds = Krip.plugin.getServer().getWorlds().stream().map(world -> new WorldObj(world, context)).collect(Collectors.toList());
+				return new RuntimeResult().success(new KripList(worlds, context));
 			}
 		});
 	}

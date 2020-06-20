@@ -5,6 +5,7 @@ package pt.kiko.krip.lang;
  */
 public enum TokenTypes {
 	STRING,
+	TEMPLATE_STRING,
 	NUMBER,
 	PLUS,
 	MINUS,

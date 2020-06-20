@@ -19,7 +19,7 @@ public class LivingEntityObj extends EntityObj {
 	public LivingEntityObj(LivingEntity entity, Context context) {
 		super(entity, context);
 
-		value.put("getEyeLocation", new BuiltInFunctionValue("getEyeLocation", Collections.emptyList(), context) {
+		value.put("getEyeLocation", new KripJavaFunction("getEyeLocation", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
@@ -30,26 +30,26 @@ public class LivingEntityObj extends EntityObj {
 			}
 		});
 
-		value.put("addEffect", new BuiltInFunctionValue("addEffect", Arrays.asList("name", "duration", "amplifier", "particles"), context) {
+		value.put("addEffect", new KripJavaFunction("addEffect", Arrays.asList("name", "duration", "amplifier", "particles"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> name = context.symbolTable.get("name");
-				Value<?> duration = context.symbolTable.get("duration");
-				Value<?> amplifier = context.symbolTable.get("amplifier");
-				Value<?> particles = context.symbolTable.get("particles");
+				KripValue<?> name = context.symbolTable.get("name");
+				KripValue<?> duration = context.symbolTable.get("duration");
+				KripValue<?> amplifier = context.symbolTable.get("amplifier");
+				KripValue<?> particles = context.symbolTable.get("particles");
 
-				if (!(name instanceof StringValue)) return invalidType(name, context);
-				if (!(duration instanceof NumberValue || duration instanceof NullValue))
+				if (!(name instanceof KripString)) return invalidType(name, context);
+				if (!(duration instanceof KripNumber || duration instanceof KripNull))
 					return invalidType(duration, context);
-				if (!(amplifier instanceof NumberValue || amplifier instanceof NullValue))
+				if (!(amplifier instanceof KripNumber || amplifier instanceof KripNull))
 					return invalidType(amplifier, context);
-				if (!(particles instanceof BooleanValue || particles instanceof NullValue))
+				if (!(particles instanceof KripBoolean || particles instanceof KripNull))
 					return invalidType(particles, context);
 
-				if (duration instanceof NumberValue && ((NumberValue) duration).getValue() != Math.floor(((NumberValue) duration).getValue()))
+				if (duration instanceof KripNumber && ((KripNumber) duration).getValue() != Math.floor(((KripNumber) duration).getValue()))
 					return result.failure(new RuntimeError(duration.startPosition, duration.endPosition, "Number must be whole", context));
-				if (amplifier instanceof NumberValue && ((NumberValue) amplifier).getValue() != Math.floor(((NumberValue) amplifier).getValue()))
+				if (amplifier instanceof KripNumber && ((KripNumber) amplifier).getValue() != Math.floor(((KripNumber) amplifier).getValue()))
 					return result.failure(new RuntimeError(amplifier.startPosition, amplifier.endPosition, "Number must be whole", context));
 
 				PotionEffectType type = PotionEffectType.getByName(name.getValueString().replace(' ', '_').toUpperCase());
@@ -57,25 +57,25 @@ public class LivingEntityObj extends EntityObj {
 				if (type == null)
 					return result.failure(new RuntimeError(startPosition, endPosition, "Invalid potion type", context));
 
-				int potionDuration = duration instanceof NumberValue ? (int) (double) ((NumberValue) duration).getValue() : 600;
-				int potionAmplifier = amplifier instanceof NumberValue ? (int) (double) ((NumberValue) amplifier).getValue() : 0;
-				boolean potionParticles = particles instanceof BooleanValue ? ((BooleanValue) particles).getValue() : true;
+				int potionDuration = duration instanceof KripNumber ? (int) (double) ((KripNumber) duration).getValue() : 600;
+				int potionAmplifier = amplifier instanceof KripNumber ? (int) (double) ((KripNumber) amplifier).getValue() : 0;
+				boolean potionParticles = particles instanceof KripBoolean ? ((KripBoolean) particles).getValue() : true;
 
 				PotionEffect effect = new PotionEffect(type, potionDuration, potionAmplifier, false, potionParticles);
 
 				Bukkit.getScheduler().runTask(Krip.plugin, () -> effect.apply(entity));
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("removeEffect", new BuiltInFunctionValue("removeEffect", Collections.singletonList("name"), context) {
+		value.put("removeEffect", new KripJavaFunction("removeEffect", Collections.singletonList("name"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> name = context.symbolTable.get("name");
+				KripValue<?> name = context.symbolTable.get("name");
 
-				if (!(name instanceof StringValue)) return invalidType(name, context);
+				if (!(name instanceof KripString)) return invalidType(name, context);
 
 				PotionEffectType type = PotionEffectType.getByName(name.getValueString().replace(' ', '_').toUpperCase());
 				if (type == null)
@@ -83,112 +83,112 @@ public class LivingEntityObj extends EntityObj {
 
 				entity.removePotionEffect(type);
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("clearEffects", new BuiltInFunctionValue("clearEffects", Collections.emptyList(), context) {
+		value.put("clearEffects", new KripJavaFunction("clearEffects", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				Collection<PotionEffect> effects = entity.getActivePotionEffects();
 
 				effects.forEach(effect -> entity.removePotionEffect(effect.getType()));
 
-				return new RuntimeResult().success(new NullValue(context));
+				return new RuntimeResult().success(new KripNull(context));
 			}
 		});
 
-		value.put("setCollidable", new BuiltInFunctionValue("setCollidable", Collections.singletonList("collidable"), context) {
+		value.put("setCollidable", new KripJavaFunction("setCollidable", Collections.singletonList("collidable"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> collidable = context.symbolTable.get("collidable");
+				KripValue<?> collidable = context.symbolTable.get("collidable");
 
-				if (!(collidable instanceof BooleanValue)) return invalidType(collidable, context);
+				if (!(collidable instanceof KripBoolean)) return invalidType(collidable, context);
 
-				entity.setCollidable(((BooleanValue) collidable).getValue());
+				entity.setCollidable(((KripBoolean) collidable).getValue());
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("setAI", new BuiltInFunctionValue("setAI", Collections.singletonList("ai"), context) {
+		value.put("setAI", new KripJavaFunction("setAI", Collections.singletonList("ai"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> ai = context.symbolTable.get("ai");
+				KripValue<?> ai = context.symbolTable.get("ai");
 
-				if (!(ai instanceof BooleanValue)) return invalidType(ai, context);
+				if (!(ai instanceof KripBoolean)) return invalidType(ai, context);
 
-				entity.setAI(((BooleanValue) ai).getValue());
+				entity.setAI(((KripBoolean) ai).getValue());
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("damage", new BuiltInFunctionValue("damage", Collections.singletonList("damage"), context) {
+		value.put("damage", new KripJavaFunction("damage", Collections.singletonList("damage"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> damage = context.symbolTable.get("damage");
+				KripValue<?> damage = context.symbolTable.get("damage");
 
-				if (!(damage instanceof NumberValue)) return invalidType(damage, context);
+				if (!(damage instanceof KripNumber)) return invalidType(damage, context);
 
-				entity.damage(((NumberValue) damage).getValue());
+				entity.damage(((KripNumber) damage).getValue());
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("kill", new BuiltInFunctionValue("kill", Collections.emptyList(), context) {
+		value.put("kill", new KripJavaFunction("kill", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				while (!entity.isDead()) {
 					entity.damage(10000);
 				}
-				return new RuntimeResult().success(new NullValue(context));
+				return new RuntimeResult().success(new KripNull(context));
 			}
 		});
 
-		value.put("isSwimming", new BuiltInFunctionValue("isSwimming", Collections.emptyList(), context) {
+		value.put("isSwimming", new KripJavaFunction("isSwimming", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(entity.isSwimming(), context));
+				return new RuntimeResult().success(new KripBoolean(entity.isSwimming(), context));
 			}
 		});
 
-		value.put("isCollidable", new BuiltInFunctionValue("isCollidable", Collections.emptyList(), context) {
+		value.put("isCollidable", new KripJavaFunction("isCollidable", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(entity.isCollidable(), context));
+				return new RuntimeResult().success(new KripBoolean(entity.isCollidable(), context));
 			}
 		});
 
-		value.put("isLeashed", new BuiltInFunctionValue("isLeashed", Collections.emptyList(), context) {
+		value.put("isLeashed", new KripJavaFunction("isLeashed", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(entity.isLeashed(), context));
+				return new RuntimeResult().success(new KripBoolean(entity.isLeashed(), context));
 			}
 		});
 
-		value.put("isGliding", new BuiltInFunctionValue("isGliding", Collections.emptyList(), context) {
+		value.put("isGliding", new KripJavaFunction("isGliding", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(entity.isGliding(), context));
+				return new RuntimeResult().success(new KripBoolean(entity.isGliding(), context));
 			}
 		});
 
-		value.put("isRiptiding", new BuiltInFunctionValue("isRiptiding", Collections.emptyList(), context) {
+		value.put("isRiptiding", new KripJavaFunction("isRiptiding", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(entity.isRiptiding(), context));
+				return new RuntimeResult().success(new KripBoolean(entity.isRiptiding(), context));
 			}
 		});
 
-		value.put("isSleeping", new BuiltInFunctionValue("isSleeping", Collections.emptyList(), context) {
+		value.put("isSleeping", new KripJavaFunction("isSleeping", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(entity.isSleeping(), context));
+				return new RuntimeResult().success(new KripBoolean(entity.isSleeping(), context));
 			}
 		});
 	}

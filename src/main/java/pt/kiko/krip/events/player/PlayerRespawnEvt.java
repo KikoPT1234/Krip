@@ -4,7 +4,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.KripEvent;
-import pt.kiko.krip.lang.values.ObjectValue;
+import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.objects.LocationObj;
 import pt.kiko.krip.objects.OnlinePlayerObj;
 
@@ -21,9 +21,9 @@ public class PlayerRespawnEvt extends KripEvent {
 	}
 
 	@Override
-	protected ObjectValue getEvent(Event event) {
+	protected KripObject getEvent(Event event) {
 		assert event instanceof PlayerRespawnEvent;
-		ObjectValue eventObj = new ObjectValue(new HashMap<>(), Krip.context);
+		KripObject eventObj = new KripObject(new HashMap<>(), Krip.context);
 
 		eventObj.set("player", new OnlinePlayerObj(((PlayerRespawnEvent) event).getPlayer(), Krip.context));
 		eventObj.set("location", new LocationObj(((PlayerRespawnEvent) event).getRespawnLocation(), Krip.context));

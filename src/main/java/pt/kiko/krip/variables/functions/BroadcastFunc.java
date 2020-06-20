@@ -3,14 +3,14 @@ package pt.kiko.krip.variables.functions;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.NullValue;
-import pt.kiko.krip.lang.values.StringValue;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripJavaFunction;
+import pt.kiko.krip.lang.values.KripNull;
+import pt.kiko.krip.lang.values.KripString;
+import pt.kiko.krip.lang.values.KripValue;
 
 import java.util.Collections;
 
-public class BroadcastFunc extends BuiltInFunctionValue {
+public class BroadcastFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("broadcast", new BroadcastFunc());
@@ -23,11 +23,11 @@ public class BroadcastFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> message = context.symbolTable.get("message");
+		KripValue<?> message = context.symbolTable.get("message");
 
-		if (!(message instanceof StringValue)) return invalidType(message, context);
+		if (!(message instanceof KripString)) return invalidType(message, context);
 
 		Krip.plugin.getServer().broadcastMessage(message.getValueString());
-		return result.success(new NullValue(context));
+		return result.success(new KripNull(context));
 	}
 }

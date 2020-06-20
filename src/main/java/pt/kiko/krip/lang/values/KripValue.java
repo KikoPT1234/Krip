@@ -15,7 +15,7 @@ import java.util.HashMap;
  *
  * @param <T> The type of the value field
  */
-abstract public class Value<T> implements Serializable {
+abstract public class KripValue<T> implements Serializable {
 
 	/**
 	 * The context this value is in
@@ -33,19 +33,19 @@ abstract public class Value<T> implements Serializable {
 	public transient Position endPosition;
 
 	/**
-	 * The ObjectValue representing this value's prototype, if any
+	 * The KripObject representing this value's prototype, if any
 	 */
-	public ObjectValue prototype;
+	public KripObject prototype;
 
 	/**
 	 * The parent value if this value is a prototype
 	 */
-	public Value<?> parent;
+	public KripValue<?> parent;
 
 	/**
 	 * The actual value to use
 	 */
-	protected T value;
+	public T value;
 
 	/**
 	 * Constructor for a prototype value
@@ -53,7 +53,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param parent  The parent value
 	 * @param context The context this value is in
 	 */
-	public Value(Value<?> parent, Context context) {
+	public KripValue(KripValue<?> parent, Context context) {
 		this.parent = parent;
 		this.context = context;
 	}
@@ -63,13 +63,13 @@ abstract public class Value<T> implements Serializable {
 	 *
 	 * @param context The context this value is in
 	 */
-	public Value(Context context) {
+	public KripValue(Context context) {
 		this.context = context;
-		prototype = new ObjectValue(new HashMap<>(), this, context);
-		prototype.set("toString", new BuiltInFunctionValue("toString", Collections.emptyList(), this, context) {
+		prototype = new KripObject(new HashMap<>(), this, context);
+		prototype.set("toString", new KripJavaFunction("toString", Collections.emptyList(), this, context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new StringValue(Value.this.getValueString(), context));
+				return new RuntimeResult().success(new KripString(KripValue.this.getValueString(), context));
 			}
 		});
 	}
@@ -94,7 +94,7 @@ abstract public class Value<T> implements Serializable {
 	public abstract void setValue(T value);
 
 	/**
-	 * Makes a new ObjectValue representing this value's prototype
+	 * Makes a new KripObject representing this value's prototype
 	 */
 	public abstract void makePrototype();
 
@@ -103,7 +103,7 @@ abstract public class Value<T> implements Serializable {
 	 *
 	 * @return A copy of this value
 	 */
-	public abstract Value<T> copy();
+	public abstract KripValue<T> copy();
 
 	/**
 	 * Sets this value's start and end positions
@@ -112,7 +112,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param endPosition   The end position
 	 * @return The instance
 	 */
-	public Value<T> setPosition(Position startPosition, Position endPosition) {
+	public KripValue<T> setPosition(Position startPosition, Position endPosition) {
 		this.startPosition = startPosition;
 		this.endPosition = endPosition;
 		return this;
@@ -124,7 +124,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param context The context
 	 * @return The instance
 	 */
-	public Value<T> setContext(Context context) {
+	public KripValue<T> setContext(Context context) {
 		this.context = context;
 		return this;
 	}
@@ -133,7 +133,7 @@ abstract public class Value<T> implements Serializable {
 	 * Alias for the getValueString method
 	 *
 	 * @return The value as a string
-	 * @see Value#getValueString()
+	 * @see KripValue#getValueString()
 	 */
 	@Override
 	public String toString() {
@@ -146,7 +146,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The error
 	 */
-	public RuntimeResult illegalOperation(@NotNull Value<?> other) {
+	public RuntimeResult illegalOperation(@NotNull KripValue<?> other) {
 		return new RuntimeResult().failure(new RuntimeError(startPosition, other.endPosition, "Illegal operation", context));
 	}
 
@@ -157,7 +157,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param context The context
 	 * @return The error
 	 */
-	protected RuntimeResult invalidType(@NotNull Value<?> value, Context context) {
+	protected RuntimeResult invalidType(@NotNull KripValue<?> value, Context context) {
 		return new RuntimeResult().failure(new RuntimeError(value.startPosition != null ? value.startPosition : startPosition, value.endPosition != null ? value.endPosition : endPosition, "Invalid type", context));
 	}
 
@@ -167,9 +167,9 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult plus(Value<?> other) {
-		if (other instanceof StringValue)
-			return new RuntimeResult().success(new StringValue(getValueString() + other.getValueString(), context));
+	public RuntimeResult plus(KripValue<?> other) {
+		if (other instanceof KripString)
+			return new RuntimeResult().success(new KripString(getValueString() + other.getValueString(), context));
 		return illegalOperation(other);
 	}
 
@@ -179,7 +179,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult minus(Value<?> other) {
+	public RuntimeResult minus(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -189,7 +189,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult mul(Value<?> other) {
+	public RuntimeResult mul(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -199,7 +199,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult div(Value<?> other) {
+	public RuntimeResult div(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -209,7 +209,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult pow(Value<?> other) {
+	public RuntimeResult pow(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -219,7 +219,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult mod(Value<?> other) {
+	public RuntimeResult mod(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -229,15 +229,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	abstract public RuntimeResult equal(Value<?> other);
-
-	/**
-	 * Not equal binary operation
-	 *
-	 * @param other The other value
-	 * @return The result
-	 */
-	abstract public RuntimeResult notEquals(Value<?> other);
+	abstract public RuntimeResult equal(KripValue<?> other);
 
 	/**
 	 * Less than binary operation
@@ -245,7 +237,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult lessThan(Value<?> other) {
+	public RuntimeResult lessThan(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -255,7 +247,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult lessThanOrEqual(Value<?> other) {
+	public RuntimeResult lessThanOrEqual(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -265,7 +257,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult greaterThan(Value<?> other) {
+	public RuntimeResult greaterThan(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -275,7 +267,7 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult greaterThanOrEqual(Value<?> other) {
+	public RuntimeResult greaterThanOrEqual(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -292,8 +284,8 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult and(Value<?> other) {
-		return new RuntimeResult().success(new BooleanValue(isTrue() && other.isTrue(), context));
+	public RuntimeResult and(KripValue<?> other) {
+		return new RuntimeResult().success(new KripBoolean(isTrue() && other.isTrue(), context));
 	}
 
 	/**
@@ -302,8 +294,14 @@ abstract public class Value<T> implements Serializable {
 	 * @param other The other value
 	 * @return The result
 	 */
-	public RuntimeResult or(Value<?> other) {
-		return new RuntimeResult().success(new BooleanValue(isTrue() || other.isTrue(), context));
+	public RuntimeResult or(KripValue<?> other) {
+		return new RuntimeResult().success(new KripBoolean(isTrue() || other.isTrue(), context));
+	}
+
+	public RuntimeResult notEquals(KripValue<?> other) {
+		RuntimeResult result = equal(other);
+
+		return result.success(new KripBoolean(!((KripBoolean) result.value).getValue(), context));
 	}
 
 }

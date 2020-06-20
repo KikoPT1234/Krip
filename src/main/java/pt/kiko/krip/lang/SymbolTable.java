@@ -1,6 +1,6 @@
 package pt.kiko.krip.lang;
 
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ public class SymbolTable {
 	/**
 	 * The map holding the symbols
 	 */
-	public HashMap<String, Value<?>> symbols = new HashMap<>();
+	public HashMap<String, KripValue<?>> symbols = new HashMap<>();
 	/**
 	 * A list of strings containing the name of the constant variables
 	 */
@@ -49,7 +49,7 @@ public class SymbolTable {
 	 * @param symbols   The symbols
 	 * @param constants The constants
 	 */
-	public SymbolTable(SymbolTable parent, HashMap<String, Value<?>> symbols, ArrayList<String> constants) {
+	public SymbolTable(SymbolTable parent, HashMap<String, KripValue<?>> symbols, ArrayList<String> constants) {
 		this.parent = parent;
 		this.symbols = symbols;
 		this.constants = constants;
@@ -61,8 +61,8 @@ public class SymbolTable {
 	 * @param name The name of the symbol
 	 * @return The symbol if any, null otherwise
 	 */
-	public Value<?> get(String name) {
-		Value<?> value = symbols.get(name);
+	public KripValue<?> get(String name) {
+		KripValue<?> value = symbols.get(name);
 		if (value == null && parent != null && !checking) {
 			checking = true;
 			value = parent.get(name);
@@ -79,7 +79,7 @@ public class SymbolTable {
 	 * @param isFinal Whether the symbol is constant (initialized with the const keyword)
 	 * @return true if successful, false otherwise
 	 */
-	public boolean set(String name, Value<?> value, Boolean isFinal) {
+	public boolean set(String name, KripValue<?> value, Boolean isFinal) {
 		if (isConstant(name)) return false;
 		symbols.put(name, value);
 		if (isFinal) constants.add(name);
@@ -103,7 +103,7 @@ public class SymbolTable {
 	 * @param value The value to set
 	 * @return true if successful, false otherwise
 	 */
-	public String setExisting(String name, Value<?> value) {
+	public String setExisting(String name, KripValue<?> value) {
 		if (isConstantParents(name)) return "constant";
 		if (symbols.containsKey(name)) {
 			symbols.put(name, value);

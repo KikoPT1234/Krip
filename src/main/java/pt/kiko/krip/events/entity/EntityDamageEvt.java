@@ -10,9 +10,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.KripEvent;
-import pt.kiko.krip.lang.values.NumberValue;
-import pt.kiko.krip.lang.values.ObjectValue;
-import pt.kiko.krip.lang.values.StringValue;
+import pt.kiko.krip.lang.values.KripNumber;
+import pt.kiko.krip.lang.values.KripObject;
+import pt.kiko.krip.lang.values.KripString;
 import pt.kiko.krip.objects.BlockObj;
 import pt.kiko.krip.objects.EntityObj;
 import pt.kiko.krip.objects.LivingEntityObj;
@@ -31,18 +31,18 @@ public class EntityDamageEvt extends KripEvent {
 	}
 
 	@Override
-	protected ObjectValue getEvent(Event event) {
+	protected KripObject getEvent(Event event) {
 		assert event instanceof EntityDamageEvent;
-		ObjectValue eventObj = new ObjectValue(new HashMap<>(), Krip.context);
+		KripObject eventObj = new KripObject(new HashMap<>(), Krip.context);
 
 		Entity entity = ((EntityDamageEvent) event).getEntity();
 		if (entity instanceof Player) eventObj.set("victim", new OnlinePlayerObj((Player) entity, Krip.context));
 		else if (entity instanceof LivingEntity)
 			eventObj.set("victim", new LivingEntityObj((LivingEntity) entity, Krip.context));
 		else eventObj.set("victim", new EntityObj(entity, Krip.context));
-		eventObj.set("cause", new StringValue(((EntityDamageEvent) event).getCause().toString(), Krip.context));
-		eventObj.set("damage", new NumberValue(((EntityDamageEvent) event).getDamage(), Krip.context));
-		eventObj.set("finalDamage", new NumberValue(((EntityDamageEvent) event).getFinalDamage(), Krip.context));
+		eventObj.set("cause", new KripString(((EntityDamageEvent) event).getCause().toString(), Krip.context));
+		eventObj.set("damage", new KripNumber(((EntityDamageEvent) event).getDamage(), Krip.context));
+		eventObj.set("finalDamage", new KripNumber(((EntityDamageEvent) event).getFinalDamage(), Krip.context));
 
 		if (event instanceof EntityDamageByEntityEvent) {
 			Entity attacker = ((EntityDamageByEntityEvent) event).getDamager();

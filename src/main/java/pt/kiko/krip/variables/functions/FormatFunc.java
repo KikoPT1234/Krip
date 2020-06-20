@@ -4,13 +4,13 @@ import org.bukkit.ChatColor;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.StringValue;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripJavaFunction;
+import pt.kiko.krip.lang.values.KripString;
+import pt.kiko.krip.lang.values.KripValue;
 
 import java.util.Collections;
 
-public class FormatFunc extends BuiltInFunctionValue {
+public class FormatFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("format", new FormatFunc());
@@ -23,10 +23,10 @@ public class FormatFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> message = context.symbolTable.get("message");
+		KripValue<?> message = context.symbolTable.get("message");
 
-		if (!(message instanceof StringValue)) return invalidType(message, context);
+		if (!(message instanceof KripString)) return invalidType(message, context);
 
-		return result.success(new StringValue(ChatColor.translateAlternateColorCodes('&', message.getValueString()), context));
+		return result.success(new KripString(ChatColor.translateAlternateColorCodes('&', message.getValueString()), context));
 	}
 }

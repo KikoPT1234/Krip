@@ -7,18 +7,18 @@ import pt.kiko.krip.lang.results.RuntimeResult;
 
 import java.util.List;
 
-abstract public class BuiltInFunctionValue extends BaseFunctionValue {
+abstract public class KripJavaFunction extends KripBaseFunction {
 
-	public BuiltInFunctionValue(String name, List<String> argNames, Value<?> parent, Context context) {
+	public KripJavaFunction(String name, List<String> argNames, KripValue<?> parent, Context context) {
 		super(name, argNames, parent, context);
 	}
 
-	public BuiltInFunctionValue(String name, List<String> argNames, Context context) {
+	public KripJavaFunction(String name, List<String> argNames, Context context) {
 		super(name, argNames, context);
 	}
 
 	@Override
-	public RuntimeResult execute(List<Value<?>> args, Context ctx) {
+	public RuntimeResult execute(List<KripValue<?>> args, Context ctx) {
 		RuntimeResult result = new RuntimeResult();
 		Context context = generateNewContext();
 		context.parent = ctx;
@@ -26,7 +26,7 @@ abstract public class BuiltInFunctionValue extends BaseFunctionValue {
 		result.register(populateArgs(argNames, args, context));
 		if (result.shouldReturn()) return result;
 
-		Value<?> value = result.register(run(context));
+		KripValue<?> value = result.register(run(context));
 		if (result.shouldReturn()) return result;
 		return result.success(value);
 	}
@@ -35,9 +35,9 @@ abstract public class BuiltInFunctionValue extends BaseFunctionValue {
 	RuntimeResult run(Context context);
 
 	@Override
-	public Value<String> copy() {
+	public KripValue<String> copy() {
 		ResultRunnable func = this::run;
-		return new BuiltInFunctionValue(value, argNames, context) {
+		return new KripJavaFunction(value, argNames, context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				return func.run(context);

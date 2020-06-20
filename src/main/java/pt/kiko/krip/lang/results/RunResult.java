@@ -1,7 +1,7 @@
 package pt.kiko.krip.lang.results;
 
 import pt.kiko.krip.lang.errors.Error;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripValue;
 
 /**
  * Represents the result of the executed code
@@ -17,7 +17,7 @@ public class RunResult {
 	/**
 	 * The value, if any
 	 */
-	public Value<?> value;
+	public KripValue<?> value;
 
 	/**
 	 * Assigns the value parameter to the value field
@@ -25,7 +25,7 @@ public class RunResult {
 	 * @param value The value to assign
 	 * @return The instance
 	 */
-	public RunResult success(Value<?> value) {
+	public RunResult success(KripValue<?> value) {
 		this.value = value;
 		return this;
 	}

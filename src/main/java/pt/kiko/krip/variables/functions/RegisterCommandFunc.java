@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class RegisterCommandFunc extends BuiltInFunctionValue {
+public class RegisterCommandFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("registerCommand", new RegisterCommandFunc());
@@ -35,27 +35,27 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 	public synchronized RuntimeResult run(@NotNull Context context) {
 		RuntimeResult result = new RuntimeResult();
 
-		Value<?> name = context.symbolTable.get("name");
-		Value<?> info = context.symbolTable.get("info");
-		Value<?> function = context.symbolTable.get("function");
+		KripValue<?> name = context.symbolTable.get("name");
+		KripValue<?> info = context.symbolTable.get("info");
+		KripValue<?> function = context.symbolTable.get("function");
 
-		if (!(name instanceof StringValue)) return invalidType(name, context);
-		if (!(info instanceof ObjectValue || info instanceof NullValue)) return invalidType(info, context);
-		if (!(function instanceof BaseFunctionValue || function instanceof NullValue))
+		if (!(name instanceof KripString)) return invalidType(name, context);
+		if (!(info instanceof KripObject || info instanceof KripNull)) return invalidType(info, context);
+		if (!(function instanceof KripBaseFunction || function instanceof KripNull))
 			return invalidType(function, context);
 
 		if (name.getValueString().equals(""))
 			return result.failure(new RuntimeError(name.startPosition, name.endPosition, "Command name must not be empty", context));
 
-		Value<?> description = null;
-		Value<?> permission = null;
-		Value<?> permissionMessage = null;
-		Value<?> usage = null;
-		Value<?> args = null;
-		Value<?> aliases = null;
+		KripValue<?> description = null;
+		KripValue<?> permission = null;
+		KripValue<?> permissionMessage = null;
+		KripValue<?> usage = null;
+		KripValue<?> args = null;
+		KripValue<?> aliases = null;
 
-		if (info instanceof ObjectValue) {
-			ObjectValue infoObj = (ObjectValue) info;
+		if (info instanceof KripObject) {
+			KripObject infoObj = (KripObject) info;
 
 			description = infoObj.get("description");
 			permission = infoObj.get("permission");
@@ -65,33 +65,33 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 			aliases = infoObj.get("aliases");
 		}
 
-		if (description != null && !(description instanceof StringValue)) return invalidType(description, context);
+		if (description != null && !(description instanceof KripString)) return invalidType(description, context);
 		else if (description != null && description.getValueString().equals(""))
 			return result.failure(new RuntimeError(description.startPosition, description.endPosition, "Description must not be empty", context));
 
-		if (permission != null && !(permission instanceof StringValue)) return invalidType(permission, context);
+		if (permission != null && !(permission instanceof KripString)) return invalidType(permission, context);
 		else if (permission != null && permission.getValueString().equals(""))
 			return result.failure(new RuntimeError(permission.startPosition, permission.endPosition, "Permission must not be empty", context));
 
-		if (permissionMessage != null && !(permissionMessage instanceof StringValue))
+		if (permissionMessage != null && !(permissionMessage instanceof KripString))
 			return invalidType(permissionMessage, context);
 		else if (permissionMessage != null && permissionMessage.getValueString().equals(""))
 			return result.failure(new RuntimeError(permissionMessage.startPosition, permissionMessage.endPosition, "Description must not be empty", context));
 
-		if (usage != null && !(usage instanceof StringValue)) return invalidType(usage, context);
+		if (usage != null && !(usage instanceof KripString)) return invalidType(usage, context);
 		else if (usage != null && usage.getValueString().equals(""))
 			return result.failure(new RuntimeError(usage.startPosition, usage.endPosition, "Description must not be empty", context));
 
-		if (args != null && !(args instanceof ListValue)) return invalidType(args, context);
+		if (args != null && !(args instanceof KripList)) return invalidType(args, context);
 
-		if (aliases != null && !(aliases instanceof ListValue)) return invalidType(aliases, context);
+		if (aliases != null && !(aliases instanceof KripList)) return invalidType(aliases, context);
 
 		PluginCommand command = null;
 		try {
 			final Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
 			c.setAccessible(true);
 			command = c.newInstance(name.getValueString(), Krip.plugin);
-			CustomCommand customCommand = new CustomCommand(function, (ListValue) args, command, context);
+			CustomCommand customCommand = new CustomCommand(function, (KripList) args, command, context);
 			if (description != null) command.setDescription(description.getValueString());
 			else command.setDescription("A Krip command");
 
@@ -103,18 +103,18 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 			else if (args != null) {
 				StringBuilder builder = new StringBuilder();
 				builder.append("/").append(command.getName().toLowerCase()).append(" ");
-				Value<?>[] list = ((ListValue) args).value.toArray(new Value[]{});
+				KripValue<?>[] list = ((KripList) args).value.toArray(new KripValue[]{});
 				boolean isOptional = false;
 
-				for (Value<?> arg : list) {
-					if (!(arg instanceof StringValue)) return invalidType(arg, context);
+				for (KripValue<?> arg : list) {
+					if (!(arg instanceof KripString)) return invalidType(arg, context);
 					else if (arg.getValueString().equals(""))
 						return result.failure(new RuntimeError(arg.startPosition, arg.endPosition, "Argument name must not be empty", context));
 
 					String value = arg.getValueString();
 					if (value.endsWith("?")) {
 						isOptional = true;
-						((StringValue) arg).setValue(value.substring(0, value.length() - 1));
+						((KripString) arg).setValue(value.substring(0, value.length() - 1));
 						value = arg.getValueString();
 						customCommand.addOptionalArg(value);
 						builder.append("[").append(value).append("] ");
@@ -128,10 +128,10 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 
 			if (aliases != null) {
 				List<String> aliasStrings = new ArrayList<>();
-				Value<?>[] list = ((ListValue) aliases).value.toArray(new Value[]{});
+				KripValue<?>[] list = ((KripList) aliases).value.toArray(new KripValue[]{});
 
-				for (Value<?> alias : list) {
-					if (!(alias instanceof StringValue)) return invalidType(alias, context);
+				for (KripValue<?> alias : list) {
+					if (!(alias instanceof KripString)) return invalidType(alias, context);
 					else if (alias.getValueString().equals(""))
 						return result.failure(new RuntimeError(alias.startPosition, alias.endPosition, "Alias must not be empty", context));
 					aliasStrings.add(alias.getValueString());
@@ -167,6 +167,6 @@ public class RegisterCommandFunc extends BuiltInFunctionValue {
 			e.printStackTrace();
 		}
 
-		return result.success(new NullValue(context));
+		return result.success(new KripNull(context));
 	}
 }

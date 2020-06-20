@@ -11,28 +11,32 @@ import pt.kiko.krip.lang.values.*;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class BlockObj extends ObjectValue {
+public class BlockObj extends KripObject {
+
+	public Block block;
 
 	public BlockObj(@NotNull Block block, Context context) {
 		super(new HashMap<>(), context);
 
+		this.block = block;
+
 		value.put("location", new LocationObj(block.getLocation(), context));
-		value.put("type", new StringValue(block.getType().toString(), context));
-		value.put("destroy", new BuiltInFunctionValue("destroy", Collections.emptyList(), context) {
+		value.put("type", new KripString(block.getType().toString(), context));
+		value.put("destroy", new KripJavaFunction("destroy", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				block.breakNaturally();
-				return new RuntimeResult().success(new NullValue(context));
+				return new RuntimeResult().success(new KripNull(context));
 			}
 		});
 
-		value.put("setType", new BuiltInFunctionValue("setType", Collections.singletonList("material"), context) {
+		value.put("setType", new KripJavaFunction("setType", Collections.singletonList("material"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> materialName = context.symbolTable.get("material");
+				KripValue<?> materialName = context.symbolTable.get("material");
 
-				if (!(materialName instanceof StringValue)) return invalidType(materialName, context);
+				if (!(materialName instanceof KripString)) return invalidType(materialName, context);
 
 				Material material = Material.getMaterial(materialName.getValueString().replace(' ', '_').toUpperCase());
 
@@ -41,31 +45,37 @@ public class BlockObj extends ObjectValue {
 
 				block.setType(material);
 
-				BlockObj.this.value.put("type", new StringValue(material.toString(), context));
-				return result.success(new NullValue(context));
+				BlockObj.this.value.put("type", new KripString(material.toString(), context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("isEmpty", new BuiltInFunctionValue("isEmpty", Collections.emptyList(), context) {
+		value.put("isEmpty", new KripJavaFunction("isEmpty", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(block.isEmpty(), context));
+				return new RuntimeResult().success(new KripBoolean(block.isEmpty(), context));
 			}
 		});
 
-		value.put("isLiquid", new BuiltInFunctionValue("isLiquid", Collections.emptyList(), context) {
+		value.put("isLiquid", new KripJavaFunction("isLiquid", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(block.isLiquid(), context));
+				return new RuntimeResult().success(new KripBoolean(block.isLiquid(), context));
 			}
 		});
 
-		value.put("isPassable", new BuiltInFunctionValue("isPassable", Collections.emptyList(), context) {
+		value.put("isPassable", new KripJavaFunction("isPassable", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new BooleanValue(block.isPassable(), context));
+				return new RuntimeResult().success(new KripBoolean(block.isPassable(), context));
 			}
 		});
 	}
 
+	@Override
+	public RuntimeResult equal(KripValue<?> other) {
+		if (other instanceof BlockObj) {
+			return new RuntimeResult().success(new KripBoolean(block == ((BlockObj) other).block || block.equals(((BlockObj) other).block), context));
+		} else return new RuntimeResult().success(new KripBoolean(false, context));
+	}
 }

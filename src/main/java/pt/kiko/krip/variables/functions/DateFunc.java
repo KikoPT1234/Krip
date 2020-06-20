@@ -3,15 +3,15 @@ package pt.kiko.krip.variables.functions;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.NullValue;
-import pt.kiko.krip.lang.values.NumberValue;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripJavaFunction;
+import pt.kiko.krip.lang.values.KripNull;
+import pt.kiko.krip.lang.values.KripNumber;
+import pt.kiko.krip.lang.values.KripValue;
 import pt.kiko.krip.objects.DateObj;
 
 import java.util.Collections;
 
-public class DateFunc extends BuiltInFunctionValue {
+public class DateFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("Date", new DateFunc());
@@ -24,12 +24,12 @@ public class DateFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> time = context.symbolTable.get("time");
+		KripValue<?> time = context.symbolTable.get("time");
 
-		if (!(time instanceof NumberValue || time instanceof NullValue)) return invalidType(time, context);
+		if (!(time instanceof KripNumber || time instanceof KripNull)) return invalidType(time, context);
 
-		if (time instanceof NumberValue)
-			return result.success(new DateObj((long) (double) ((NumberValue) time).getValue(), context));
+		if (time instanceof KripNumber)
+			return result.success(new DateObj((long) (double) ((KripNumber) time).getValue(), context));
 		else return result.success(new DateObj(context));
 	}
 }

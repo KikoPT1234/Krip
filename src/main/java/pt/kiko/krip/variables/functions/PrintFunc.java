@@ -3,12 +3,12 @@ package pt.kiko.krip.variables.functions;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.NullValue;
+import pt.kiko.krip.lang.values.KripJavaFunction;
+import pt.kiko.krip.lang.values.KripNull;
 
 import java.util.Collections;
 
-public class PrintFunc extends BuiltInFunctionValue {
+public class PrintFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("print", new PrintFunc());
@@ -21,6 +21,6 @@ public class PrintFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		System.out.println(context.symbolTable.get("value").toString());
-		return new RuntimeResult().success(new NullValue(context));
+		return new RuntimeResult().success(new KripNull(context));
 	}
 }

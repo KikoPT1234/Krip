@@ -4,13 +4,13 @@ import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.StringValue;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripJavaFunction;
+import pt.kiko.krip.lang.values.KripString;
+import pt.kiko.krip.lang.values.KripValue;
 
 import java.util.Collections;
 
-public class ErrorFunc extends BuiltInFunctionValue {
+public class ErrorFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("Error", new ErrorFunc());
@@ -23,9 +23,9 @@ public class ErrorFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> details = context.symbolTable.get("details");
+		KripValue<?> details = context.symbolTable.get("details");
 
-		if (!(details instanceof StringValue)) return invalidType(details, context);
+		if (!(details instanceof KripString)) return invalidType(details, context);
 
 		return result.failure(new RuntimeError(startPosition, endPosition, details.getValueString(), context));
 	}

@@ -9,10 +9,7 @@ import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class OnlinePlayerObj extends LivingEntityObj {
@@ -23,245 +20,284 @@ public class OnlinePlayerObj extends LivingEntityObj {
 		super(player, context);
 
 		this.player = player;
-		value.put("name", new StringValue(player.getName(), context));
+		value.put("name", new KripString(player.getName(), context));
 
-		value.put("uuid", new StringValue(player.getUniqueId().toString(), context));
+		value.put("uuid", new KripString(player.getUniqueId().toString(), context));
 
-		value.put("ban", new BuiltInFunctionValue("ban", Collections.singletonList("reason"), context) {
+		value.put("ban", new KripJavaFunction("ban", Collections.singletonList("reason"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> reason = context.symbolTable.get("reason");
+				KripValue<?> reason = context.symbolTable.get("reason");
 
-				if (!(reason instanceof StringValue || reason instanceof NullValue))
+				if (!(reason instanceof KripString || reason instanceof KripNull))
 					return invalidType(reason, context);
 
 				BanEntry entry = Bukkit.getServer().getBanList(BanList.Type.NAME).addBan(player.getUniqueId().toString(), reason.getValueString(), null, null);
 				assert entry != null;
 				if (player.isOnline()) Objects.requireNonNull(player.getPlayer()).kickPlayer(entry.getReason());
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("unban", new BuiltInFunctionValue("unban", Collections.singletonList("reason"), context) {
+		value.put("unban", new KripJavaFunction("unban", Collections.singletonList("reason"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> reason = context.symbolTable.get("reason");
+				KripValue<?> reason = context.symbolTable.get("reason");
 
-				if (!(reason instanceof StringValue || reason instanceof NullValue))
+				if (!(reason instanceof KripString || reason instanceof KripNull))
 					return invalidType(reason, context);
 
 				Bukkit.getServer().getBanList(BanList.Type.NAME).pardon(player.getUniqueId().toString());
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("chat", new BuiltInFunctionValue("chat", Collections.singletonList("message"), context) {
+		value.put("chat", new KripJavaFunction("chat", Collections.singletonList("message"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> message = context.symbolTable.get("message");
+				KripValue<?> message = context.symbolTable.get("message");
 
-				if (!(message instanceof StringValue))
+				if (!(message instanceof KripString))
 					return invalidType(message, context);
 
 				player.chat(message.getValueString());
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("send", new BuiltInFunctionValue("send", Collections.singletonList("message"), context) {
+		value.put("send", new KripJavaFunction("send", Collections.singletonList("message"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> message = context.symbolTable.get("message");
+				KripValue<?> message = context.symbolTable.get("message");
 
-				if (!(message instanceof StringValue)) return invalidType(message, context);
+				if (!(message instanceof KripString)) return invalidType(message, context);
 
 				player.sendMessage(message.getValueString());
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("hasPermission", new BuiltInFunctionValue("hasPermission", Collections.singletonList("permission"), context) {
+		value.put("hasPermission", new KripJavaFunction("hasPermission", Collections.singletonList("permission"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> permission = context.symbolTable.get("permission");
+				KripValue<?> permission = context.symbolTable.get("permission");
 
-				if (!(permission instanceof StringValue))
+				if (!(permission instanceof KripString))
 					return invalidType(permission, context);
 
 				if (Krip.permission != null)
-					return result.success(new BooleanValue(Krip.permission.has(player, permission.getValueString()), context));
-				else return result.success(new BooleanValue(player.hasPermission(permission.toString()), context));
+					return result.success(new KripBoolean(Krip.permission.has(player, permission.getValueString()), context));
+				else return result.success(new KripBoolean(player.hasPermission(permission.toString()), context));
 			}
 		});
 
-		value.put("setDisplayName", new BuiltInFunctionValue("setDisplayName", Collections.singletonList("name"), context) {
+		value.put("setDisplayName", new KripJavaFunction("setDisplayName", Collections.singletonList("name"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> name = context.symbolTable.get("name");
+				KripValue<?> name = context.symbolTable.get("name");
 
-				if (!(name instanceof StringValue))
+				if (!(name instanceof KripString))
 					return invalidType(name, context);
 
 				player.setDisplayName(name.getValueString());
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
-		value.put("kick", new BuiltInFunctionValue("kick", Collections.singletonList("reason"), context) {
+		value.put("kick", new KripJavaFunction("kick", Collections.singletonList("reason"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> reason = context.symbolTable.get("reason");
+				KripValue<?> reason = context.symbolTable.get("reason");
 
-				if (!(reason instanceof StringValue || reason instanceof NullValue))
+				if (!(reason instanceof KripString || reason instanceof KripNull))
 					return invalidType(reason, context);
 
 				player.kickPlayer(reason.getValueString());
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
+			}
+		});
+
+		value.put("inventory", new PlayerInventoryObj(player.getInventory(), context));
+
+		value.put("getOpenInventory", new KripJavaFunction("getOpenInventories", Collections.emptyList(), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				KripObject object = new KripObject(new HashMap<>(), context);
+
+				object.set("top", new InventoryObj(player.getOpenInventory().getTopInventory(), player.getOpenInventory().getTitle(), context));
+				object.set("bottom", new InventoryObj(player.getOpenInventory().getBottomInventory(), null, context));
+
+				return new RuntimeResult().success(object);
+			}
+		});
+
+		value.put("openInventory", new KripJavaFunction("openInventory", Collections.singletonList("inventory"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				KripValue<?> inventory = context.symbolTable.get("inventory");
+
+				if (!(inventory instanceof InventoryObj)) return invalidType(inventory, context);
+
+				Bukkit.getScheduler().runTask(Krip.plugin, () -> player.openInventory(((InventoryObj) inventory).inventory));
+
+				return result.success(new KripNull(context));
+			}
+		});
+
+		value.put("closeInventory", new KripJavaFunction("closeInventory", Collections.emptyList(), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				Bukkit.getScheduler().runTask(Krip.plugin, player::closeInventory);
+
+				return new RuntimeResult().success(new KripNull(context));
 			}
 		});
 
 		if (Krip.permission != null && Krip.chat != null) {
-			value.put("addGroup", new BuiltInFunctionValue("addGroup", Collections.singletonList("group"), context) {
+			value.put("addGroup", new KripJavaFunction("addGroup", Collections.singletonList("group"), context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					RuntimeResult result = new RuntimeResult();
-					Value<?> group = context.symbolTable.get("group");
+					KripValue<?> group = context.symbolTable.get("group");
 
-					if (!(group instanceof StringValue)) return invalidType(group, context);
+					if (!(group instanceof KripString)) return invalidType(group, context);
 
 					Krip.permission.playerAddGroup(player, group.getValueString());
 
-					return result.success(new NullValue(context));
+					return result.success(new KripNull(context));
 				}
 			});
 
-			value.put("removeGroup", new BuiltInFunctionValue("removeGroup", Collections.singletonList("group"), context) {
+			value.put("removeGroup", new KripJavaFunction("removeGroup", Collections.singletonList("group"), context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					RuntimeResult result = new RuntimeResult();
-					Value<?> group = context.symbolTable.get("group");
+					KripValue<?> group = context.symbolTable.get("group");
 
-					if (!(group instanceof StringValue)) return invalidType(group, context);
+					if (!(group instanceof KripString)) return invalidType(group, context);
 
 					Krip.permission.playerRemoveGroup(player, group.getValueString());
 
-					return result.success(new NullValue(context));
+					return result.success(new KripNull(context));
 				}
 			});
 
-			value.put("hasGroup", new BuiltInFunctionValue("hasGroup", Collections.singletonList("group"), context) {
+			value.put("hasGroup", new KripJavaFunction("hasGroup", Collections.singletonList("group"), context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					RuntimeResult result = new RuntimeResult();
-					Value<?> group = context.symbolTable.get("group");
+					KripValue<?> group = context.symbolTable.get("group");
 
-					if (!(group instanceof StringValue)) return invalidType(group, context);
+					if (!(group instanceof KripString)) return invalidType(group, context);
 
-					return result.success(new BooleanValue(Krip.permission.playerInGroup(player, group.getValueString()), context));
+					return result.success(new KripBoolean(Krip.permission.playerInGroup(player, group.getValueString()), context));
 				}
 			});
 
-			value.put("addPermission", new BuiltInFunctionValue("addPermission", Collections.singletonList("permission"), context) {
+			value.put("addPermission", new KripJavaFunction("addPermission", Collections.singletonList("permission"), context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					RuntimeResult result = new RuntimeResult();
-					Value<?> permission = context.symbolTable.get("permission");
+					KripValue<?> permission = context.symbolTable.get("permission");
 
-					if (!(permission instanceof StringValue)) return invalidType(permission, context);
+					if (!(permission instanceof KripString)) return invalidType(permission, context);
 
 					Krip.permission.playerAdd(player, permission.getValueString());
 
-					return result.success(new NullValue(context));
+					return result.success(new KripNull(context));
 				}
 			});
 
-			value.put("removePermission", new BuiltInFunctionValue("removePermission", Collections.singletonList("permission"), context) {
+			value.put("removePermission", new KripJavaFunction("removePermission", Collections.singletonList("permission"), context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					RuntimeResult result = new RuntimeResult();
-					Value<?> permission = context.symbolTable.get("permission");
+					KripValue<?> permission = context.symbolTable.get("permission");
 
-					if (!(permission instanceof StringValue)) return invalidType(permission, context);
+					if (!(permission instanceof KripString)) return invalidType(permission, context);
 
 					Krip.permission.playerRemove(player, permission.getValueString());
 
-					return result.success(new NullValue(context));
+					return result.success(new KripNull(context));
 				}
 			});
 
-			value.put("getPrefix", new BuiltInFunctionValue("getPrefix", Collections.emptyList(), context) {
+			value.put("getPrefix", new KripJavaFunction("getPrefix", Collections.emptyList(), context) {
 				@Override
 				public RuntimeResult run(Context context) {
-					return new RuntimeResult().success(new StringValue(Krip.chat.getPlayerPrefix(player), context));
+					return new RuntimeResult().success(new KripString(Krip.chat.getPlayerPrefix(player), context));
 				}
 			});
 
-			value.put("setPrefix", new BuiltInFunctionValue("setPrefix", Collections.singletonList("prefix"), context) {
+			value.put("setPrefix", new KripJavaFunction("setPrefix", Collections.singletonList("prefix"), context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					RuntimeResult result = new RuntimeResult();
-					Value<?> prefix = context.symbolTable.get("prefix");
+					KripValue<?> prefix = context.symbolTable.get("prefix");
 
-					if (!(prefix instanceof StringValue)) return invalidType(prefix, context);
+					if (!(prefix instanceof KripString)) return invalidType(prefix, context);
 
 					Krip.chat.setPlayerPrefix(player, prefix.getValueString());
 
-					return result.success(new NullValue(context));
+					return result.success(new KripNull(context));
 				}
 			});
 
-			value.put("getSuffix", new BuiltInFunctionValue("getSuffix", Collections.emptyList(), context) {
+			value.put("getSuffix", new KripJavaFunction("getSuffix", Collections.emptyList(), context) {
 				@Override
 				public RuntimeResult run(Context context) {
-					return new RuntimeResult().success(new StringValue(Krip.chat.getPlayerSuffix(player), context));
+					return new RuntimeResult().success(new KripString(Krip.chat.getPlayerSuffix(player), context));
 				}
 			});
 
-			value.put("setSuffix", new BuiltInFunctionValue("setSuffix", Collections.singletonList("suffix"), context) {
+			value.put("setSuffix", new KripJavaFunction("setSuffix", Collections.singletonList("suffix"), context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					RuntimeResult result = new RuntimeResult();
-					Value<?> suffix = context.symbolTable.get("suffix");
+					KripValue<?> suffix = context.symbolTable.get("suffix");
 
-					if (!(suffix instanceof StringValue)) return invalidType(suffix, context);
+					if (!(suffix instanceof KripString)) return invalidType(suffix, context);
 
 					Krip.chat.setPlayerSuffix(player, suffix.getValueString());
 
-					return result.success(new NullValue(context));
+					return result.success(new KripNull(context));
 				}
 			});
 
-			value.put("getGroups", new BuiltInFunctionValue("getGroups", Collections.emptyList(), context) {
+			value.put("getGroups", new KripJavaFunction("getGroups", Collections.emptyList(), context) {
 				@Override
 				public RuntimeResult run(Context context) {
-					List<Value<?>> groups = Arrays.stream(Krip.permission.getPlayerGroups(player)).map(group -> new StringValue(group, context)).collect(Collectors.toList());
-					return new RuntimeResult().success(new ListValue(groups, context));
+					List<KripValue<?>> groups = Arrays.stream(Krip.permission.getPlayerGroups(player)).map(group -> new KripString(group, context)).collect(Collectors.toList());
+					return new RuntimeResult().success(new KripList(groups, context));
 				}
 			});
 
-			value.put("getGroup", new BuiltInFunctionValue("getGroup", Collections.singletonList("name"), context) {
+			value.put("getGroup", new KripJavaFunction("getGroup", Collections.singletonList("name"), context) {
 				@Override
 				public RuntimeResult run(Context context) {
 					RuntimeResult result = new RuntimeResult();
-					Value<?> name = context.symbolTable.get("name");
+					KripValue<?> name = context.symbolTable.get("name");
 
-					if (!(name instanceof StringValue)) return invalidType(name, context);
+					if (!(name instanceof KripString)) return invalidType(name, context);
 
 					if (!Krip.permission.playerInGroup(player, name.getValueString()))
-						return result.success(new NullValue(context));
+						return result.success(new KripNull(context));
 
-					return result.success(new StringValue(name.getValueString(), context));
+					return result.success(new KripString(name.getValueString(), context));
 				}
 			});
+
+
 		}
 	}
 

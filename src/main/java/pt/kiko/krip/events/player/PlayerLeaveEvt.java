@@ -4,7 +4,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerQuitEvent;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.KripEvent;
-import pt.kiko.krip.lang.values.ObjectValue;
+import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.objects.OnlinePlayerObj;
 
 import java.util.HashMap;
@@ -20,9 +20,9 @@ public class PlayerLeaveEvt extends KripEvent {
 	}
 
 	@Override
-	protected ObjectValue getEvent(Event event) {
+	protected KripObject getEvent(Event event) {
 		assert event instanceof PlayerQuitEvent;
-		ObjectValue eventObj = new ObjectValue(new HashMap<>(), Krip.context);
+		KripObject eventObj = new KripObject(new HashMap<>(), Krip.context);
 		eventObj.set("player", new OnlinePlayerObj(((PlayerQuitEvent) event).getPlayer(), Krip.context));
 		return eventObj;
 	}

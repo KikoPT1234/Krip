@@ -4,12 +4,12 @@ import org.bukkit.Bukkit;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.NullValue;
+import pt.kiko.krip.lang.values.KripJavaFunction;
+import pt.kiko.krip.lang.values.KripNull;
 
 import java.util.Collections;
 
-public class WarnFunc extends BuiltInFunctionValue {
+public class WarnFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("warn", new WarnFunc());
@@ -22,6 +22,6 @@ public class WarnFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		Bukkit.getLogger().warning(context.symbolTable.get("value").toString());
-		return new RuntimeResult().success(new NullValue(context));
+		return new RuntimeResult().success(new KripNull(context));
 	}
 }

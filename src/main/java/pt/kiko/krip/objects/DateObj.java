@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
-public class DateObj extends ObjectValue {
+public class DateObj extends KripObject {
 
 	public Date date;
 
@@ -16,20 +16,20 @@ public class DateObj extends ObjectValue {
 		super(new HashMap<>(), context);
 		date = new Date();
 
-		value.put("time", new NumberValue(date.getTime(), context));
+		value.put("time", new KripNumber(date.getTime(), context));
 
-		value.put("setTime", new BuiltInFunctionValue("setTime", Collections.singletonList("time"), context) {
+		value.put("setTime", new KripJavaFunction("setTime", Collections.singletonList("time"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> time = context.symbolTable.get("time");
+				KripValue<?> time = context.symbolTable.get("time");
 
-				if (!(time instanceof NumberValue)) return invalidType(time, context);
+				if (!(time instanceof KripNumber)) return invalidType(time, context);
 
-				date.setTime((long) (double) ((NumberValue) time).getValue());
-				DateObj.this.value.put("time", new NumberValue(date.getTime(), context));
+				date.setTime((long) (double) ((KripNumber) time).getValue());
+				DateObj.this.value.put("time", new KripNumber(date.getTime(), context));
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 
@@ -40,20 +40,20 @@ public class DateObj extends ObjectValue {
 		super(new HashMap<>(), context);
 		date = new Date(time);
 
-		value.put("time", new NumberValue(date.getTime(), context));
+		value.put("time", new KripNumber(date.getTime(), context));
 
-		value.put("setTime", new BuiltInFunctionValue("setTime", Collections.singletonList("time"), context) {
+		value.put("setTime", new KripJavaFunction("setTime", Collections.singletonList("time"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				Value<?> time = context.symbolTable.get("time");
+				KripValue<?> time = context.symbolTable.get("time");
 
-				if (!(time instanceof NumberValue)) return invalidType(time, context);
+				if (!(time instanceof KripNumber)) return invalidType(time, context);
 
-				date.setTime((long) (double) ((NumberValue) time).getValue());
-				DateObj.this.value.put("time", new NumberValue(date.getTime(), context));
+				date.setTime((long) (double) ((KripNumber) time).getValue());
+				DateObj.this.value.put("time", new KripNumber(date.getTime(), context));
 
-				return result.success(new NullValue(context));
+				return result.success(new KripNull(context));
 			}
 		});
 	}
@@ -61,5 +61,12 @@ public class DateObj extends ObjectValue {
 	@Override
 	public String toString() {
 		return date.toString();
+	}
+
+	@Override
+	public RuntimeResult equal(KripValue<?> other) {
+		if (other instanceof DateObj) {
+			return new RuntimeResult().success(new KripBoolean(date == ((DateObj) other).date || date.equals(((DateObj) other).date), context));
+		} else return new RuntimeResult().success(new KripBoolean(false, context));
 	}
 }

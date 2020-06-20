@@ -28,7 +28,7 @@ final public class Interpreter {
 	 * @return A RuntimeResult instance
 	 */
 	public static RuntimeResult visit(Node node, Context context) {
-		if (node == null) return new RuntimeResult().success(new NullValue(context));
+		if (node == null) return new RuntimeResult().success(new KripNull(context));
 		else if (node instanceof NumberNode) return visitNumberNode((NumberNode) node, context);
 		else if (node instanceof StringNode) return visitStringNode((StringNode) node, context);
 		else if (node instanceof ListNode) return visitListNode((ListNode) node, context);
@@ -51,97 +51,95 @@ final public class Interpreter {
 		else if (node instanceof ContinueNode) return visitContinueNode();
 		else if (node instanceof BreakNode) return visitBreakNode();
 		else if (node instanceof EmptyNode)
-			return new RuntimeResult().success(new NullValue(context).setPosition(node.startPosition, node.endPosition));
+			return new RuntimeResult().success(new KripNull(context).setPosition(node.startPosition, node.endPosition));
 		else
 			return new RuntimeResult().failure(new RuntimeError(node.startPosition, node.endPosition, "Unexpected node", context));
 	}
 
 	private static RuntimeResult visitNumberNode(@NotNull NumberNode node, Context context) {
-		return new RuntimeResult().success(new NumberValue(Double.parseDouble(node.token.value), context).setPosition(node.startPosition, node.endPosition));
+		return new RuntimeResult().success(new KripNumber(Double.parseDouble(node.token.value), context).setPosition(node.startPosition, node.endPosition));
 	}
 
 	private static RuntimeResult visitStringNode(@NotNull StringNode node, Context context) {
-		return new RuntimeResult().success(new StringValue(node.token.value, context).setPosition(node.startPosition, node.endPosition));
+		return new RuntimeResult().success(new KripString(node.token.value, context).setPosition(node.startPosition, node.endPosition));
 	}
 
 	private static RuntimeResult visitListNode(@NotNull ListNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		ArrayList<Value<?>> elements = new ArrayList<>();
-		Node[] nodes = {};
-		nodes = node.nodes.toArray(nodes);
+		ArrayList<KripValue<?>> elements = new ArrayList<>();
 
-		for (Node elementNode : nodes) {
-			Value<?> element = result.register(visit(elementNode, context));
+		for (Node elementNode : node.nodes) {
+			KripValue<?> element = result.register(visit(elementNode, context));
 			if (result.shouldReturn()) return result;
 			elements.add(element);
 		}
 
-		return result.success(new ListValue(elements, context).setPosition(node.startPosition, node.endPosition));
+		return result.success(new KripList(elements, context).setPosition(node.startPosition, node.endPosition));
 	}
 
 	private static RuntimeResult visitBinaryOperationNode(@NotNull BinaryOperationNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 
-		Value<?> left = result.register(visit(node.left, context));
+		KripValue<?> left = result.register(visit(node.left, context));
 		if (result.shouldReturn()) return result;
 
-		Value<?> right = result.register(visit(node.right, context));
+		KripValue<?> right = result.register(visit(node.right, context));
 		if (result.shouldReturn()) return result;
 
 		if (node.operationToken.matches(TokenTypes.PLUS)) {
-			Value<?> operationResult = result.register(left.plus(right));
+			KripValue<?> operationResult = result.register(left.plus(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.MINUS)) {
-			Value<?> operationResult = result.register(left.minus(right));
+			KripValue<?> operationResult = result.register(left.minus(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.MUL)) {
-			Value<?> operationResult = result.register(left.mul(right));
+			KripValue<?> operationResult = result.register(left.mul(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.DIV)) {
-			Value<?> operationResult = result.register(left.div(right));
+			KripValue<?> operationResult = result.register(left.div(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.POW)) {
-			Value<?> operationResult = result.register(left.pow(right));
+			KripValue<?> operationResult = result.register(left.pow(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.MOD)) {
-			Value<?> operationResult = result.register(left.mod(right));
+			KripValue<?> operationResult = result.register(left.mod(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.EE)) {
-			Value<?> operationResult = result.register(left.equal(right));
+			KripValue<?> operationResult = result.register(left.equal(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.NE)) {
-			Value<?> operationResult = result.register(left.notEquals(right));
+			KripValue<?> operationResult = result.register(left.notEquals(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.LT)) {
-			Value<?> operationResult = result.register(left.lessThan(right));
+			KripValue<?> operationResult = result.register(left.lessThan(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.LTE)) {
-			Value<?> operationResult = result.register(left.lessThanOrEqual(right));
+			KripValue<?> operationResult = result.register(left.lessThanOrEqual(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.GT)) {
-			Value<?> operationResult = result.register(left.greaterThan(right));
+			KripValue<?> operationResult = result.register(left.greaterThan(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.GTE)) {
-			Value<?> operationResult = result.register(left.greaterThanOrEqual(right));
+			KripValue<?> operationResult = result.register(left.greaterThanOrEqual(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.AND)) {
-			Value<?> operationResult = result.register(left.and(right));
+			KripValue<?> operationResult = result.register(left.and(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.OR)) {
-			Value<?> operationResult = result.register(left.or(right));
+			KripValue<?> operationResult = result.register(left.or(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else return left.illegalOperation(right);
@@ -149,57 +147,55 @@ final public class Interpreter {
 
 	private static RuntimeResult visitUnaryOperationNode(@NotNull UnaryOperationNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> value = result.register(visit(node.node, context)).setPosition(node.startPosition, node.endPosition);
+		KripValue<?> value = result.register(visit(node.node, context)).setPosition(node.startPosition, node.endPosition);
 		if (result.shouldReturn()) return result;
 
-		if (node.operationToken.matches(TokenTypes.MINUS)) return value.mul(new NumberValue(-1, context));
+		if (node.operationToken.matches(TokenTypes.MINUS)) return value.mul(new KripNumber(-1, context));
 		else if (node.operationToken.matches(TokenTypes.NOT))
-			return result.success(new BooleanValue(!value.isTrue(), context));
+			return result.success(new KripBoolean(!value.isTrue(), context));
 		else return result.success(value);
 	}
 
 	private static RuntimeResult visitIfNode(@NotNull IfNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Case[] cases = {};
-		cases = node.cases.toArray(cases);
 
-		for (Case ifCase : cases) {
+		for (Case ifCase : node.cases) {
 			Node condition = ifCase.condition;
 			Node body = ifCase.body;
 			boolean shouldReturnNull = !ifCase.isExpression;
 
-			Value<?> conditionValue = result.register(visit(condition, context));
+			KripValue<?> conditionValue = result.register(visit(condition, context));
 			if (result.shouldReturn()) return result;
 
 			if (conditionValue.isTrue()) {
-				Value<?> expressionValue = result.register(visit(body, context));
+				KripValue<?> expressionValue = result.register(visit(body, context));
 				if (result.shouldReturn()) return result;
 
-				return result.success(shouldReturnNull ? new NullValue(context) : expressionValue);
+				return result.success(shouldReturnNull ? new KripNull(context) : expressionValue);
 			}
 		}
 
 		if (node.elseCase != null) {
-			Value<?> elseValue = result.register(visit(node.elseCase.body, context));
+			KripValue<?> elseValue = result.register(visit(node.elseCase.body, context));
 			if (result.shouldReturn()) return result;
 
-			return result.success(node.elseCase.isExpression ? elseValue : new NullValue(context));
+			return result.success(node.elseCase.isExpression ? elseValue : new KripNull(context));
 		}
-		return result.success(new NullValue(context));
+		return result.success(new KripNull(context));
 	}
 
 	private static RuntimeResult visitObjectNode(@NotNull ObjectNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Map<String, Value<?>> valueObj = new HashMap<>();
-		ObjectValue objectValue = new ObjectValue(valueObj, context);
+		Map<String, KripValue<?>> valueObj = new HashMap<>();
+		KripObject objectValue = new KripObject(valueObj, context);
 
 		for (Map.Entry<String, Node> value : node.object.entrySet()) {
-			Value<?> objValue = result.register(visit(value.getValue(), context));
+			KripValue<?> objValue = result.register(visit(value.getValue(), context));
 			if (result.shouldReturn()) return result;
 
-			if (objValue instanceof BaseFunctionValue) {
-				((BaseFunctionValue) objValue).setThis(objectValue);
-				((BaseFunctionValue) objValue).setValue(value.getKey());
+			if (objValue instanceof KripBaseFunction) {
+				((KripBaseFunction) objValue).setThis(objectValue);
+				((KripBaseFunction) objValue).setValue(value.getKey());
 			}
 
 			valueObj.put(value.getKey(), objValue);
@@ -211,25 +207,25 @@ final public class Interpreter {
 
 	private static RuntimeResult visitObjectAccessNode(@NotNull ObjectAccessNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> object = result.register(visit(node.objectNode, context));
+		KripValue<?> object = result.register(visit(node.objectNode, context));
 		if (result.shouldReturn()) return result;
 
 		String key = node.keyToken != null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValueString();
 		Position startPosition = node.keyToken != null ? node.keyToken.startPosition : node.keyNode.startPosition;
 		Position endPosition = node.keyToken != null ? node.keyToken.endPosition : node.keyNode.endPosition;
-		Value<?> returnValue = null;
+		KripValue<?> returnValue = null;
 
-		if (object instanceof ObjectValue) {
+		if (object instanceof KripObject) {
 
 			if (result.shouldReturn()) return result;
 
-			returnValue = ((ObjectValue) object).get(key);
-		} else if (object instanceof ListValue) {
-			Value<?> keyValue = result.register(visit(node.keyNode, context));
+			returnValue = ((KripObject) object).get(key);
+		} else if (object instanceof KripList) {
+			KripValue<?> keyValue = result.register(visit(node.keyNode, context));
 			if (result.shouldReturn()) return result;
 
-			if (keyValue instanceof NumberValue) {
-				returnValue = ((ListValue) object).value.get(Integer.parseInt(keyValue.getValueString()));
+			if (keyValue instanceof KripNumber) {
+				returnValue = ((KripList) object).value.get(Integer.parseInt(keyValue.getValueString()));
 			}
 		}
 		if (returnValue == null) {
@@ -237,39 +233,39 @@ final public class Interpreter {
 			returnValue = object.prototype.get(key);
 		}
 
-		return result.success(returnValue != null ? returnValue.setPosition(startPosition, endPosition) : new NullValue(context).setPosition(startPosition, endPosition));
+		return result.success(returnValue != null ? returnValue.setPosition(startPosition, endPosition) : new KripNull(context).setPosition(startPosition, endPosition));
 	}
 
 	private static RuntimeResult visitObjectAssignNode(@NotNull ObjectAssignNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> object = result.register(visit(node.objectNode, context));
+		KripValue<?> object = result.register(visit(node.objectNode, context));
 		if (result.shouldReturn()) return result;
 
-		if (!(object instanceof ObjectValue || object instanceof ListValue))
+		if (!(object instanceof KripObject || object instanceof KripList))
 			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Not an object/list", context));
 
-		if (node.keyToken != null && object instanceof ListValue)
+		if (node.keyToken != null && object instanceof KripList)
 			return result.failure(new RuntimeError(node.keyToken.startPosition, node.keyToken.endPosition, "Not an object", context));
 
-		Value<?> value = result.register(visit(node.valueNode, context));
+		KripValue<?> value = result.register(visit(node.valueNode, context));
 		if (result.shouldReturn()) return result;
 
-		if (object instanceof ObjectValue) {
+		if (object instanceof KripObject) {
 			String key = node.keyNode == null ? node.keyToken.value : result.register(visit(node.keyNode, context)).getValueString();
 			if (result.shouldReturn()) return result;
 
-			if (value instanceof BaseFunctionValue) ((BaseFunctionValue) value).setValue(key);
-			((ObjectValue) object).set(key, value);
+			if (value instanceof KripBaseFunction) ((KripBaseFunction) value).setValue(key);
+			((KripObject) object).set(key, value);
 		} else {
-			Value<?> keyValue = result.register(visit(node.keyNode, context));
+			KripValue<?> keyValue = result.register(visit(node.keyNode, context));
 			if (result.shouldReturn()) return result;
 
-			if (!(keyValue instanceof NumberValue) || keyValue.getValueString().contains(".") || Integer.parseInt(keyValue.getValueString()) < 0 || Integer.parseInt(keyValue.getValueString()) > ((ListValue) object).value.size())
-				return result.success(new NullValue(context));
+			if (!(keyValue instanceof KripNumber) || keyValue.getValueString().contains(".") || Integer.parseInt(keyValue.getValueString()) < 0 || Integer.parseInt(keyValue.getValueString()) > ((KripList) object).value.size())
+				return result.success(new KripNull(context));
 
-			if (Integer.parseInt(keyValue.getValueString()) == ((ListValue) object).value.size())
-				((ListValue) object).value.add(value);
-			else ((ListValue) object).value.set(Integer.parseInt(keyValue.getValueString()), value);
+			if (Integer.parseInt(keyValue.getValueString()) == ((KripList) object).value.size())
+				((KripList) object).value.add(value);
+			else ((KripList) object).value.set(Integer.parseInt(keyValue.getValueString()), value);
 
 		}
 		return result.success(object);
@@ -278,7 +274,7 @@ final public class Interpreter {
 	private static RuntimeResult visitVarAccessNode(@NotNull VarAccessNode node, @NotNull Context context) {
 		RuntimeResult result = new RuntimeResult();
 		String varName = node.token.value;
-		Value<?> value = context.symbolTable.get(varName);
+		KripValue<?> value = context.symbolTable.get(varName);
 
 		if (value == null)
 			return result.failure(new RuntimeError(node.startPosition, node.endPosition, varName + " is not defined", context));
@@ -291,7 +287,7 @@ final public class Interpreter {
 		RuntimeResult result = new RuntimeResult();
 		String varName = node.token.value;
 
-		Value<?> value = result.register(visit(node.expression, context));
+		KripValue<?> value = result.register(visit(node.expression, context));
 		if (result.shouldReturn()) return result;
 
 		if (value == null)
@@ -311,7 +307,7 @@ final public class Interpreter {
 
 		String varName = node.token.value;
 
-		Value<?> value = result.register(visit(node.expression, context)).setPosition(node.token.startPosition, node.token.endPosition);
+		KripValue<?> value = result.register(visit(node.expression, context)).setPosition(node.token.startPosition, node.token.endPosition);
 		if (result.shouldReturn()) return result;
 
 		if (Krip.globals.containsKey(varName)) {
@@ -335,15 +331,15 @@ final public class Interpreter {
 
 	private static RuntimeResult visitForNode(@NotNull ForNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		List<Value<?>> elements = new ArrayList<>();
+		List<KripValue<?>> elements = new ArrayList<>();
 
-		Value<?> startValue = result.register(visit(node.startValueNode, context));
+		KripValue<?> startValue = result.register(visit(node.startValueNode, context));
 		if (result.shouldReturn()) return result;
 
-		Value<?> endValue = result.register(visit(node.endValueNode, context));
+		KripValue<?> endValue = result.register(visit(node.endValueNode, context));
 		if (result.shouldReturn()) return result;
 
-		if (!(startValue instanceof NumberValue && endValue instanceof NumberValue))
+		if (!(startValue instanceof KripNumber && endValue instanceof KripNumber))
 			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Not a number", context));
 
 		int i = Integer.parseInt(startValue.getValueString());
@@ -355,10 +351,10 @@ final public class Interpreter {
 		forContext.symbolTable = new SymbolTable(context.symbolTable);
 
 		while (i <= Integer.parseInt(endValue.getValueString())) {
-			forContext.symbolTable.set(node.varNameToken.value, new NumberValue(i, forContext), false);
+			forContext.symbolTable.set(node.varNameToken.value, new KripNumber(i, forContext), false);
 			i++;
 
-			Value<?> value = result.register(visit(node.bodyNode, forContext));
+			KripValue<?> value = result.register(visit(node.bodyNode, forContext));
 
 			if (result.shouldReturn() && !result.loopShouldContinue && !result.loopShouldBreak) return result;
 
@@ -368,15 +364,15 @@ final public class Interpreter {
 			elements.add(value);
 		}
 
-		return result.success(node.shouldReturnNull ? new NullValue(context) : new ListValue(elements, context).setPosition(node.startPosition, node.endPosition));
+		return result.success(node.shouldReturnNull ? new KripNull(context) : new KripList(elements, context).setPosition(node.startPosition, node.endPosition));
 	}
 
 	private static RuntimeResult visitWhileNode(@NotNull WhileNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		List<Value<?>> elements = new ArrayList<>();
+		List<KripValue<?>> elements = new ArrayList<>();
 
 		while (true) {
-			BooleanValue condition = (BooleanValue) result.register(visit(node.conditionNode, context));
+			KripBoolean condition = (KripBoolean) result.register(visit(node.conditionNode, context));
 			if (result.shouldReturn()) return result;
 
 			if (!condition.isTrue()) break;
@@ -384,7 +380,7 @@ final public class Interpreter {
 			Context whileContext = new Context("while loop", context);
 			whileContext.symbolTable = new SymbolTable(context.symbolTable);
 
-			Value<?> value = result.register(visit(node.bodyNode, whileContext));
+			KripValue<?> value = result.register(visit(node.bodyNode, whileContext));
 
 			if (result.shouldReturn() && !result.loopShouldContinue && !result.loopShouldBreak) return result;
 
@@ -393,7 +389,7 @@ final public class Interpreter {
 			elements.add(value);
 		}
 
-		return result.success(node.shouldReturnNull ? new NullValue(context) : new ListValue(elements, context).setPosition(node.startPosition, node.endPosition));
+		return result.success(node.shouldReturnNull ? new KripNull(context) : new KripList(elements, context).setPosition(node.startPosition, node.endPosition));
 	}
 
 	@Contract(pure = true)
@@ -406,7 +402,7 @@ final public class Interpreter {
 		List<String> argNames = new ArrayList<>();
 		node.argNameTokens.forEach((token) -> argNames.add(token.value));
 
-		Value<?> functionValue = new FunctionValue(functionName, body, argNames, node.shouldAutoReturn, context).setPosition(node.startPosition, node.endPosition);
+		KripValue<?> functionValue = new KripFunction(functionName, body, argNames, node.shouldAutoReturn, context).setPosition(node.startPosition, node.endPosition);
 
 		boolean success = true;
 		if (node.varNameToken != null) success = context.symbolTable.set(functionName, functionValue, false);
@@ -419,19 +415,19 @@ final public class Interpreter {
 	private static RuntimeResult visitCallNode(@NotNull CallNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 
-		Value<?> valueToCall = result.register(visit(node.nodeToCall, context));
+		KripValue<?> valueToCall = result.register(visit(node.nodeToCall, context));
 		if (result.shouldReturn()) return result;
 
-		if (!(valueToCall instanceof BaseFunctionValue))
+		if (!(valueToCall instanceof KripBaseFunction))
 			return result.failure(new RuntimeError(valueToCall.startPosition, valueToCall.endPosition, "Not a function", context));
 		valueToCall.setPosition(node.startPosition, node.endPosition);
 
 		Context callContext = new Context("<arguments>", context, node.startPosition);
 		callContext.symbolTable = new SymbolTable(context.symbolTable);
-		List<Value<?>> args = node.argNodes.stream().map(arg -> result.register(visit(arg, callContext))).collect(Collectors.toList());
+		List<KripValue<?>> args = node.argNodes.stream().map(arg -> result.register(visit(arg, callContext))).collect(Collectors.toList());
 		if (result.shouldReturn()) return result;
 
-		Value<?> returnValue = result.register(((BaseFunctionValue) valueToCall).execute(args, context));
+		KripValue<?> returnValue = result.register(((KripBaseFunction) valueToCall).execute(args, context));
 		if (result.shouldReturn()) return result;
 		returnValue.setContext(context).setPosition(node.startPosition, node.endPosition);
 
@@ -445,7 +441,7 @@ final public class Interpreter {
 
 		result.register(visit(node.tryNode, tryContext));
 		if (result.error != null) {
-			ErrorValue errorValue = new ErrorValue(result.error, node.startPosition, node.endPosition, context);
+			KripError errorValue = new KripError(result.error, node.startPosition, node.endPosition, context);
 
 			Context catchContext = new Context("<catch>", context);
 			catchContext.symbolTable = new SymbolTable(context.symbolTable);
@@ -466,12 +462,12 @@ final public class Interpreter {
 			if (result.shouldReturn()) return result;
 		}
 
-		return result.success(new NullValue(context));
+		return result.success(new KripNull(context));
 	}
 
 	private static RuntimeResult visitReturnNode(@NotNull ReturnNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> value = new NullValue(context);
+		KripValue<?> value = new KripNull(context);
 
 		if (node.nodeToReturn != null) {
 			value = result.register(visit(node.nodeToReturn, context));

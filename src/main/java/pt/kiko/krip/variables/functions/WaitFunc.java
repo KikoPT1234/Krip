@@ -4,14 +4,14 @@ import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
-import pt.kiko.krip.lang.values.BuiltInFunctionValue;
-import pt.kiko.krip.lang.values.NullValue;
-import pt.kiko.krip.lang.values.NumberValue;
-import pt.kiko.krip.lang.values.Value;
+import pt.kiko.krip.lang.values.KripJavaFunction;
+import pt.kiko.krip.lang.values.KripNull;
+import pt.kiko.krip.lang.values.KripNumber;
+import pt.kiko.krip.lang.values.KripValue;
 
 import java.util.Collections;
 
-public class WaitFunc extends BuiltInFunctionValue {
+public class WaitFunc extends KripJavaFunction {
 
 	static {
 		Krip.registerValue("wait", new WaitFunc());
@@ -24,11 +24,11 @@ public class WaitFunc extends BuiltInFunctionValue {
 	@Override
 	public RuntimeResult run(Context context) {
 		RuntimeResult result = new RuntimeResult();
-		Value<?> millis = context.symbolTable.get("millis");
+		KripValue<?> millis = context.symbolTable.get("millis");
 
-		if (!(millis instanceof NumberValue)) return invalidType(millis, context);
+		if (!(millis instanceof KripNumber)) return invalidType(millis, context);
 
-		double number = ((NumberValue) millis).getValue();
+		double number = ((KripNumber) millis).getValue();
 
 		if (number < 0 || Math.floor(number) != number)
 			return result.failure(new RuntimeError(millis.startPosition, millis.endPosition, "Number must be natural", context));
@@ -39,6 +39,6 @@ public class WaitFunc extends BuiltInFunctionValue {
 			return result.failure(new RuntimeError(startPosition, endPosition, "Error while waiting " + millis + " milliseconds: " + e.getMessage(), context));
 		}
 
-		return result.success(new NullValue(context));
+		return result.success(new KripNull(context));
 	}
 }

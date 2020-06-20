@@ -7,23 +7,23 @@ import pt.kiko.krip.lang.results.RuntimeResult;
 
 import java.util.List;
 
-abstract public class BaseFunctionValue extends Value<String> {
+abstract public class KripBaseFunction extends KripValue<String> {
 
 	public List<String> argNames;
 
-	public BaseFunctionValue(String name, List<String> argNames, Value<?> parent, Context context) {
+	public KripBaseFunction(String name, List<String> argNames, KripValue<?> parent, Context context) {
 		super(parent, context);
 		this.value = name;
 		this.argNames = argNames;
 	}
 
-	public BaseFunctionValue(String name, List<String> argNames, Context context) {
+	public KripBaseFunction(String name, List<String> argNames, Context context) {
 		super(context);
 		this.value = name;
 		this.argNames = argNames;
 	}
 
-	public void setThis(ObjectValue object) {
+	public void setThis(KripObject object) {
 		Context thisContext = generateNewContext();
 		thisContext.symbolTable.set("this", object, true);
 		context = thisContext;
@@ -35,13 +35,13 @@ abstract public class BaseFunctionValue extends Value<String> {
 		return newContext;
 	}
 
-	public RuntimeResult populateArgs(@NotNull List<String> argNames, List<Value<?>> args, Context context) {
+	public RuntimeResult populateArgs(@NotNull List<String> argNames, List<KripValue<?>> args, Context context) {
 		argNames.forEach((argName) -> {
 			int index = argNames.indexOf(argName);
-			Value<?> argValue = args.size() - 1 >= index ? args.get(index) : new NullValue(context);
+			KripValue<?> argValue = args.size() - 1 >= index ? args.get(index) : new KripNull(context);
 			context.symbolTable.set(argName, argValue, false);
 		});
-		return new RuntimeResult().success(new NullValue(context));
+		return new RuntimeResult().success(new KripNull(context));
 	}
 
 	@Override
@@ -55,21 +55,14 @@ abstract public class BaseFunctionValue extends Value<String> {
 	}
 
 	@Override
-	public RuntimeResult equal(Value<?> other) {
-		if (other instanceof BaseFunctionValue)
-			return new RuntimeResult().success(new BooleanValue(value.equals(other.getValueString()), context));
-		else return new RuntimeResult().success(new BooleanValue(false, context));
+	public RuntimeResult equal(KripValue<?> other) {
+		if (other instanceof KripBaseFunction) {
+			return new RuntimeResult().success(new KripBoolean(this == other || this.equals(other), context));
+		} else return new RuntimeResult().success(new KripBoolean(false, context));
 	}
 
 	@Override
-	public RuntimeResult notEquals(Value<?> other) {
-		if (other instanceof BaseFunctionValue)
-			return new RuntimeResult().success(new BooleanValue(!value.equals(other.getValueString()), context));
-		else return new RuntimeResult().success(new BooleanValue(true, context));
-	}
-
-	@Override
-	public RuntimeResult plus(Value<?> other) {
+	public RuntimeResult plus(KripValue<?> other) {
 		return illegalOperation(other);
 	}
 
@@ -78,5 +71,5 @@ abstract public class BaseFunctionValue extends Value<String> {
 
 	}
 
-	abstract public RuntimeResult execute(List<Value<?>> args, Context ctx);
+	abstract public RuntimeResult execute(List<KripValue<?>> args, Context ctx);
 }
