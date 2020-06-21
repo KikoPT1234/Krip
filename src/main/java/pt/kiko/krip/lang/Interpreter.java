@@ -227,7 +227,9 @@ final public class Interpreter {
 			if (keyValue instanceof KripNumber) {
 				returnValue = ((KripList) object).value.get(Integer.parseInt(keyValue.getValueString()));
 			}
-		}
+		} else if (object instanceof KripNull)
+			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Cannot read property '" + key + "' of null", context));
+
 		if (returnValue == null) {
 			object.makePrototype();
 			returnValue = object.prototype.get(key);
@@ -419,7 +421,7 @@ final public class Interpreter {
 		if (result.shouldReturn()) return result;
 
 		if (!(valueToCall instanceof KripBaseFunction))
-			return result.failure(new RuntimeError(valueToCall.startPosition, valueToCall.endPosition, "Not a function", context));
+			return result.failure(new RuntimeError(valueToCall.startPosition, valueToCall.endPosition, "Type '" + valueToCall.getType() + "' is not a function", context));
 		valueToCall.setPosition(node.startPosition, node.endPosition);
 
 		Context callContext = new Context("<arguments>", context, node.startPosition);

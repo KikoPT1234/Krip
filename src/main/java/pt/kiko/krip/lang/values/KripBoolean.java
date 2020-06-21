@@ -41,4 +41,9 @@ public class KripBoolean extends KripValue<Boolean> {
 	public void makePrototype() {
 
 	}
+
+	@Override
+	public String getType() {
+		return "boolean";
+	}
 }

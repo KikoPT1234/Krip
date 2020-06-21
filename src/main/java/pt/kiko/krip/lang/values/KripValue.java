@@ -140,6 +140,8 @@ abstract public class KripValue<T> implements Serializable {
 		return getValueString();
 	}
 
+	public abstract String getType();
+
 	/**
 	 * Shortcut for returning an illegal operation error
 	 *

@@ -71,5 +71,10 @@ abstract public class KripBaseFunction extends KripValue<String> {
 
 	}
 
+	@Override
+	public String getType() {
+		return "function";
+	}
+
 	abstract public RuntimeResult execute(List<KripValue<?>> args, Context ctx);
 }

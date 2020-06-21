@@ -153,4 +153,9 @@ public class KripList extends KripValue<List<KripValue<?>>> {
 			}
 		});
 	}
+
+	@Override
+	public String getType() {
+		return "list";
+	}
 }

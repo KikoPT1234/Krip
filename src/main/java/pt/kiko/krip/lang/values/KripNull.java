@@ -37,4 +37,9 @@ public class KripNull extends KripValue<String> {
 	public void makePrototype() {
 
 	}
+
+	@Override
+	public String getType() {
+		return "null";
+	}
 }

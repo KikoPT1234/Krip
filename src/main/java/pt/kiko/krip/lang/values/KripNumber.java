@@ -23,6 +23,11 @@ public class KripNumber extends KripValue<Double> {
 	}
 
 	@Override
+	public String getType() {
+		return "number";
+	}
+
+	@Override
 	public RuntimeResult plus(KripValue<?> other) {
 		if (other instanceof KripString)
 			return new RuntimeResult().success(new KripString(getValueString() + other.getValueString(), context));

@@ -54,6 +54,11 @@ public class KripString extends KripValue<String> {
 	}
 
 	@Override
+	public String getType() {
+		return "string";
+	}
+
+	@Override
 	public RuntimeResult plus(KripValue<?> other) {
 		if (other instanceof KripNull)
 			return new RuntimeResult().success(new KripString(getValueString() + "null", context));

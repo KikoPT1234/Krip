@@ -98,6 +98,53 @@ public class InventoryObj extends KripObject {
 			}
 		});
 
+		value.put("setItemInSlots", new KripJavaFunction("setItemInSlots", Arrays.asList("item", "slots"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				KripValue<?> item = context.symbolTable.get("item");
+				KripValue<?> slots = context.symbolTable.get("slots");
+
+				if (!(item instanceof ItemStackObj || item instanceof MaterialObj || item instanceof KripString))
+					return invalidType(item, context);
+				if (!(slots instanceof KripList)) return invalidType(slots, context);
+
+				ItemStack itemStack;
+
+				if (item instanceof ItemStackObj) itemStack = ((ItemStackObj) item).itemStack;
+				else if (item instanceof MaterialObj) itemStack = new ItemStack(((MaterialObj) item).material, 1);
+				else {
+					Material material = Material.getMaterial(item.getValueString());
+
+					if (material == null)
+						return result.failure(new RuntimeError(item.startPosition, item.endPosition, "Invalid material", context));
+
+					itemStack = new ItemStack(material, 1);
+				}
+
+				List<Integer> slotNumbers = new ArrayList<>();
+
+				for (KripValue<?> slot : ((KripList) slots).getValue()) {
+					if (!(slot instanceof KripNumber)) return invalidType(slot, context);
+					if (!((KripNumber) slot).isWhole())
+						return result.failure(new RuntimeError(slot.startPosition, slot.endPosition, "Slot number must be whole", context));
+
+					int slotNumber = (int) (double) ((KripNumber) slot).getValue();
+
+					if (slotNumbers.contains(slotNumber))
+						return result.failure(new RuntimeError(slot.startPosition, slot.endPosition, "Duplicate slot number", context));
+
+					slotNumbers.add(slotNumber);
+				}
+
+				for (int number : slotNumbers) {
+					inventory.setItem(number, itemStack);
+				}
+
+				return result.success(InventoryObj.this);
+			}
+		});
+
 		value.put("getStorageContents", new KripJavaFunction("getStorageContents", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {

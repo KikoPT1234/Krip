@@ -67,6 +67,11 @@ public class KripObject extends KripValue<Map<String, KripValue<?>>> {
 	}
 
 	@Override
+	public String getType() {
+		return "object";
+	}
+
+	@Override
 	public RuntimeResult equal(KripValue<?> other) {
 		if (other instanceof KripObject) {
 			return new RuntimeResult().success(new KripBoolean(value == other.getValue() || value.equals(other.getValue()), context));
