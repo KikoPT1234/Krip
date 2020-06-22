@@ -1,4 +1,4 @@
-package pt.kiko.krip.objects;
+package pt.kiko.krip.objects.player;
 
 import org.bukkit.BanEntry;
 import org.bukkit.BanList;

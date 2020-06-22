@@ -1,4 +1,4 @@
-package pt.kiko.krip.objects;
+package pt.kiko.krip.objects.material;
 
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;

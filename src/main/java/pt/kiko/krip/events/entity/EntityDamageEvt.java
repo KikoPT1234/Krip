@@ -4,7 +4,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -13,14 +12,14 @@ import pt.kiko.krip.KripEvent;
 import pt.kiko.krip.lang.values.KripNumber;
 import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.lang.values.KripString;
-import pt.kiko.krip.objects.BlockObj;
-import pt.kiko.krip.objects.EntityObj;
-import pt.kiko.krip.objects.LivingEntityObj;
-import pt.kiko.krip.objects.OnlinePlayerObj;
+import pt.kiko.krip.objects.entity.EntityObj;
+import pt.kiko.krip.objects.entity.LivingEntityObj;
+import pt.kiko.krip.objects.material.BlockObj;
+import pt.kiko.krip.objects.player.OnlinePlayerObj;
 
 import java.util.HashMap;
 
-public class EntityDamageEvt extends KripEvent {
+public class EntityDamageEvt extends KripEvent<EntityDamageEvent> {
 
 	static {
 		Krip.registerEvent(new EntityDamageEvt());
@@ -31,18 +30,17 @@ public class EntityDamageEvt extends KripEvent {
 	}
 
 	@Override
-	protected KripObject getEvent(Event event) {
-		assert event instanceof EntityDamageEvent;
+	protected KripObject getEvent(EntityDamageEvent event) {
 		KripObject eventObj = new KripObject(new HashMap<>(), Krip.context);
 
-		Entity entity = ((EntityDamageEvent) event).getEntity();
+		Entity entity = event.getEntity();
 		if (entity instanceof Player) eventObj.set("victim", new OnlinePlayerObj((Player) entity, Krip.context));
 		else if (entity instanceof LivingEntity)
 			eventObj.set("victim", new LivingEntityObj((LivingEntity) entity, Krip.context));
 		else eventObj.set("victim", new EntityObj(entity, Krip.context));
-		eventObj.set("cause", new KripString(((EntityDamageEvent) event).getCause().toString(), Krip.context));
-		eventObj.set("damage", new KripNumber(((EntityDamageEvent) event).getDamage(), Krip.context));
-		eventObj.set("finalDamage", new KripNumber(((EntityDamageEvent) event).getFinalDamage(), Krip.context));
+		eventObj.set("cause", new KripString(event.getCause().toString(), Krip.context));
+		eventObj.set("damage", new KripNumber(event.getDamage(), Krip.context));
+		eventObj.set("finalDamage", new KripNumber(event.getFinalDamage(), Krip.context));
 
 		if (event instanceof EntityDamageByEntityEvent) {
 			Entity attacker = ((EntityDamageByEntityEvent) event).getDamager();

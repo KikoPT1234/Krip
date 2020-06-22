@@ -8,6 +8,7 @@ import pt.kiko.krip.lang.values.KripBoolean;
 import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.lang.values.KripString;
 import pt.kiko.krip.lang.values.KripValue;
+import pt.kiko.krip.objects.player.OnlinePlayerObj;
 
 import java.util.HashMap;
 

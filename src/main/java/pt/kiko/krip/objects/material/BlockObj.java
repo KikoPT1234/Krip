@@ -1,4 +1,4 @@
-package pt.kiko.krip.objects;
+package pt.kiko.krip.objects.material;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -7,6 +7,7 @@ import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.LocationObj;
 
 import java.util.Collections;
 import java.util.HashMap;

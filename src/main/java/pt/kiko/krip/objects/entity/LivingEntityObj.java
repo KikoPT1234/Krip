@@ -1,4 +1,4 @@
-package pt.kiko.krip.objects;
+package pt.kiko.krip.objects.entity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
@@ -9,6 +9,7 @@ import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.LocationObj;
 
 import java.util.Arrays;
 import java.util.Collection;

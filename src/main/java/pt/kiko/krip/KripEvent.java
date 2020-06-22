@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-abstract public class KripEvent implements Listener {
+abstract public class KripEvent<T extends Event> implements Listener {
 
 	public String name;
 	public List<KripBaseFunction> functions = new ArrayList<>();
 	public Class<? extends Event> event;
 
-	public KripEvent(String name, Class<? extends Event> event) {
+	public KripEvent(String name, Class<T> event) {
 		this.name = name;
 		this.event = event;
 	}
@@ -27,7 +27,7 @@ abstract public class KripEvent implements Listener {
 		functions.add(function);
 	}
 
-	public void execute(Event event) {
+	public void execute(T event) {
 		KripObject eventObj = getEvent(event);
 		eventObj.set("isCancellable", new KripBoolean(event instanceof Cancellable, Krip.context));
 
@@ -55,6 +55,6 @@ abstract public class KripEvent implements Listener {
 		});
 	}
 
-	protected abstract KripObject getEvent(Event event);
+	protected abstract KripObject getEvent(T event);
 
 }

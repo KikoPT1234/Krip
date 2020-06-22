@@ -10,8 +10,8 @@ import pt.kiko.krip.lang.values.KripJavaFunction;
 import pt.kiko.krip.lang.values.KripNumber;
 import pt.kiko.krip.lang.values.KripString;
 import pt.kiko.krip.lang.values.KripValue;
-import pt.kiko.krip.objects.ItemStackObj;
-import pt.kiko.krip.objects.MaterialObj;
+import pt.kiko.krip.objects.material.ItemStackObj;
+import pt.kiko.krip.objects.material.MaterialObj;
 
 import java.util.Arrays;
 

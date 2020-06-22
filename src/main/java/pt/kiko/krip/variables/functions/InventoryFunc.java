@@ -8,7 +8,7 @@ import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
-import pt.kiko.krip.objects.InventoryObj;
+import pt.kiko.krip.objects.inventory.InventoryObj;
 
 import java.util.Arrays;
 

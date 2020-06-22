@@ -1,4 +1,4 @@
-package pt.kiko.krip.objects;
+package pt.kiko.krip.objects.inventory;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,6 +10,9 @@ import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.LocationObj;
+import pt.kiko.krip.objects.material.ItemStackObj;
+import pt.kiko.krip.objects.material.MaterialObj;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -98,11 +101,11 @@ public class InventoryObj extends KripObject {
 			}
 		});
 
-		value.put("setItemInSlots", new KripJavaFunction("setItemInSlots", Arrays.asList("item", "slots"), context) {
+		value.put("setItemInSlots", new KripJavaFunction("setItemInSlots", Arrays.asList("material", "slots"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				KripValue<?> item = context.symbolTable.get("item");
+				KripValue<?> item = context.symbolTable.get("material");
 				KripValue<?> slots = context.symbolTable.get("slots");
 
 				if (!(item instanceof ItemStackObj || item instanceof MaterialObj || item instanceof KripString))
@@ -202,11 +205,11 @@ public class InventoryObj extends KripObject {
 			}
 		});
 
-		value.put("setItem", new KripJavaFunction("setItem", Arrays.asList("item", "amount"), context) {
+		value.put("setItem", new KripJavaFunction("setItem", Arrays.asList("material", "amount"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				KripValue<?> item = context.symbolTable.get("item");
+				KripValue<?> item = context.symbolTable.get("material");
 				KripValue<?> amount = context.symbolTable.get("amount");
 				int itemAmt;
 
@@ -234,11 +237,11 @@ public class InventoryObj extends KripObject {
 			}
 		});
 
-		value.put("remove", new KripJavaFunction("remove", Collections.singletonList("item"), context) {
+		value.put("remove", new KripJavaFunction("remove", Collections.singletonList("material"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				KripValue<?> item = context.symbolTable.get("item");
+				KripValue<?> item = context.symbolTable.get("material");
 
 				if (!(item instanceof ItemStackObj || item instanceof MaterialObj || item instanceof KripString))
 					return invalidType(item, context);
@@ -291,11 +294,11 @@ public class InventoryObj extends KripObject {
 			}
 		});
 
-		value.put("all", new KripJavaFunction("all", Collections.singletonList("item"), context) {
+		value.put("all", new KripJavaFunction("all", Collections.singletonList("material"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				KripValue<?> item = context.symbolTable.get("item");
+				KripValue<?> item = context.symbolTable.get("material");
 
 				if (!(item instanceof ItemStackObj || item instanceof MaterialObj || item instanceof KripString))
 					return invalidType(item, context);
@@ -379,11 +382,11 @@ public class InventoryObj extends KripObject {
 			}
 		});
 
-		value.put("contains", new KripJavaFunction("contains", Arrays.asList("item", "amount"), context) {
+		value.put("contains", new KripJavaFunction("contains", Arrays.asList("material", "amount"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				KripValue<?> item = context.symbolTable.get("item");
+				KripValue<?> item = context.symbolTable.get("material");
 				KripValue<?> amount = context.symbolTable.get("amount");
 
 				if (!(item instanceof ItemStackObj || item instanceof MaterialObj || item instanceof KripString))
@@ -415,11 +418,11 @@ public class InventoryObj extends KripObject {
 			}
 		});
 
-		value.put("first", new KripJavaFunction("first", Collections.singletonList("item"), context) {
+		value.put("first", new KripJavaFunction("first", Collections.singletonList("material"), context) {
 			@Override
 			public RuntimeResult run(Context context) {
 				RuntimeResult result = new RuntimeResult();
-				KripValue<?> item = context.symbolTable.get("item");
+				KripValue<?> item = context.symbolTable.get("material");
 
 				if (!(item instanceof MaterialObj || item instanceof ItemStackObj || item instanceof KripString))
 					return invalidType(item, context);

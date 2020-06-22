@@ -53,6 +53,8 @@ public class RegisterCommandFunc extends KripJavaFunction {
 		KripValue<?> usage = null;
 		KripValue<?> args = null;
 		KripValue<?> aliases = null;
+		KripValue<?> executableBy = null;
+		KripValue<?> executorMessage = null;
 
 		if (info instanceof KripObject) {
 			KripObject infoObj = (KripObject) info;
@@ -63,6 +65,8 @@ public class RegisterCommandFunc extends KripJavaFunction {
 			usage = infoObj.get("usage");
 			args = infoObj.get("args");
 			aliases = infoObj.get("aliases");
+			executableBy = infoObj.get("executableBy");
+			executorMessage = infoObj.get("executorMessage");
 		}
 
 		if (description != null && !(description instanceof KripString)) return invalidType(description, context);
@@ -75,6 +79,8 @@ public class RegisterCommandFunc extends KripJavaFunction {
 
 		if (permissionMessage != null && !(permissionMessage instanceof KripString))
 			return invalidType(permissionMessage, context);
+		else if (permissionMessage != null && permission == null)
+			return result.failure(new RuntimeError(permissionMessage.startPosition, permissionMessage.endPosition, "Permission message must not be set without a permission", context));
 		else if (permissionMessage != null && permissionMessage.getValueString().equals(""))
 			return result.failure(new RuntimeError(permissionMessage.startPosition, permissionMessage.endPosition, "Description must not be empty", context));
 
@@ -86,12 +92,23 @@ public class RegisterCommandFunc extends KripJavaFunction {
 
 		if (aliases != null && !(aliases instanceof KripList)) return invalidType(aliases, context);
 
+		if (executableBy != null && !(executableBy instanceof KripString)) return invalidType(executableBy, context);
+		else if (executableBy != null && !executableBy.getValueString().equals("player") && !executableBy.getValueString().equals("console"))
+			return result.failure(new RuntimeError(executableBy.startPosition, executableBy.endPosition, "Executor must be either 'player' or 'console'", context));
+
+		if (executorMessage != null && !(executorMessage instanceof KripString))
+			return invalidType(executorMessage, context);
+		else if (executorMessage != null && executableBy == null)
+			return result.failure(new RuntimeError(executorMessage.startPosition, executorMessage.endPosition, "Executor message must not be set without an executor", context));
+		else if (executorMessage != null && executorMessage.getValueString().equals(""))
+			return result.failure(new RuntimeError(executorMessage.startPosition, executorMessage.endPosition, "Executor message must not be empty", context));
+
 		PluginCommand command = null;
 		try {
 			final Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
 			c.setAccessible(true);
 			command = c.newInstance(name.getValueString(), Krip.plugin);
-			CustomCommand customCommand = new CustomCommand(function, (KripList) args, command, context);
+			CustomCommand customCommand = new CustomCommand(function, (KripList) args, command, context, executableBy != null ? executableBy.getValueString() : null, executorMessage != null ? executorMessage.getValueString() : null);
 			if (description != null) command.setDescription(description.getValueString());
 			else command.setDescription("A Krip command");
 

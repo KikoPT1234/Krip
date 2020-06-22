@@ -10,9 +10,9 @@ import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.errors.RuntimeError;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
-import pt.kiko.krip.objects.OfflinePlayerObj;
-import pt.kiko.krip.objects.OnlinePlayerObj;
 import pt.kiko.krip.objects.WorldObj;
+import pt.kiko.krip.objects.player.OfflinePlayerObj;
+import pt.kiko.krip.objects.player.OnlinePlayerObj;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -1,10 +1,12 @@
-package pt.kiko.krip.objects;
+package pt.kiko.krip.objects.entity;
 
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.LocationObj;
+import pt.kiko.krip.objects.WorldObj;
 
 import java.util.Collections;
 import java.util.HashMap;

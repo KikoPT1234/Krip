@@ -1,4 +1,4 @@
-package pt.kiko.krip.objects;
+package pt.kiko.krip.objects.player;
 
 import org.bukkit.BanEntry;
 import org.bukkit.BanList;
@@ -8,6 +8,9 @@ import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.entity.LivingEntityObj;
+import pt.kiko.krip.objects.inventory.InventoryObj;
+import pt.kiko.krip.objects.inventory.PlayerInventoryObj;
 
 import java.util.*;
 import java.util.stream.Collectors;

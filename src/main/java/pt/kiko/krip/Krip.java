@@ -6,6 +6,7 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -42,7 +43,7 @@ public class Krip extends JavaPlugin {
 	public static Context context = new Context("<program>");
 	public static HashMap<String, KripValue<?>> globals = new HashMap<>();
 	public static Krip plugin;
-	public static Map<String, KripEvent> events = new HashMap<>();
+	public static Map<String, KripEvent<?>> events = new HashMap<>();
 	public static List<String> registeredNames = new ArrayList<>();
 	public static Map<String, String> commandNames = new HashMap<>();
 	public static SimpleCommandMap commandMap;
@@ -100,11 +101,12 @@ public class Krip extends JavaPlugin {
 		registeredNames.add(name);
 	}
 
-	public static void registerEvent(KripEvent kripEvent) {
+	@SuppressWarnings("unchecked")
+	public static <T extends Event> void registerEvent(KripEvent<T> kripEvent) {
 		events.put(kripEvent.name, kripEvent);
 		plugin.getServer().getPluginManager().registerEvent(kripEvent.event, kripEvent, EventPriority.NORMAL, (listener, event) -> {
 			if (!kripEvent.event.isInstance(event)) return;
-			kripEvent.execute(event);
+			kripEvent.execute((T) event);
 		}, plugin);
 	}
 

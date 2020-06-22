@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.material.BlockObj;
+import pt.kiko.krip.objects.player.OnlinePlayerObj;
 
 import java.util.Arrays;
 import java.util.Collections;

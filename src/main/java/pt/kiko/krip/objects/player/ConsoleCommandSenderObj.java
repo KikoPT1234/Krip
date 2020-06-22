@@ -1,4 +1,4 @@
-package pt.kiko.krip.objects;
+package pt.kiko.krip.objects.player;
 
 import org.bukkit.command.ConsoleCommandSender;
 import pt.kiko.krip.lang.Context;
