@@ -138,10 +138,10 @@ public class Lexer {
 		} else if (currentChar == '>') {
 			returnToken = makeGreaterThan();
 		} else if (currentChar == '&') {
-			returnToken = new Token(TokenTypes.AND, position);
+			returnToken = makeAnd();
 			advance();
 		} else if (currentChar == '|') {
-			returnToken = new Token(TokenTypes.OR, position);
+			returnToken = makeOr();
 			advance();
 		} else if (currentChar == '!') {
 			returnToken = makeNot();
@@ -157,6 +157,28 @@ public class Lexer {
 		} else error = new LexError(position, "Illegal character '" + currentChar + "'");
 
 		return returnToken;
+	}
+
+	private @NotNull Token makeAnd() {
+		Position startPosition = position;
+		advance();
+
+		if (currentChar == '&') {
+			Token token = new Token(TokenTypes.AND, startPosition, position);
+			advance();
+			return token;
+		} else return new Token(TokenTypes.BIT_AND, startPosition);
+	}
+
+	private @NotNull Token makeOr() {
+		Position startPosition = position;
+		advance();
+
+		if (currentChar == '|') {
+			Token token = new Token(TokenTypes.OR, startPosition, position);
+			advance();
+			return token;
+		} else return new Token(TokenTypes.BIT_OR, startPosition);
 	}
 
 	/**

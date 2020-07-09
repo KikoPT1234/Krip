@@ -341,7 +341,7 @@ public class Parser {
 			}
 		}
 
-		Node node = result.register(binaryOperation(this::comparisonExpression, new TokenTypes[]{TokenTypes.AND, TokenTypes.OR}));
+		Node node = result.register(binaryOperation(this::comparisonExpression, new TokenTypes[]{TokenTypes.AND, TokenTypes.OR, TokenTypes.BIT_AND, TokenTypes.BIT_OR}));
 		if (result.error != null) return result;
 
 		return result.success(node);
