@@ -1,31 +1,32 @@
 package pt.kiko.krip.lang.nodes;
 
-import pt.kiko.krip.lang.Token;
+import org.jetbrains.annotations.NotNull;
 
 public class ForNode extends Node {
 
-	public Token varNameToken;
-	public Node startValueNode;
-	public Node endValueNode;
-	public Node bodyNode;
+	public VarCreateNode declaration;
+	public Node condition;
+	public Node execution;
+	public Node statements;
 	public boolean shouldReturnNull;
 
-	public ForNode(Token varNameToken, Node startValueNode, Node endValueNode, Node bodyNode, boolean shouldReturnNull) {
-		super(varNameToken.startPosition, bodyNode.endPosition);
-		this.varNameToken = varNameToken;
-		this.startValueNode = startValueNode;
-		this.endValueNode = endValueNode;
-		this.bodyNode = bodyNode;
+	public ForNode(@NotNull VarCreateNode declaration, Node condition, Node execution, @NotNull Node statements, boolean shouldReturnNull) {
+		super(declaration.startPosition, statements.endPosition);
+
+		this.declaration = declaration;
+		this.condition = condition;
+		this.execution = execution;
+		this.statements = statements;
 		this.shouldReturnNull = shouldReturnNull;
 	}
 
 	@Override
 	public String toString() {
 		return "ForNode {\n" +
-				"varNameToken: " + varNameToken + "\n" +
-				"startValueNode: " + startValueNode + "\n" +
-				"endValueNode: " + endValueNode + "\n" +
-				"bodyNode: " + bodyNode + "\n" +
+				"declaration: " + declaration + "\n" +
+				"condition: " + condition + "\n" +
+				"execution: " + execution + "\n" +
+				"statements: " + statements + "\n" +
 				"shouldReturnNull: " + shouldReturnNull + "\n" +
 				'}';
 	}

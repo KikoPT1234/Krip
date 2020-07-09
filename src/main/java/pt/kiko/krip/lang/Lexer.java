@@ -78,13 +78,14 @@ public class Lexer {
 			if (currentChar == ';') {
 				Position startPosition = position.copy();
 				advance();
-				returnToken = new Token(TokenTypes.NEWLINE, startPosition);
-				if (String.valueOf(currentChar).equals("\n")) {
+				returnToken = new Token(TokenTypes.NEWLINE, ";", startPosition);
+				if (currentChar == '\n') {
 					advance();
+					returnToken = new Token(TokenTypes.NEWLINE, ";\n", startPosition, position);
 				}
 				return returnToken;
 			}
-			returnToken = new Token(TokenTypes.NEWLINE, position);
+			returnToken = new Token(TokenTypes.NEWLINE, "\n", position);
 			advance();
 		} else if (String.valueOf(currentChar).matches("\\s")) advance();
 		else if (Characters.letters.contains(String.valueOf(currentChar))) {

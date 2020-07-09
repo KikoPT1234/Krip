@@ -820,53 +820,53 @@ public class Parser {
 		result.registerAdvancement();
 		advance();
 
-		if (!currentToken.matches(TokenTypes.IDENTIFIER))
-			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Unexpected identifier"));
-
-		Token varNameToken = currentToken;
-		result.registerAdvancement();
-		advance();
-
-		if (!currentToken.matches(TokenTypes.EQ))
-			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '='"));
-
-		result.registerAdvancement();
-		advance();
-
-		Node startValue = result.register(expression());
+		Node declaration = result.register(expression());
 		if (result.error != null) return result;
 
-		if (!currentToken.matches(TokenTypes.KEYWORD, "to")) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected 'to'"));
+		if (!(declaration instanceof VarCreateNode))
+			return result.failure(new SyntaxError(declaration.startPosition, declaration.endPosition, "Not a variable declaration"));
+
+		if (!currentToken.matches(TokenTypes.NEWLINE, ";"))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ';'"));
 
 		result.registerAdvancement();
 		advance();
 
-		Node endValue = result.register(expression());
+		Node condition = result.register(expression());
 		if (result.error != null) return result;
 
-		if (!currentToken.matches(TokenTypes.RPAREN)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ')'"));
+		if (!currentToken.matches(TokenTypes.NEWLINE, ";"))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ';'"));
 
 		result.registerAdvancement();
 		advance();
+
+		Node execute = result.register(expression());
+		if (result.error != null) return result;
+
+		if (!currentToken.matches(TokenTypes.RPAREN))
+			return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected ')'"));
+
+		advance(result);
 
 		if (currentToken.matches(TokenTypes.LBRACKET)) {
 			result.registerAdvancement();
 			advance();
 
-			Node body = result.register(statements());
+			Node statements = result.register(statements());
 			if (result.error != null) return result;
 
-			if (!currentToken.matches(TokenTypes.RBRACKET)) return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
+			if (!currentToken.matches(TokenTypes.RBRACKET))
+				return result.failure(new SyntaxError(currentToken.startPosition, currentToken.endPosition, "Expected '}'"));
 
-			result.registerAdvancement();
 			advance();
 
-			return result.success(new ForNode(varNameToken, startValue, endValue, body, true));
+			return result.success(new ForNode((VarCreateNode) declaration, condition, execute, statements, true));
 		} else {
-			Node body = result.register(statement());
+			Node expression = result.register(expression());
 			if (result.error != null) return result;
 
-			return result.success(new ForNode(varNameToken, startValue, endValue, body, false));
+			return result.success(new ForNode((VarCreateNode) declaration, condition, execute, expression, false));
 		}
 	}
 

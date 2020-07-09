@@ -331,39 +331,33 @@ final public class Interpreter {
 		return result.success(value);
 	}
 
-	private static RuntimeResult visitForNode(@NotNull ForNode node, Context context) {
+	private static @NotNull RuntimeResult visitForNode(@NotNull ForNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
 		List<KripValue<?>> elements = new ArrayList<>();
 
-		KripValue<?> startValue = result.register(visit(node.startValueNode, context));
+		Context forContext1 = new Context("for loop", context);
+		forContext1.symbolTable = new SymbolTable(context.symbolTable);
+
+		result.register(visit(node.declaration, forContext1));
 		if (result.shouldReturn()) return result;
 
-		KripValue<?> endValue = result.register(visit(node.endValueNode, context));
-		if (result.shouldReturn()) return result;
+		while (true) {
+			KripValue<?> condition = result.register(visit(node.condition, forContext1));
+			if (result.shouldReturn()) return result;
+			if (!condition.isTrue()) break;
 
-		if (!(startValue instanceof KripNumber && endValue instanceof KripNumber))
-			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Not a number", context));
+			Context forContext2 = new Context("for loop", context);
+			forContext2.symbolTable = new SymbolTable(forContext1.symbolTable);
 
-		int i = Integer.parseInt(startValue.getValueString());
-
-		if (i > Integer.parseInt(endValue.getValueString()))
-			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "The start value mustn't be greater than the end value", context));
-
-		Context forContext = new Context("for loop", context);
-		forContext.symbolTable = new SymbolTable(context.symbolTable);
-
-		while (i <= Integer.parseInt(endValue.getValueString())) {
-			forContext.symbolTable.set(node.varNameToken.value, new KripNumber(i, forContext), false);
-			i++;
-
-			KripValue<?> value = result.register(visit(node.bodyNode, forContext));
-
-			if (result.shouldReturn() && !result.loopShouldContinue && !result.loopShouldBreak) return result;
+			KripValue<?> value = result.register(visit(node.statements, forContext2));
+			if (result.shouldReturn()) return result;
 
 			if (result.loopShouldContinue) continue;
 			if (result.loopShouldBreak) break;
-
 			elements.add(value);
+
+			result.register(visit(node.execution, forContext1));
+			if (result.shouldReturn()) return result;
 		}
 
 		return result.success(node.shouldReturnNull ? new KripNull(context) : new KripList(elements, context).setPosition(node.startPosition, node.endPosition));
@@ -374,7 +368,7 @@ final public class Interpreter {
 		List<KripValue<?>> elements = new ArrayList<>();
 
 		while (true) {
-			KripBoolean condition = (KripBoolean) result.register(visit(node.conditionNode, context));
+			KripValue<?> condition = result.register(visit(node.conditionNode, context));
 			if (result.shouldReturn()) return result;
 
 			if (!condition.isTrue()) break;

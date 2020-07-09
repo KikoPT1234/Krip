@@ -34,7 +34,6 @@ final public class Characters {
 			"else if",
 			"else",
 			"for",
-			"to",
 			"while",
 			"return",
 			"break",
