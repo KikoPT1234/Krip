@@ -1,9 +1,9 @@
 main: pt.kiko.krip.Krip
 name: Krip
-version: 0.2.0
-api-version: '1.15'
+version: 0.3.0
+api-version: '1.16'
 softdepend: [Vault]
 
 commands:
-  krip:
-    aliases: [kp]
+    krip:
+        aliases: [kp]
