@@ -118,6 +118,24 @@ public class KripNumber extends KripValue<Double> {
 	}
 
 	@Override
+	public RuntimeResult bitwiseAnd(KripValue<?> other) {
+		if (other instanceof KripNumber) {
+			KripNumber numberValue = (KripNumber) other;
+			if (!isWhole() || !((KripNumber) other).isWhole()) return illegalOperation(other);
+			return new RuntimeResult().success(new KripNumber((int) (double) value & (int) (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
+	}
+
+	@Override
+	public RuntimeResult bitwiseOr(KripValue<?> other) {
+		if (other instanceof KripNumber) {
+			KripNumber numberValue = (KripNumber) other;
+			if (!isWhole() || !((KripNumber) other).isWhole()) return illegalOperation(other);
+			return new RuntimeResult().success(new KripNumber((int) (double) value | (int) (double) numberValue.getValue(), context));
+		} else return illegalOperation(other);
+	}
+
+	@Override
 	public boolean isTrue() {
 		return value != 0;
 	}

@@ -291,6 +291,16 @@ abstract public class KripValue<T> implements Serializable {
 	}
 
 	/**
+	 * Bitwise and binary operation
+	 *
+	 * @param other The other value
+	 * @return The result
+	 */
+	public RuntimeResult bitwiseAnd(KripValue<?> other) {
+		return illegalOperation(other);
+	}
+
+	/**
 	 * Or binary operation
 	 *
 	 * @param other The other value
@@ -304,6 +314,16 @@ abstract public class KripValue<T> implements Serializable {
 		RuntimeResult result = equal(other);
 
 		return result.success(new KripBoolean(!((KripBoolean) result.value).getValue(), context));
+	}
+
+	/**
+	 * Bitwise or binary operation
+	 *
+	 * @param other The other value
+	 * @return The result
+	 */
+	public RuntimeResult bitwiseOr(KripValue<?> other) {
+		return illegalOperation(other);
 	}
 
 }

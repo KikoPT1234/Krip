@@ -138,8 +138,16 @@ final public class Interpreter {
 			KripValue<?> operationResult = result.register(left.and(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
+		} else if (node.operationToken.matches(TokenTypes.BIT_AND)) {
+			KripValue<?> operationResult = result.register(left.bitwiseAnd(right));
+			if (result.shouldReturn()) return result;
+			return result.success(operationResult.setContext(context));
 		} else if (node.operationToken.matches(TokenTypes.OR)) {
 			KripValue<?> operationResult = result.register(left.or(right));
+			if (result.shouldReturn()) return result;
+			return result.success(operationResult.setContext(context));
+		} else if (node.operationToken.matches(TokenTypes.BIT_OR)) {
+			KripValue<?> operationResult = result.register(left.bitwiseOr(right));
 			if (result.shouldReturn()) return result;
 			return result.success(operationResult.setContext(context));
 		} else return left.illegalOperation(right);

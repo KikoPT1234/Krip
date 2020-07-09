@@ -27,6 +27,13 @@ public class OnlinePlayerObj extends LivingEntityObj {
 
 		value.put("uuid", new KripString(player.getUniqueId().toString(), context));
 
+		value.put("hasPlayedBefore", new KripJavaFunction("hasPlayedBefore", Collections.emptyList(), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				return new RuntimeResult().success(new KripBoolean(player.hasPlayedBefore(), context));
+			}
+		});
+
 		value.put("ban", new KripJavaFunction("ban", Collections.singletonList("reason"), context) {
 			@Override
 			public RuntimeResult run(Context context) {

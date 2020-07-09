@@ -341,10 +341,14 @@ public class Parser {
 			}
 		}
 
-		Node node = result.register(binaryOperation(this::comparisonExpression, new TokenTypes[]{TokenTypes.AND, TokenTypes.OR}));
+		Node node = result.register(binaryOperation(this::bitwiseExpression, new TokenTypes[]{TokenTypes.AND, TokenTypes.OR}));
 		if (result.error != null) return result;
 
 		return result.success(node);
+	}
+
+	private ParseResult bitwiseExpression() {
+		return binaryOperation(this::comparisonExpression, new TokenTypes[]{TokenTypes.BIT_AND, TokenTypes.BIT_OR});
 	}
 
 	private ParseResult comparisonExpression() {
@@ -1078,5 +1082,13 @@ public class Parser {
 			left = new BinaryOperationNode(left, operationToken, right);
 		}
 		return result.success(left);
+	}
+
+	/**
+	 * Functional interface for a ParseResult
+	 */
+	@FunctionalInterface
+	public interface ParseRunnable {
+		ParseResult run();
 	}
 }
