@@ -326,4 +326,8 @@ abstract public class KripValue<T> implements Serializable {
 		return illegalOperation(other);
 	}
 
+	public RuntimeResult bitwiseNot() {
+		return illegalOperation(this);
+	}
+
 }

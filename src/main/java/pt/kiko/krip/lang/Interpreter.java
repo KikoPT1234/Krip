@@ -161,6 +161,7 @@ final public class Interpreter {
 		if (node.operationToken.matches(TokenTypes.MINUS)) return value.mul(new KripNumber(-1, context));
 		else if (node.operationToken.matches(TokenTypes.NOT))
 			return result.success(new KripBoolean(!value.isTrue(), context));
+		else if (node.operationToken.matches(TokenTypes.BIT_NOT)) return value.bitwiseNot();
 		else return result.success(value);
 	}
 

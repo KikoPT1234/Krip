@@ -154,6 +154,9 @@ public class Lexer {
 		} else if (currentChar == '.') {
 			returnToken = new Token(TokenTypes.PERIOD, position);
 			advance();
+		} else if (currentChar == '~') {
+			returnToken = new Token(TokenTypes.BIT_NOT, position);
+			advance();
 		} else error = new LexError(position, "Illegal character '" + currentChar + "'");
 
 		return returnToken;

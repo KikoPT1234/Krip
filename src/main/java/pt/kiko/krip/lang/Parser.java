@@ -367,6 +367,21 @@ public class Parser {
 			if (result.error != null) return result;
 			return result.success(new UnaryOperationNode(operationToken, node));
 		}
+		return bitwiseNotExpression();
+	}
+
+	private ParseResult bitwiseNotExpression() {
+		ParseResult result = new ParseResult();
+
+		if (currentToken.matches(TokenTypes.BIT_NOT)) {
+			Token token = currentToken;
+			result.registerAdvancement();
+			advance();
+
+			Node node = result.register(bitwiseNotExpression());
+			if (result.error != null) return result;
+			return result.success(new UnaryOperationNode(token, node));
+		}
 		return binaryOperation(this::term, new TokenTypes[]{TokenTypes.PLUS, TokenTypes.MINUS});
 	}
 

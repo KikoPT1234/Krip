@@ -32,6 +32,7 @@ public enum TokenTypes {
 	GTE,
 	ARROW,
 	NOT,
+	BIT_NOT,
 	IDENTIFIER,
 	KEYWORD,
 	COLON,

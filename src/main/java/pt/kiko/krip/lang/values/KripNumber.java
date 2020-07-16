@@ -136,6 +136,12 @@ public class KripNumber extends KripValue<Double> {
 	}
 
 	@Override
+	public RuntimeResult bitwiseNot() {
+		if (!isWhole()) return illegalOperation(this);
+		return new RuntimeResult().success(new KripNumber(~((int) (double) value), context));
+	}
+
+	@Override
 	public boolean isTrue() {
 		return value != 0;
 	}
