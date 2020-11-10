@@ -155,8 +155,9 @@ final public class Interpreter {
 
 	private static RuntimeResult visitUnaryOperationNode(@NotNull UnaryOperationNode node, Context context) {
 		RuntimeResult result = new RuntimeResult();
-		KripValue<?> value = result.register(visit(node.node, context)).setPosition(node.startPosition, node.endPosition);
+		KripValue<?> value = result.register(visit(node.node, context));
 		if (result.shouldReturn()) return result;
+		value.setPosition(node.startPosition, node.endPosition);
 
 		if (node.operationToken.matches(TokenTypes.MINUS)) return value.mul(new KripNumber(-1, context));
 		else if (node.operationToken.matches(TokenTypes.NOT))
@@ -234,7 +235,7 @@ final public class Interpreter {
 			if (result.shouldReturn()) return result;
 
 			if (keyValue instanceof KripNumber) {
-				returnValue = ((KripList) object).value.get(Integer.parseInt(keyValue.getValueString()));
+				returnValue = ((KripList) object).getValue().get(Integer.parseInt(keyValue.getValueString()));
 			}
 		} else if (object instanceof KripNull)
 			return result.failure(new RuntimeError(node.startPosition, node.endPosition, "Cannot read property '" + key + "' of null", context));
@@ -271,12 +272,12 @@ final public class Interpreter {
 			KripValue<?> keyValue = result.register(visit(node.keyNode, context));
 			if (result.shouldReturn()) return result;
 
-			if (!(keyValue instanceof KripNumber) || keyValue.getValueString().contains(".") || Integer.parseInt(keyValue.getValueString()) < 0 || Integer.parseInt(keyValue.getValueString()) > ((KripList) object).value.size())
+			if (!(keyValue instanceof KripNumber) || keyValue.getValueString().contains(".") || Integer.parseInt(keyValue.getValueString()) < 0 || Integer.parseInt(keyValue.getValueString()) > ((KripList) object).getValue().size())
 				return result.success(new KripNull(context));
 
-			if (Integer.parseInt(keyValue.getValueString()) == ((KripList) object).value.size())
-				((KripList) object).value.add(value);
-			else ((KripList) object).value.set(Integer.parseInt(keyValue.getValueString()), value);
+			if (Integer.parseInt(keyValue.getValueString()) == ((KripList) object).getValue().size())
+				((KripList) object).getValue().add(value);
+			else ((KripList) object).getValue().set(Integer.parseInt(keyValue.getValueString()), value);
 
 		}
 		return result.success(object);

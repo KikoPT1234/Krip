@@ -61,7 +61,7 @@ public class WorldObj extends KripObject {
             }
         });
 
-        value.put("setBlock", new KripJavaFunction("setBlock", Arrays.asList("x", "y", "z"), context) {
+        value.put("setBlock", new KripJavaFunction("setBlock", Arrays.asList("block", "x", "y", "z"), context) {
             @Override
             public RuntimeResult run(Context context) {
                 RuntimeResult result = new RuntimeResult();
@@ -94,7 +94,7 @@ public class WorldObj extends KripObject {
                     return result.success(new BlockObj(b, context));
                 } else {
                     assert y instanceof KripNumber;
-                    Block b = world.getBlockAt((int) (double) ((KripNumber) x).getValue(), (int) (double) ((KripNumber) y).getValue(), (int) (double) ((KripNumber) z).getValue());
+                    Block b = world.getBlockAt((int) Math.round(((KripNumber) x).getValue()), (int) Math.round(((KripNumber) y).getValue()), (int) Math.round(((KripNumber) z).getValue()));
                     b.setType(material);
                     return result.success(new BlockObj(b, context));
                 }

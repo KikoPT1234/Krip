@@ -3,7 +3,9 @@ package pt.kiko.krip.objects.player;
 import org.bukkit.BanEntry;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
@@ -13,6 +15,7 @@ import pt.kiko.krip.objects.WorldObj;
 import pt.kiko.krip.objects.entity.LivingEntityObj;
 import pt.kiko.krip.objects.inventory.InventoryObj;
 import pt.kiko.krip.objects.inventory.PlayerInventoryObj;
+import pt.kiko.krip.objects.material.BlockObj;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,6 +31,21 @@ public class OnlinePlayerObj extends LivingEntityObj {
 		value.put("name", new KripString(player.getName(), context));
 
 		value.put("uuid", new KripString(player.getUniqueId().toString(), context));
+
+		value.put("getTargetBlock", new KripJavaFunction("getTargetBlock", Collections.singletonList("maxDistance"), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				RuntimeResult result = new RuntimeResult();
+				KripValue<?> maxDistance = context.symbolTable.get("maxDistance");
+
+				if (!(maxDistance instanceof KripNumber)) return invalidType(maxDistance, context);
+
+				Block block = player.getTargetBlock((int) (double) ((KripNumber) maxDistance).getValue());
+
+				if (block == null) return result.success(new KripNull(context));
+				else return result.success(new BlockObj(block, context));
+			}
+		});
 
 		value.put("getLocation", new KripJavaFunction("getLocation", Collections.emptyList(), context) {
 			@Override
@@ -183,7 +201,7 @@ public class OnlinePlayerObj extends LivingEntityObj {
 		value.put("closeInventory", new KripJavaFunction("closeInventory", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				Bukkit.getScheduler().runTask(Krip.plugin, player::closeInventory);
+				Bukkit.getScheduler().runTask(Krip.plugin, (@NotNull Runnable) player::closeInventory);
 
 				return new RuntimeResult().success(new KripNull(context));
 			}
