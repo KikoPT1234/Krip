@@ -37,9 +37,15 @@ public class BlockObj extends KripObject {
 				RuntimeResult result = new RuntimeResult();
 				KripValue<?> materialName = context.symbolTable.get("material");
 
-				if (!(materialName instanceof KripString)) return invalidType(materialName, context);
+				if (!(materialName instanceof KripString || materialName instanceof MaterialObj))
+					return invalidType(materialName, context);
 
-				Material material = Material.getMaterial(materialName.getValueString().replace(' ', '_').toUpperCase());
+				Material material;
+				if (materialName instanceof KripString) {
+					material = Material.getMaterial(materialName.getValueString().replace(' ', '_').toUpperCase());
+				} else {
+					material = ((MaterialObj) materialName).material;
+				}
 
 				if (material == null)
 					return result.failure(new RuntimeError(startPosition, endPosition, "Material not found", context));

@@ -45,11 +45,7 @@ public class EntityDamageEvt extends KripEvent<EntityDamageEvent> {
 		if (event instanceof EntityDamageByEntityEvent) {
 			Entity attacker = ((EntityDamageByEntityEvent) event).getDamager();
 
-			if (attacker instanceof Player)
-				eventObj.set("attacker", new OnlinePlayerObj((Player) attacker, Krip.context));
-			else if (attacker instanceof LivingEntity)
-				eventObj.set("attacker", new LivingEntityObj((LivingEntity) attacker, Krip.context));
-			else eventObj.set("attacker", new EntityObj(attacker, Krip.context));
+			eventObj.set("attacker", Krip.getEntity(attacker, Krip.context));
 		} else if (event instanceof EntityDamageByBlockEvent) {
 			Block block = ((EntityDamageByBlockEvent) event).getDamager();
 			if (block != null) eventObj.set("block", new BlockObj(block, Krip.context));

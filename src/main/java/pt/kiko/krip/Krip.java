@@ -6,6 +6,7 @@ import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.Plugin;
@@ -13,6 +14,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.*;
 import pt.kiko.krip.lang.results.LexResult;
@@ -20,6 +22,8 @@ import pt.kiko.krip.lang.results.ParseResult;
 import pt.kiko.krip.lang.results.RunResult;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.KripValue;
+import pt.kiko.krip.objects.entity.*;
+import pt.kiko.krip.objects.player.OnlinePlayerObj;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -94,6 +98,22 @@ public class Krip extends JavaPlugin {
 			return result.failure(runtimeResult.error);
 		}
 		return result.success(runtimeResult.value);
+	}
+
+	@Contract("null, _ -> new")
+	public static @NotNull LivingEntityObj getLivingEntity(LivingEntity entity, Context context) {
+		if (entity instanceof Player) return new OnlinePlayerObj((Player) entity, context);
+		else if (entity instanceof Bat) return new BatObj((Bat) entity, context);
+		else if (entity instanceof Cat) return new CatObj((Cat) entity, context);
+		else if (entity instanceof Cow) return new CowObj((Cow) entity, context);
+		else if (entity instanceof Sheep) return new SheepObj((Sheep) entity, context);
+		else return new LivingEntityObj(entity, context);
+	}
+
+	@Contract("_, _ -> new")
+	public static @NotNull EntityObj getEntity(Entity entity, Context context) {
+		if (entity instanceof LivingEntity) return getLivingEntity((LivingEntity) entity, context);
+		else return new EntityObj(entity, context);
 	}
 
 	public static void registerValue(String name, KripValue<?> value) {

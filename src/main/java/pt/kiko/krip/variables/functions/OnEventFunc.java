@@ -8,13 +8,13 @@ import pt.kiko.krip.lang.values.*;
 
 import java.util.Arrays;
 
-public class onEventFunc extends KripJavaFunction {
+public class OnEventFunc extends KripJavaFunction {
 
 	static {
-		Krip.registerValue("onEvent", new onEventFunc());
+		Krip.registerValue("onEvent", new OnEventFunc());
 	}
 
-	public onEventFunc() {
+	public OnEventFunc() {
 		super("onEvent", Arrays.asList("eventName", "function"), Krip.context);
 	}
 

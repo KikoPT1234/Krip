@@ -25,17 +25,31 @@ public class EntityObj extends KripObject {
 		value.put("getLocation", new KripJavaFunction("getLocation", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new LocationObj(entity.getLocation(), context));
-			}
-		});
+                return new RuntimeResult().success(new LocationObj(entity.getLocation(), context));
+            }
+        });
 
-		value.put("getWorld", new KripJavaFunction("getWorld", Collections.emptyList(), context) {
-			@Override
-			public RuntimeResult run(Context context) {
-				return new RuntimeResult().success(new WorldObj(entity.getWorld(), context));
-			}
-		});
-	}
+        value.put("getWorld", new KripJavaFunction("getWorld", Collections.emptyList(), context) {
+            @Override
+            public RuntimeResult run(Context context) {
+                return new RuntimeResult().success(new WorldObj(entity.getWorld(), context));
+            }
+        });
+
+        value.put("getName", new KripJavaFunction("getName", Collections.emptyList(), context) {
+            @Override
+            public RuntimeResult run(Context context) {
+                return new RuntimeResult().success(new KripString(entity.getName(), context));
+            }
+        });
+
+        value.put("getCustomName", new KripJavaFunction("getCustomName", Collections.emptyList(), context) {
+            @Override
+            public RuntimeResult run(Context context) {
+                return new RuntimeResult().success(new KripString(entity.getCustomName(), context));
+            }
+        });
+    }
 
 	@Override
 	public RuntimeResult equal(KripValue<?> other) {

@@ -8,6 +8,8 @@ import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;
+import pt.kiko.krip.objects.LocationObj;
+import pt.kiko.krip.objects.WorldObj;
 import pt.kiko.krip.objects.entity.LivingEntityObj;
 import pt.kiko.krip.objects.inventory.InventoryObj;
 import pt.kiko.krip.objects.inventory.PlayerInventoryObj;
@@ -26,6 +28,20 @@ public class OnlinePlayerObj extends LivingEntityObj {
 		value.put("name", new KripString(player.getName(), context));
 
 		value.put("uuid", new KripString(player.getUniqueId().toString(), context));
+
+		value.put("getLocation", new KripJavaFunction("getLocation", Collections.emptyList(), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				return new RuntimeResult().success(new LocationObj(player.getLocation(), context));
+			}
+		});
+
+		value.put("getWorld", new KripJavaFunction("getWorld", Collections.emptyList(), context) {
+			@Override
+			public RuntimeResult run(Context context) {
+				return new RuntimeResult().success(new WorldObj(player.getWorld(), context));
+			}
+		});
 
 		value.put("hasPlayedBefore", new KripJavaFunction("hasPlayedBefore", Collections.emptyList(), context) {
 			@Override
