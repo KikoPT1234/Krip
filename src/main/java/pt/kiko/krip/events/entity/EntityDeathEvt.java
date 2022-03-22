@@ -4,7 +4,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.KripEvent;
+import pt.kiko.krip.events.KripEvent;
 import pt.kiko.krip.lang.values.KripNumber;
 import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.objects.entity.LivingEntityObj;

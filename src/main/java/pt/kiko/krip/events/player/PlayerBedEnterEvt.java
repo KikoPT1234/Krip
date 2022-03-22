@@ -3,7 +3,7 @@ package pt.kiko.krip.events.player;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.KripEvent;
+import pt.kiko.krip.events.KripEvent;
 import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.lang.values.KripString;
 import pt.kiko.krip.objects.material.BlockObj;

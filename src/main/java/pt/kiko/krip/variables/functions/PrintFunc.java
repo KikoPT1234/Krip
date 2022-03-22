@@ -1,5 +1,6 @@
 package pt.kiko.krip.variables.functions;
 
+import org.bukkit.Bukkit;
 import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
@@ -20,7 +21,7 @@ public class PrintFunc extends KripJavaFunction {
 
 	@Override
 	public RuntimeResult run(Context context) {
-		System.out.println(context.symbolTable.get("value").toString());
+		Bukkit.getLogger().info(context.symbolTable.get("value").toString());
 		return new RuntimeResult().success(new KripNull(context));
 	}
 }

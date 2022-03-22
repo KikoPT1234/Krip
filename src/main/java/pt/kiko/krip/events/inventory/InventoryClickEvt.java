@@ -5,7 +5,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.KripEvent;
+import pt.kiko.krip.events.KripEvent;
 import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.lang.values.KripString;
 import pt.kiko.krip.objects.inventory.InventoryObj;

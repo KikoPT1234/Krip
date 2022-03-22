@@ -1,6 +1,6 @@
 package pt.kiko.krip.lang.values;
 
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.ResultRunnable;
 import pt.kiko.krip.lang.results.RuntimeResult;

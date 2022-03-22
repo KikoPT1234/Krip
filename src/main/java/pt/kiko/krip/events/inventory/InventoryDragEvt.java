@@ -3,7 +3,7 @@ package pt.kiko.krip.events.inventory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.KripEvent;
+import pt.kiko.krip.events.KripEvent;
 import pt.kiko.krip.lang.values.KripList;
 import pt.kiko.krip.lang.values.KripNumber;
 import pt.kiko.krip.lang.values.KripObject;

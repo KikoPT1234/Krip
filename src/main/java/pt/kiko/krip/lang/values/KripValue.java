@@ -72,6 +72,7 @@ abstract public class KripValue<T> implements Serializable {
 				return new RuntimeResult().success(new KripString(KripValue.this.getValueString(), context));
 			}
 		});
+		prototype.set("__proto__", prototype);
 	}
 
 	/**

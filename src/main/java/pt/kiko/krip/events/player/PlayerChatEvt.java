@@ -2,7 +2,7 @@ package pt.kiko.krip.events.player;
 
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.KripEvent;
+import pt.kiko.krip.events.KripEvent;
 import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.objects.MessageObj;
 import pt.kiko.krip.objects.player.OnlinePlayerObj;

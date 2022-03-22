@@ -146,7 +146,7 @@ public class KripList extends KripValue<List<KripValue<?>>> {
 					KripValue<?> returnedValue = result.register(((KripBaseFunction) function).execute(Collections.singletonList(value), context));
 					if (result.shouldReturn()) return result;
 
-					if (returnedValue.isTrue()) return result.success(returnedValue);
+					if (returnedValue.isTrue()) return result.success(value);
 				}
 
 				return result.success(new KripNull(context));

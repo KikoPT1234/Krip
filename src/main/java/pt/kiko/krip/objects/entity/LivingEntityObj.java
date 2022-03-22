@@ -144,9 +144,8 @@ public class LivingEntityObj extends EntityObj {
 		value.put("kill", new KripJavaFunction("kill", Collections.emptyList(), context) {
 			@Override
 			public RuntimeResult run(Context context) {
-				while (!entity.isDead()) {
-					entity.damage(10000);
-				}
+				entity.damage(1000000000);
+				entity.setHealth(0.0);
 				return new RuntimeResult().success(new KripNull(context));
 			}
 		});

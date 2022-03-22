@@ -1,8 +1,9 @@
-package pt.kiko.krip;
+package pt.kiko.krip.events;
 
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
+import pt.kiko.krip.Krip;
 import pt.kiko.krip.lang.Context;
 import pt.kiko.krip.lang.results.RuntimeResult;
 import pt.kiko.krip.lang.values.*;

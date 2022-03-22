@@ -2,7 +2,7 @@ package pt.kiko.krip.events.inventory;
 
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.KripEvent;
+import pt.kiko.krip.events.KripEvent;
 import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.objects.inventory.InventoryObj;
 import pt.kiko.krip.objects.material.ItemStackObj;

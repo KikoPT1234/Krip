@@ -1,6 +1,6 @@
 package pt.kiko.krip.lang;
 
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the position of a piece of code in the file

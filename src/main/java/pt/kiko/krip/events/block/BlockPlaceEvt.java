@@ -2,7 +2,7 @@ package pt.kiko.krip.events.block;
 
 import org.bukkit.event.block.BlockPlaceEvent;
 import pt.kiko.krip.Krip;
-import pt.kiko.krip.KripEvent;
+import pt.kiko.krip.events.KripEvent;
 import pt.kiko.krip.lang.values.KripObject;
 import pt.kiko.krip.objects.material.BlockObj;
 import pt.kiko.krip.objects.player.OnlinePlayerObj;

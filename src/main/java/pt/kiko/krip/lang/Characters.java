@@ -16,12 +16,12 @@ final public class Characters {
 	/**
 	 * Letters
 	 */
-	static String letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	static String letters = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 	/**
 	 * Letters and digits (and '_')
 	 */
-	static String lettersDigits = digits + letters + "_";
+	static String lettersDigits = digits + letters;
 
 	/**
 	 * Array of keywords
